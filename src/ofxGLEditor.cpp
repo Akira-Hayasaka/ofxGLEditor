@@ -26,7 +26,7 @@ void ofxGLEditor::setup(string fontFile) {
 }
 
 void ofxGLEditor::keyPressed(int key) {
-	
+	   
 	bool alt = kmap.isAltDown();
 	bool shift = kmap.isShiftDown();
 	bool ctrl = kmap.isControlDown();
