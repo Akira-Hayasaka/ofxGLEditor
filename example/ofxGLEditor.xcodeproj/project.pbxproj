@@ -30,7 +30,6 @@
 		E4C2424810CC5A17004149E2 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E4C2424510CC5A17004149E2 /* Cocoa.framework */; };
 		E4C2424910CC5A17004149E2 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E4C2424610CC5A17004149E2 /* IOKit.framework */; };
 		E4EB6799138ADC1D00A09F29 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBAB23BE13894E4700AA2426 /* GLUT.framework */; };
-		E933D944149EF54400B1D6D2 /* ofxKeyMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E933D942149EF54400B1D6D2 /* ofxKeyMap.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -96,8 +95,6 @@
 		E4C2424610CC5A17004149E2 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = /System/Library/Frameworks/IOKit.framework; sourceTree = "<absolute>"; };
 		E4EB691F138AFCF100A09F29 /* CoreOF.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = CoreOF.xcconfig; path = ../../../libs/openFrameworksCompiled/project/osx/CoreOF.xcconfig; sourceTree = SOURCE_ROOT; };
 		E4EB6923138AFD0F00A09F29 /* Project.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Project.xcconfig; sourceTree = "<group>"; };
-		E933D942149EF54400B1D6D2 /* ofxKeyMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxKeyMap.cpp; sourceTree = "<group>"; };
-		E933D943149EF54400B1D6D2 /* ofxKeyMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxKeyMap.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -162,7 +159,6 @@
 		BB4B014C10F69532006C3DED /* addons */ = {
 			isa = PBXGroup;
 			children = (
-				E933D941149EF54400B1D6D2 /* ofxKeyMap */,
 				31FE1520143FC092001B2BAE /* ofxGLEditor */,
 			);
 			name = addons;
@@ -243,16 +239,6 @@
 				E4328143138ABC890047C5CB /* openFrameworksLib.xcodeproj */,
 			);
 			name = openFrameworks;
-			sourceTree = "<group>";
-		};
-		E933D941149EF54400B1D6D2 /* ofxKeyMap */ = {
-			isa = PBXGroup;
-			children = (
-				E933D942149EF54400B1D6D2 /* ofxKeyMap.cpp */,
-				E933D943149EF54400B1D6D2 /* ofxKeyMap.h */,
-			);
-			name = ofxKeyMap;
-			path = ../../ofxKeyMap;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -358,7 +344,6 @@
 				31FE15CC143FC093001B2BAE /* ofxGLEditor.cpp in Sources */,
 				31FE15CD143FC093001B2BAE /* PolyGlyph.cpp in Sources */,
 				31FE15CE143FC093001B2BAE /* Unicode.cpp in Sources */,
-				E933D944149EF54400B1D6D2 /* ofxKeyMap.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -21,6 +21,6 @@ public:
 	void gotMessage(ofMessage msg);
 	
 private:
-	ofxGLEditor ofeditor;
+	ofxGLEditor editor;
 		
 };

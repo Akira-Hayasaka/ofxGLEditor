@@ -5,9 +5,22 @@
  *  Created by Makira on 11/07/05.
  *  Copyright 2011 ・‥…―━━━―…‥・yesMAYBEno・‥…―━━━―…‥・. All rights reserved.
  *
+ *	Updated by Dan Wilcox <danomatika@gmail.com> 2012
  */
 
 #include "ofxGLEditor.h"
+
+#ifndef __APPLE__
+#include <GL/glut.h>
+#else
+#include <GLUT/glut.h>
+#endif
+
+ofxGLEditor::ofxGLEditor() {
+	bAltPressed = false;
+	bShiftPressed = false;
+	bControlPressed = false;
+}
 
 void ofxGLEditor::setup(string fontFile) {
 	
@@ -26,17 +39,23 @@ void ofxGLEditor::setup(string fontFile) {
 }
 
 void ofxGLEditor::keyPressed(int key) {
-	   
-	bool alt = kmap.isAltDown();
-	bool shift = kmap.isShiftDown();
-	bool ctrl = kmap.isControlDown();
+	
+	#ifdef TARGET_WIN32
+		bAltPressed = (bool) ((GetKeyState( VK_MENU ) & 0x80) > 0);
+		bShiftPressed = (bool) ((GetKeyState( VK_SHIFT ) & 0x80) > 0);
+		bControlPressed = (bool) ((GetKeyState( VK_CONTROL ) & 0x80) > 0);
+    #else
+		bAltPressed = (bool) (glutGetModifiers() & GLUT_ACTIVE_ALT);
+		bShiftPressed = (bool) (glutGetModifiers() & GLUT_ACTIVE_SHIFT);
+		bControlPressed = (bool) (glutGetModifiers() & GLUT_ACTIVE_CTRL);
+    #endif
 	
 	int mod = 0;
-	if (shift) {
+	if (bShiftPressed) {
 		mod = 1;
-	}else if (ctrl) {
+	}else if (bControlPressed) {
 		mod = 2;
-	}else if (alt) {
+	}else if (bAltPressed) {
 		mod = 4;
 	}
 	
@@ -52,7 +71,7 @@ void ofxGLEditor::keyPressed(int key) {
 		key = 0;
 	}
 	
-	if (alt && key == 'r') {
+	if (bAltPressed && key == 'r') {
 		int i = 0;
 		string script;
 		for (int i = 0; i < glEditor.size(); i++) {
@@ -60,35 +79,35 @@ void ofxGLEditor::keyPressed(int key) {
 			script += "\n";
 		}
 		ofNotifyEvent(doCompileEvent, script);
-	}else if (alt && key == 'b') {
+	}else if (bAltPressed && key == 'b') {
 		glEditor[currentEditor]->BlowupCursor();
-	}else if (alt && key == 'a') {
+	}else if (bAltPressed && key == 'a') {
 		glEditor[currentEditor]->ClearAllText();
-	}else if (alt && key == 'c') {
+	}else if (bAltPressed && key == 'c') {
 		copyToClipBoard();
-	}else if (alt && key == 'v') {
+	}else if (bAltPressed && key == 'v') {
 		pasteFromClipBoard();
-	}else if (alt && key == 's') {
+	}else if (bAltPressed && key == 's') {
 		saveToFile();
-	}else if (alt && key == 'd') {
+	}else if (bAltPressed && key == 'd') {
 		currentEditor = 1;
-	}else if (alt && key == '1') {
+	}else if (bAltPressed && key == '1') {
 		currentEditor = 1;
-	}else if (alt && key == '2') {
+	}else if (bAltPressed && key == '2') {
 		currentEditor = 2;
-	}else if (alt && key == '3') {
+	}else if (bAltPressed && key == '3') {
 		currentEditor = 3;
-	}else if (alt && key == '4') {
+	}else if (bAltPressed && key == '4') {
 		currentEditor = 4;
-	}else if (alt && key == '5') {
+	}else if (bAltPressed && key == '5') {
 		currentEditor = 5;
-	}else if (alt && key == '6') {
+	}else if (bAltPressed && key == '6') {
 		currentEditor = 6;
-	}else if (alt && key == '7') {
+	}else if (bAltPressed && key == '7') {
 		currentEditor = 7;
-	}else if (alt && key == '8') {
+	}else if (bAltPressed && key == '8') {
 		currentEditor = 8;
-	}else if (alt && key == '9') {
+	}else if (bAltPressed && key == '9') {
 		currentEditor = 9;
 	}
 	glEditor[currentEditor]->Handle(-1, key, special, 0, ofGetMouseX(), ofGetMouseY(), mod);
@@ -105,14 +124,6 @@ void ofxGLEditor::draw() {
 	ofPopMatrix();
 	ofPopView();
 	glDisable(GL_LIGHTING);
-	
-}
-
-bool ofxGLEditor::isAltPressed() {
-	
-	bool alt = kmap.isAltDown();
-	if (alt) return true;
-	return false;
 	
 }
 

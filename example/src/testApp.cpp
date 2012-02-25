@@ -3,7 +3,7 @@
 //--------------------------------------------------------------
 void testApp::setup(){
 	ofBackground(0);
-	ofeditor.setup();
+	editor.setup();
 
 	// if you have some script lang companion (e.g. ofxLua)	
 	//ofAddListener(ofeditor.doCompileEvent, this, &yourClass::yourListener);
@@ -12,7 +12,7 @@ void testApp::setup(){
 //--------------------------------------------------------------
 void testApp::update(){
     
-    if (ofGetKeyPressed(/*glutGetModifiers() & GLUT_ACTIVE_ALT*/OF_KEY_MODIFIER & OF_KEY_ALT)) {
+    if (editor.isAltPressed()) {
         cout << "alt pressed!" << endl;
     }    
     
@@ -20,17 +20,17 @@ void testApp::update(){
 
 //--------------------------------------------------------------
 void testApp::draw(){
-	ofeditor.draw();
+	editor.draw();
 }
 
 //--------------------------------------------------------------
 void testApp::keyPressed(int key){
-	bool alt = ofeditor.isAltPressed();
+	editor.keyPressed(key);
+	bool alt = editor.isAltPressed();
 	if (alt && key == 'f') {
 		ofToggleFullscreen();
-		ofeditor.reShape();
+		editor.reShape();
 	}
-	ofeditor.keyPressed(key);
 }
 //--------------------------------------------------------------
 void testApp::keyReleased(int key){}
