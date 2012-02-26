@@ -114,8 +114,20 @@ void ofxGLEditor::keyPressed(int key) {
 
 }
 
+void ofxGLEditor::setText( string & text , int nEditor ){
+
+    if ( nEditor == -1)
+        nEditor = currentEditor;
+    else 
+        nEditor++; 
+    
+    glEditor[nEditor]->SetText( string_to_wstring(text) );
+};
+string ofxGLEditor::getText(){
+    return wstring_to_string(glEditor[currentEditor]->GetAllText());
+};
+
 void ofxGLEditor::draw() {
-	
 	ofPushView();
 	ofPushMatrix();
 	ofPushStyle();
@@ -128,7 +140,6 @@ void ofxGLEditor::draw() {
 }
 
 void ofxGLEditor::reShape() {
-	
 	int w = (ofGetWindowMode() == OF_WINDOW)?ofGetWidth():ofGetScreenWidth();
 	int h = (ofGetWindowMode() == OF_WINDOW)?ofGetHeight():ofGetScreenHeight();
 	for (int i = 0; i < glEditor.size(); i++) {

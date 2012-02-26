@@ -23,21 +23,21 @@ public:
 	
 	ofxGLEditor();
 	
-	void setup(string fontFile = "fonts/DroidSansMono.ttf");
+	void setup(string fontFile = "DroidSansMono.ttf");
 	void keyPressed(int key);
 	void draw();	
 	void reShape();
 	void pasteFromClipBoard();
 	void copyToClipBoard();
 	void saveToFile();
-	
-	
-	vector<GLEditor*> glEditor;
-	int currentEditor;
-	ClipBoard clipBoard;
-	
-	ofEvent<string> doCompileEvent;
-	
+    
+    void setText( string & text, int nEditor = -1 );
+    
+    string getText();
+    int getCurrentEditor(){ return currentEditor - 1 ;};
+    
+    ofEvent<string> doCompileEvent;
+    
 	///
 	/// keep track of pressed modifer keys
 	///
@@ -49,7 +49,11 @@ public:
 	inline bool isControlPressed()	{return bControlPressed;}
 	
 private:
-
+    vector<GLEditor*> glEditor;
+	ClipBoard clipBoard;
+    
+    int currentEditor;
+    
 	bool bAltPressed;
 	bool bShiftPressed;
 	bool bControlPressed;
