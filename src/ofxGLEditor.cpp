@@ -72,11 +72,11 @@ void ofxGLEditor::keyPressed(int key){
 		bAltPressed = (bool) ((GetKeyState(VK_MENU) & 0x80) > 0);
 		bShiftPressed = (bool) ((GetKeyState(VK_SHIFT) & 0x80) > 0);
 		bControlPressed = (bool) ((GetKeyState(VK_CONTROL) & 0x80) > 0);
-    #else
+	#else
 		bAltPressed = (bool) (glutGetModifiers() & GLUT_ACTIVE_ALT);
 		bShiftPressed = (bool) (glutGetModifiers() & GLUT_ACTIVE_SHIFT);
 		bControlPressed = (bool) (glutGetModifiers() & GLUT_ACTIVE_CTRL);
-    #endif
+	#endif
 	
 	int mod = 0;
 	if(bShiftPressed){
@@ -151,7 +151,7 @@ void ofxGLEditor::setText(string text, int editor){
 	else
         editor--; 
     
-    glEditor[editor]->SetText(string_to_wstring(text));
+	glEditor[editor]->SetText(string_to_wstring(text));
 };
 
 //--------------------------------------------------------------

@@ -23,7 +23,6 @@
 
 /// a wrapper around the fluxus opengl text editor
 /// http://www.pawfal.org/fluxus/
-///
 class ofxGLEditor {
 
 public:
@@ -86,13 +85,13 @@ public:
 	///
 	/// set editor to 0 for the current editor
 	/// or an editor index from 1 - 9
-    void setText(string text, int nEditor = 0);
+	void setText(string text, int nEditor = 0);
     
 	/// get the contents of an editor
 	///
 	/// set editor to 0 for the current editor
 	/// or an editor index of 1 - 9
-    string getText(int editor = 0);
+	string getText(int editor = 0);
 	
 	/// clear the contents of an editor
 	void clearText(int editor = 0);
@@ -104,11 +103,11 @@ public:
 	void setCurrentEditor(int editor);
 	
 	/// get the index of the current editor, from 1 - 9
-    int getCurrentEditor();
+	int getCurrentEditor();
     
 	/// this event is triggered when ALT + r is pressed
 	/// returns the index of the current editor
-    ofEvent<int> runScriptEvent;
+	ofEvent<int> runScriptEvent;
 	
 	/// this event is triggered when ALT + s is pressed
 	/// returns the index of the current editor
@@ -131,10 +130,10 @@ private:
 
 	class Editor;
 	
-    vector<Editor*> glEditor;
+	vector<Editor*> glEditor;
 	ClipBoard clipBoard;
     
-    int currentEditor; ///< note: 0-9, while valid nums are 1 - 9
+	int currentEditor; ///< note: 0-9, while valid nums are 1 - 9
     
 	bool bAltPressed;
 	bool bShiftPressed;
