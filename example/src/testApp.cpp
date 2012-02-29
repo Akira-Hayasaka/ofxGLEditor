@@ -39,24 +39,6 @@ void testApp::keyPressed(int key){
 		ofToggleFullscreen();
 		editor.reShape();
 	}
-	
-	// change editors with the arrow keys
-	switch(key){
-		case OF_KEY_LEFT: {
-			int ed = editor.getCurrentEditor()-1;
-			if(ed > 0) {
-				editor.setCurrentEditor(ed);
-			}
-			break;
-		}
-		case OF_KEY_RIGHT: {
-			int ed = editor.getCurrentEditor()+1;
-			if(ed < editor.s_numEditors) {
-				editor.setCurrentEditor(ed);
-			}
-			break;
-		}
-	}
 }
 //--------------------------------------------------------------
 void testApp::keyReleased(int key){}
