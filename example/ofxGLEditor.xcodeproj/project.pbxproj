@@ -7,12 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		316FD0551432D9160083F156 /* icon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 316FD0531432D8FF0083F156 /* icon.icns */; };
-		31FE15CA143FC093001B2BAE /* ClipBoard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 31FE158D143FC093001B2BAE /* ClipBoard.cpp */; };
-		31FE15CB143FC093001B2BAE /* GLEditor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 31FE158F143FC093001B2BAE /* GLEditor.cpp */; };
-		31FE15CC143FC093001B2BAE /* ofxGLEditor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 31FE1591143FC093001B2BAE /* ofxGLEditor.cpp */; };
-		31FE15CD143FC093001B2BAE /* PolyGlyph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 31FE1593143FC093001B2BAE /* PolyGlyph.cpp */; };
-		31FE15CE143FC093001B2BAE /* Unicode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 31FE1595143FC093001B2BAE /* Unicode.cpp */; };
+		3011D84A14FA9168002D4755 /* ClipBoard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3011D83914FA9167002D4755 /* ClipBoard.cpp */; };
+		3011D84B14FA9168002D4755 /* GLEditor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3011D83B14FA9167002D4755 /* GLEditor.cpp */; };
+		3011D84C14FA9168002D4755 /* ofxGLEditor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3011D83D14FA9167002D4755 /* ofxGLEditor.cpp */; };
+		3011D84D14FA9168002D4755 /* PolyGlyph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3011D83F14FA9167002D4755 /* PolyGlyph.cpp */; };
+		3011D84E14FA9168002D4755 /* Unicode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3011D84114FA9167002D4755 /* Unicode.cpp */; };
 		BBAB23CB13894F3D00AA2426 /* GLUT.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = BBAB23BE13894E4700AA2426 /* GLUT.framework */; };
 		E4328149138ABC9F0047C5CB /* openFrameworksDebug.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E4328148138ABC890047C5CB /* openFrameworksDebug.a */; };
 		E45BE97B0E8CC7DD009D7055 /* AGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E45BE9710E8CC7DD009D7055 /* AGL.framework */; };
@@ -30,7 +29,6 @@
 		E4C2424810CC5A17004149E2 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E4C2424510CC5A17004149E2 /* Cocoa.framework */; };
 		E4C2424910CC5A17004149E2 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E4C2424610CC5A17004149E2 /* IOKit.framework */; };
 		E4EB6799138ADC1D00A09F29 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBAB23BE13894E4700AA2426 /* GLUT.framework */; };
-		E933D944149EF54400B1D6D2 /* ofxKeyMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E933D942149EF54400B1D6D2 /* ofxKeyMap.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -64,17 +62,16 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		316FD0531432D8FF0083F156 /* icon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = icon.icns; path = bin/data/icon.icns; sourceTree = "<group>"; };
-		31FE158D143FC093001B2BAE /* ClipBoard.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ClipBoard.cpp; sourceTree = "<group>"; };
-		31FE158E143FC093001B2BAE /* ClipBoard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ClipBoard.h; sourceTree = "<group>"; };
-		31FE158F143FC093001B2BAE /* GLEditor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GLEditor.cpp; sourceTree = "<group>"; };
-		31FE1590143FC093001B2BAE /* GLEditor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLEditor.h; sourceTree = "<group>"; };
-		31FE1591143FC093001B2BAE /* ofxGLEditor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxGLEditor.cpp; sourceTree = "<group>"; };
-		31FE1592143FC093001B2BAE /* ofxGLEditor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxGLEditor.h; sourceTree = "<group>"; };
-		31FE1593143FC093001B2BAE /* PolyGlyph.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PolyGlyph.cpp; sourceTree = "<group>"; };
-		31FE1594143FC093001B2BAE /* PolyGlyph.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PolyGlyph.h; sourceTree = "<group>"; };
-		31FE1595143FC093001B2BAE /* Unicode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Unicode.cpp; sourceTree = "<group>"; };
-		31FE1596143FC093001B2BAE /* Unicode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Unicode.h; sourceTree = "<group>"; };
+		3011D83914FA9167002D4755 /* ClipBoard.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ClipBoard.cpp; sourceTree = "<group>"; };
+		3011D83A14FA9167002D4755 /* ClipBoard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ClipBoard.h; sourceTree = "<group>"; };
+		3011D83B14FA9167002D4755 /* GLEditor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GLEditor.cpp; sourceTree = "<group>"; };
+		3011D83C14FA9167002D4755 /* GLEditor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLEditor.h; sourceTree = "<group>"; };
+		3011D83D14FA9167002D4755 /* ofxGLEditor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxGLEditor.cpp; sourceTree = "<group>"; };
+		3011D83E14FA9167002D4755 /* ofxGLEditor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxGLEditor.h; sourceTree = "<group>"; };
+		3011D83F14FA9167002D4755 /* PolyGlyph.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PolyGlyph.cpp; sourceTree = "<group>"; };
+		3011D84014FA9167002D4755 /* PolyGlyph.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PolyGlyph.h; sourceTree = "<group>"; };
+		3011D84114FA9167002D4755 /* Unicode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Unicode.cpp; sourceTree = "<group>"; };
+		3011D84214FA9167002D4755 /* Unicode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Unicode.h; sourceTree = "<group>"; };
 		BBAB23BE13894E4700AA2426 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = ../../../libs/glut/lib/osx/GLUT.framework; sourceTree = "<group>"; };
 		E4328143138ABC890047C5CB /* openFrameworksLib.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = openFrameworksLib.xcodeproj; path = ../../../libs/openFrameworksCompiled/project/osx/openFrameworksLib.xcodeproj; sourceTree = SOURCE_ROOT; };
 		E45BE9710E8CC7DD009D7055 /* AGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AGL.framework; path = /System/Library/Frameworks/AGL.framework; sourceTree = "<absolute>"; };
@@ -96,8 +93,6 @@
 		E4C2424610CC5A17004149E2 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = /System/Library/Frameworks/IOKit.framework; sourceTree = "<absolute>"; };
 		E4EB691F138AFCF100A09F29 /* CoreOF.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = CoreOF.xcconfig; path = ../../../libs/openFrameworksCompiled/project/osx/CoreOF.xcconfig; sourceTree = SOURCE_ROOT; };
 		E4EB6923138AFD0F00A09F29 /* Project.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Project.xcconfig; sourceTree = "<group>"; };
-		E933D942149EF54400B1D6D2 /* ofxKeyMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxKeyMap.cpp; sourceTree = "<group>"; };
-		E933D943149EF54400B1D6D2 /* ofxKeyMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxKeyMap.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -125,36 +120,28 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		316FD04B1432D8EB0083F156 /* resources */ = {
+		3011D82214FA9167002D4755 /* ofxGLEditor */ = {
 			isa = PBXGroup;
 			children = (
-				316FD0531432D8FF0083F156 /* icon.icns */,
-			);
-			name = resources;
-			sourceTree = "<group>";
-		};
-		31FE1520143FC092001B2BAE /* ofxGLEditor */ = {
-			isa = PBXGroup;
-			children = (
-				31FE158C143FC093001B2BAE /* src */,
+				3011D83814FA9167002D4755 /* src */,
 			);
 			name = ofxGLEditor;
 			path = ../../../addons/ofxGLEditor;
-			sourceTree = SOURCE_ROOT;
+			sourceTree = "<group>";
 		};
-		31FE158C143FC093001B2BAE /* src */ = {
+		3011D83814FA9167002D4755 /* src */ = {
 			isa = PBXGroup;
 			children = (
-				31FE158D143FC093001B2BAE /* ClipBoard.cpp */,
-				31FE158E143FC093001B2BAE /* ClipBoard.h */,
-				31FE158F143FC093001B2BAE /* GLEditor.cpp */,
-				31FE1590143FC093001B2BAE /* GLEditor.h */,
-				31FE1591143FC093001B2BAE /* ofxGLEditor.cpp */,
-				31FE1592143FC093001B2BAE /* ofxGLEditor.h */,
-				31FE1593143FC093001B2BAE /* PolyGlyph.cpp */,
-				31FE1594143FC093001B2BAE /* PolyGlyph.h */,
-				31FE1595143FC093001B2BAE /* Unicode.cpp */,
-				31FE1596143FC093001B2BAE /* Unicode.h */,
+				3011D83914FA9167002D4755 /* ClipBoard.cpp */,
+				3011D83A14FA9167002D4755 /* ClipBoard.h */,
+				3011D83B14FA9167002D4755 /* GLEditor.cpp */,
+				3011D83C14FA9167002D4755 /* GLEditor.h */,
+				3011D83D14FA9167002D4755 /* ofxGLEditor.cpp */,
+				3011D83E14FA9167002D4755 /* ofxGLEditor.h */,
+				3011D83F14FA9167002D4755 /* PolyGlyph.cpp */,
+				3011D84014FA9167002D4755 /* PolyGlyph.h */,
+				3011D84114FA9167002D4755 /* Unicode.cpp */,
+				3011D84214FA9167002D4755 /* Unicode.h */,
 			);
 			path = src;
 			sourceTree = "<group>";
@@ -162,8 +149,7 @@
 		BB4B014C10F69532006C3DED /* addons */ = {
 			isa = PBXGroup;
 			children = (
-				E933D941149EF54400B1D6D2 /* ofxKeyMap */,
-				31FE1520143FC092001B2BAE /* ofxGLEditor */,
+				3011D82214FA9167002D4755 /* ofxGLEditor */,
 			);
 			name = addons;
 			sourceTree = "<group>";
@@ -221,7 +207,6 @@
 				E4EEC9E9138DF44700A80321 /* openFrameworks */,
 				BB4B014C10F69532006C3DED /* addons */,
 				E45BE5980E8CC70C009D7055 /* frameworks */,
-				316FD04B1432D8EB0083F156 /* resources */,
 				E4B69B5B0A3A1756003C02F2 /* ofxGLEditorDebug.app */,
 			);
 			sourceTree = "<group>";
@@ -245,16 +230,6 @@
 			name = openFrameworks;
 			sourceTree = "<group>";
 		};
-		E933D941149EF54400B1D6D2 /* ofxKeyMap */ = {
-			isa = PBXGroup;
-			children = (
-				E933D942149EF54400B1D6D2 /* ofxKeyMap.cpp */,
-				E933D943149EF54400B1D6D2 /* ofxKeyMap.h */,
-			);
-			name = ofxKeyMap;
-			path = ../../ofxKeyMap;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -266,7 +241,6 @@
 				E4B69B590A3A1756003C02F2 /* Frameworks */,
 				E4B6FFFD0C3F9AB9008CF71C /* ShellScript */,
 				E4C2427710CC5ABF004149E2 /* CopyFiles */,
-				316FD05D1432D9210083F156 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -319,17 +293,6 @@
 		};
 /* End PBXReferenceProxy section */
 
-/* Begin PBXResourcesBuildPhase section */
-		316FD05D1432D9210083F156 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				316FD0551432D9160083F156 /* icon.icns in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXResourcesBuildPhase section */
-
 /* Begin PBXShellScriptBuildPhase section */
 		E4B6FFFD0C3F9AB9008CF71C /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -353,12 +316,11 @@
 			files = (
 				E4B69E200A3A1BDC003C02F2 /* main.cpp in Sources */,
 				E4B69E210A3A1BDC003C02F2 /* testApp.cpp in Sources */,
-				31FE15CA143FC093001B2BAE /* ClipBoard.cpp in Sources */,
-				31FE15CB143FC093001B2BAE /* GLEditor.cpp in Sources */,
-				31FE15CC143FC093001B2BAE /* ofxGLEditor.cpp in Sources */,
-				31FE15CD143FC093001B2BAE /* PolyGlyph.cpp in Sources */,
-				31FE15CE143FC093001B2BAE /* Unicode.cpp in Sources */,
-				E933D944149EF54400B1D6D2 /* ofxKeyMap.cpp in Sources */,
+				3011D84A14FA9168002D4755 /* ClipBoard.cpp in Sources */,
+				3011D84B14FA9168002D4755 /* GLEditor.cpp in Sources */,
+				3011D84C14FA9168002D4755 /* ofxGLEditor.cpp in Sources */,
+				3011D84D14FA9168002D4755 /* PolyGlyph.cpp in Sources */,
+				3011D84E14FA9168002D4755 /* Unicode.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -511,7 +473,7 @@
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_52)",
 				);
 				PREBINDING = NO;
-				PRODUCT_NAME = "$(TARGET_NAME)Debug";
+				PRODUCT_NAME = ofxGLEditorDebug;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -597,7 +559,7 @@
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_51)",
 				);
 				PREBINDING = NO;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = ofxGLEditor;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

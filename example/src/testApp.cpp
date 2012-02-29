@@ -3,34 +3,42 @@
 //--------------------------------------------------------------
 void testApp::setup(){
 	ofBackground(0);
-	ofeditor.setup();
+	ofSetFrameRate(30);
+	
+	// let's see what's going on inside
+	ofSetLogLevel("ofxGLEditor", OF_LOG_VERBOSE);
+	
+	// setup the editor with a font
+	editor.setup("fonts/DroidSansMono.ttf");
+	
+	// load a file into the current editor (1)
+	editor.loadFile("hello.txt");
 
-	// if you have some script lang companion (e.g. ofxLua)	
-	//ofAddListener(ofeditor.doCompileEvent, this, &yourClass::yourListener);
+	// add editor event listening
+	ofAddListener(editor.runScriptEvent, this, &testApp::runScriptEvent);
+	ofAddListener(editor.saveFileEvent, this, &testApp::saveFileEvent);
 }
 
 //--------------------------------------------------------------
-void testApp::update(){
-    
-    if (ofGetKeyPressed(/*glutGetModifiers() & GLUT_ACTIVE_ALT*/OF_KEY_MODIFIER & OF_KEY_ALT)) {
-        cout << "alt pressed!" << endl;
-    }    
-    
-}
+void testApp::update(){}
 
 //--------------------------------------------------------------
 void testApp::draw(){
-	ofeditor.draw();
+	editor.draw();
 }
 
 //--------------------------------------------------------------
 void testApp::keyPressed(int key){
-	bool alt = ofeditor.isAltPressed();
-	if (alt && key == 'f') {
+
+	// see ofxGLEditor.h for key commands
+	editor.keyPressed(key);
+	
+	// check for modifiers
+	bool alt = editor.isAltPressed();
+	if(alt && key == 'f'){
 		ofToggleFullscreen();
-		ofeditor.reShape();
+		editor.reShape();
 	}
-	ofeditor.keyPressed(key);
 }
 //--------------------------------------------------------------
 void testApp::keyReleased(int key){}
@@ -48,3 +56,19 @@ void testApp::windowResized(int w, int h){}
 void testApp::gotMessage(ofMessage msg){}
 //--------------------------------------------------------------
 void testApp::dragEvent(ofDragInfo dragInfo){}
+
+//--------------------------------------------------------------
+void testApp::runScriptEvent(int & whichEditor){
+	// received on editor ALT + r
+
+	// if you have some scripting language (e.g. ofxLua)
+	cout << "run script in editor " << whichEditor << endl;
+}
+
+//--------------------------------------------------------------
+void testApp::saveFileEvent(int & whichEditor){
+	// received on editor ALT + s
+	
+	cout << "save file from editor " << whichEditor << endl;
+	editor.saveFile(ofToString(whichEditor)+".txt", whichEditor, false);
+}

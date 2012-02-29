@@ -5,11 +5,14 @@
  *  Created by Makira on 11/07/09.
  *  Copyright 2011 ・‥…―━━━―…‥・yesMAYBEno・‥…―━━━―…‥・. All rights reserved.
  *
+ *	Updated by Dan Wilcox <danomatika@gmail.com> 2012
  */
 
 #include "ClipBoard.h"
 
-char* ClipBoard::getTextFromPasteboard() {  
+string ClipBoard::getText() {  
+	
+#ifdef TARGET_OSX
 	
     OSStatus             err = noErr;  
     ItemCount            itemCount;  
@@ -40,13 +43,21 @@ char* ClipBoard::getTextFromPasteboard() {
     }  
 	
 CantGetPasteboardItemCount:  
+    return (string) data;
 	
-    return data;  
+#else
+
+	ofLog(OF_LOG_WARNING, "ofxGLEditor: sorry, copying to the system clipboard is not supported on your OS yet");
+	return "";
+
+#endif	
 }  
 
 
-OSStatus ClipBoard::setTextToPasteboard(const char* byteArrayIndex) {  
+bool ClipBoard::setText(const string text) {  
 	
+#ifdef TARGET_OSX
+
     OSStatus                err = noErr;  
     static PasteboardRef    pasteboard = NULL;  
     PasteboardCreate( kPasteboardClipboard, &pasteboard );  
@@ -56,11 +67,24 @@ OSStatus ClipBoard::setTextToPasteboard(const char* byteArrayIndex) {
 	
     CFDataRef  data;  
 	
-    data = CFDataCreate(kCFAllocatorDefault, (UInt8*) byteArrayIndex, strlen(byteArrayIndex)+1);  
+    data = CFDataCreate(kCFAllocatorDefault, (UInt8*) text.c_str(), strlen(text.c_str())+1);  
     err = PasteboardPutItemFlavor( pasteboard, (PasteboardItemID)1, kUTTypeUTF8PlainText, data, 0);   
     require_noerr( err, PasteboardPutItemFlavor_FAILED );  
 	
-PasteboardPutItemFlavor_FAILED:   
-PasteboardClear_FAILED:  
-    return err;  
-}  
+	return true;
+	
+PasteboardPutItemFlavor_FAILED: 
+	ofLog(OF_LOG_ERROR, "ofxGLEditor: pasting from the pasteboard failed");
+	return false;
+	
+PasteboardClear_FAILED:
+	ofLog(OF_LOG_ERROR, "ofxGLEditor: clearing the cliboard failed");
+    return false;
+	
+#else
+	
+	ofLog(OF_LOG_WARNING, "ofxGLEditor: sorry, pasting from the system clipboard is not supported on your OS yet");
+	return true;
+
+#endif	
+}

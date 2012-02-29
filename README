@@ -6,35 +6,7 @@ http://www.pawfal.org/fluxus/
 clipboards are form here
 http://forum.openframeworks.cc/index.php?topic=2296.0
 
-ofxGLEditor needs ofxKeyMap
-http://forum.openframeworks.cc/index.php?topic=2034.0
-http://companje.nl/downloads/openframeworks/ofxKeyMap.zip
-
 and needs Monospaced font.
 
 USAGE:
-### testApp.h ###
-#include "ofxGLEditor.h"
-ofxGLEditor ofeditor;
-
-### testApp.cpp ###
-void testApp::setup(){
-	ofBackground(0);
-	ofeditor.setup();
-
-	// if you have some script lang companion (e.g. ofxLua)	
-	//ofAddListener(ofeditor.doCompileEvent, this, &yourClass::yourListener);
-}
-
-void testApp::draw(){
-	ofeditor.draw();
-}
-
-void testApp::keyPressed(int key){
-	bool alt = ofeditor.isAltPressed();
-	if (alt && key == 'f') {
-		ofToggleFullscreen();
-		ofeditor.reShape();
-	}
-	ofeditor.keyPressed(key);
-}
+	see the example testApp.h/.cpp
