@@ -20,7 +20,11 @@ public:
 	void dragEvent(ofDragInfo dragInfo);
 	void gotMessage(ofMessage msg);
 	
+	/// editor events
+	void runScriptEvent(int & whichEditor);
+	void saveFileEvent(int & whichEditor);
+	
 private:
-	ofxGLEditor ofeditor;
+	ofxGLEditor editor;
 		
 };

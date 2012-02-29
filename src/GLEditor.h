@@ -115,7 +115,7 @@ public:
 	static float m_EffectSwirlCenterY;
 	static float m_EffectSwirlRotation;
 
-//protected:
+protected:
 
 	void DrawCharBlock();
 	void DrawCursor();
