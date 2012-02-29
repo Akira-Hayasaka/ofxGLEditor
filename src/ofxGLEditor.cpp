@@ -226,6 +226,8 @@ void ofxGLEditor::draw(){
 	ofPopStyle();
 	ofPopMatrix();
 	ofPopView();
+	
+	glDisable(GL_LIGHTING);
 }
 
 //--------------------------------------------------------------
