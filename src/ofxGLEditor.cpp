@@ -45,10 +45,10 @@ bool ofxGLEditor::setup(string fontFile){
 	ofLogVerbose("ofxGLEditor") << "setting up with font \""
 		<< ofFilePath::getFileName(path) << "\"";
 	
-	GLEditor::InitFont(string_to_wstring(path));
-	GLEditor::m_DoEffects = true;
+	Editor::InitFont(string_to_wstring(path));
+	Editor::m_DoEffects = true;
 	for(int i = 1; i < s_numEditors; i++) {
-		GLEditor* editor = new GLEditor();
+		Editor* editor = new Editor();
 		glEditor.push_back(editor);
 	}
 	reShape();	
@@ -106,7 +106,7 @@ void ofxGLEditor::keyPressed(int key){
 	}else if(bAltPressed && key == 'b'){
 		glEditor[currentEditor]->BlowupCursor();
 	}else if(bAltPressed && key == 'a'){
-		glEditor[currentEditor]->ClearAllText();
+		clearText();
 	}else if(bAltPressed && key == 'c'){
 		copyToClipBoard();
 	}else if(bAltPressed && key == 'v'){
@@ -175,6 +175,30 @@ string ofxGLEditor::getText(int editor){
 };
 
 //--------------------------------------------------------------
+void ofxGLEditor::clearText(int editor){
+	if(editor < 0 || (editor - 1) >= glEditor.size()){
+		ofLogError("ofxGLEditor") << "cannot clear text in unknown editor " << editor;
+		return;
+	}
+	else if(editor == 0){
+		editor = currentEditor;
+	}
+	else
+		editor--;
+	
+	ofLogVerbose("ofxGLEditor") << "cleared text in editor" << currentEditor;
+	glEditor[editor]->ClearAllText();
+}
+
+//--------------------------------------------------------------
+void ofxGLEditor::clearAllText(){
+	for(int i = 1; i < glEditor.size(); i++) {
+		glEditor[i]->ClearAllText();
+	}
+	ofLogVerbose("ofxGLEditor") << "cleared text in all editors";
+}
+
+//--------------------------------------------------------------
 void ofxGLEditor::setCurrentEditor(int editor){
 	
 	if(editor < 0 && (editor - 1) >= glEditor.size()){
@@ -196,6 +220,7 @@ void ofxGLEditor::draw(){
 	ofPushMatrix();
 	ofPushStyle();
 	
+	glEditor[currentEditor]->RenderString(ofToString(currentEditor+1), 0, 0);
 	glEditor[currentEditor]->Render();
 	
 	ofPopStyle();
@@ -205,7 +230,6 @@ void ofxGLEditor::draw(){
 
 //--------------------------------------------------------------
 void ofxGLEditor::reShape(){
-
 	int w = (ofGetWindowMode() == OF_WINDOW)?ofGetViewportWidth():ofGetScreenWidth();
 	int h = (ofGetWindowMode() == OF_WINDOW)?ofGetViewportHeight():ofGetScreenHeight();
 	for(int i = 0; i < glEditor.size(); i++){
@@ -215,19 +239,12 @@ void ofxGLEditor::reShape(){
 
 //--------------------------------------------------------------
 void ofxGLEditor::pasteFromClipBoard(){
-	
-	wstring m_CopyBuffer = string_to_wstring(clipBoard.getText());
-	glEditor[currentEditor]->m_Text.insert(glEditor[currentEditor]->m_Position, m_CopyBuffer);
-	glEditor[currentEditor]->m_Selection = false;
-	glEditor[currentEditor]->m_Position += m_CopyBuffer.size();	
-	glEditor[currentEditor]->ProcessTabs();
+	glEditor[currentEditor]->InsertText(clipBoard.getText());
 }
 
 //--------------------------------------------------------------
 void ofxGLEditor::copyToClipBoard(){
-	
-	string text = wstring_to_string(glEditor[currentEditor]->GetText());
-	clipBoard.setText(text);
+	clipBoard.setText(wstring_to_string(glEditor[currentEditor]->GetText()));
 }
 
 //--------------------------------------------------------------
@@ -292,3 +309,79 @@ bool ofxGLEditor::saveFile(string filename, int editor, bool addTimestamp){
 		
 	return true;
 }
+
+// EDITOR
+
+//--------------------------------------------------------------
+void ofxGLEditor::Editor::InsertText(const string& s) {
+	m_CopyBuffer = string_to_wstring(s);
+	m_Text.insert(m_Position, m_CopyBuffer);
+	m_Selection = false;
+	m_Position += m_CopyBuffer.size();	
+	ProcessTabs();
+}
+
+//--------------------------------------------------------------
+void ofxGLEditor::Editor::RenderString(const string& s, float x, float y, ofFloatColor color) {
+	wstring text = string_to_wstring(s);
+	
+	// the gl stuff is from GLEditor::render()
+	
+	glViewport(0, 0, m_Width,m_Height);
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	glOrtho(-50, 50, -37.5, 37.5, 0, 10);
+
+	glMatrixMode(GL_MODELVIEW);
+	glDisable(GL_TEXTURE_2D);
+
+
+	glPushMatrix();
+	glDisable(GL_LIGHTING);
+	glDisable(GL_DEPTH_TEST);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glPolygonMode(GL_FRONT, GL_FILL);
+
+	glLoadIdentity();
+	
+	// magic numbers wee!
+	// kind of wonky but works ...
+	glTranslatef(-50, 35.65, 0);
+	glScalef(0.0005f, 0.0005f, 1);
+
+	glPushMatrix();
+	
+	// draw char by char
+	float xPos = x * 200, yPos = -y * 200; //< more magic nums here
+	for(int i = 0; i < text.size(); ++i) {
+	
+		// new line?
+		if(text[i] == '\n') {
+			glPopMatrix();
+			glPushMatrix();
+			xPos = x * 200;
+			yPos -= m_PolyGlyph->CharacterHeight('N') * 0.5;
+			glTranslatef(xPos, yPos, 0);
+		}
+		else if(text[i] == '\t') {
+			xPos += m_PolyGlyph->CharacterWidth(text['N']) * 4;
+		}
+		else {
+			m_PolyGlyph->Render(text[i], color.r, color.g, color.b, color.a, xPos, yPos);
+			xPos += m_PolyGlyph->CharacterWidth(text[i]) * 0.0005f;
+		}
+	}
+	
+	glPopMatrix();
+	
+	glPopMatrix();
+
+	glEnable(GL_LIGHTING);
+	glEnable(GL_DEPTH_TEST);
+
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
+}
+	

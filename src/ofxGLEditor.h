@@ -94,6 +94,12 @@ public:
 	/// or an editor index of 1 - 9
     string getText(int editor = 0);
 	
+	/// clear the contents of an editor
+	void clearText(int editor = 0);
+	
+	/// clear the contents of *all* editors
+	void clearAllText();
+	
 	/// set the current editor by index, form 1 - 9
 	void setCurrentEditor(int editor);
 	
@@ -123,7 +129,9 @@ public:
 	
 private:
 
-    vector<fluxus::GLEditor*> glEditor;
+	class Editor;
+	
+    vector<Editor*> glEditor;
 	ClipBoard clipBoard;
     
     int currentEditor; ///< note: 0-9, while valid nums are 1 - 9
@@ -131,4 +139,16 @@ private:
 	bool bAltPressed;
 	bool bShiftPressed;
 	bool bControlPressed;
+	
+	// wrapper for added functionality
+	class Editor : public fluxus::GLEditor {
+	public:
+
+		// insert text at the current position
+		void InsertText(const string& s);
+		
+		// render a string using the built in PolyGlyph,
+		// handles tabs and endlines
+		void RenderString(const string& s, float x, float y, ofFloatColor color=ofFloatColor::white);
+	};
 };
