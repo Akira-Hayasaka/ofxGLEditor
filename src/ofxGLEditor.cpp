@@ -1,13 +1,22 @@
 /*
- *  ofxGLEditor.cpp
- *  LiveCoding
+ * Copyright (C) 2012 Akira Hayasaka & Dan Wilcox <danomatika@gmail.com> 
  *
- *  Created by Makira on 11/07/05.
- *  Copyright 2011 ・‥…―━━━―…‥・yesMAYBEno・‥…―━━━―…‥・. All rights reserved.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- *	Updated by Dan Wilcox <danomatika@gmail.com> 2012
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * See https://github.com/Akira-Hayasaka/ofxGLEditor for more info.
  */
-
 #include "ofxGLEditor.h"
 
 // for mapping special keys
@@ -58,7 +67,7 @@ bool ofxGLEditor::setup(string fontFile){
 
 //--------------------------------------------------------------
 void ofxGLEditor::clear(){
-	for(int i = 1; i < glEditor.size(); i++){
+	for(int i = 1; i < (int) glEditor.size(); i++){
 		if(glEditor[i] != NULL)
 			delete glEditor[i];
 	}
@@ -141,7 +150,7 @@ void ofxGLEditor::keyPressed(int key){
 //--------------------------------------------------------------
 void ofxGLEditor::setText(string text, int editor){
 
-	if(editor < 0 || (editor - 1) >= glEditor.size()){
+	if(editor < 0 || (editor - 1) >= (int) glEditor.size()){
 		ofLogError("ofxGLEditor") << "cannot set text into unknown editor " << editor;
 		return;
 	}
@@ -157,7 +166,7 @@ void ofxGLEditor::setText(string text, int editor){
 //--------------------------------------------------------------
 string ofxGLEditor::getText(int editor){
     
-	if(editor < 0 || (editor - 1) >= glEditor.size()){
+	if(editor < 0 || (editor - 1) >= (int) glEditor.size()){
 		ofLogError("ofxGLEditor") << "cannot get text from unknown editor " << editor;
 		return "";
 	}
@@ -176,7 +185,7 @@ string ofxGLEditor::getText(int editor){
 
 //--------------------------------------------------------------
 void ofxGLEditor::clearText(int editor){
-	if(editor < 0 || (editor - 1) >= glEditor.size()){
+	if(editor < 0 || (editor - 1) >= (int) glEditor.size()){
 		ofLogError("ofxGLEditor") << "cannot clear text in unknown editor " << editor;
 		return;
 	}
@@ -192,7 +201,7 @@ void ofxGLEditor::clearText(int editor){
 
 //--------------------------------------------------------------
 void ofxGLEditor::clearAllText(){
-	for(int i = 1; i < glEditor.size(); i++) {
+	for(int i = 1; i < (int) glEditor.size(); i++) {
 		glEditor[i]->ClearAllText();
 	}
 	ofLogVerbose("ofxGLEditor") << "cleared text in all editors";
@@ -201,7 +210,7 @@ void ofxGLEditor::clearAllText(){
 //--------------------------------------------------------------
 void ofxGLEditor::setCurrentEditor(int editor){
 	
-	if(editor < 0 && (editor - 1) >= glEditor.size()){
+	if(editor < 0 && (editor - 1) >= (int) glEditor.size()){
 		ofLogError("ofxGLEditor") << "cannot set unkown editor " << editor;
 		return;
 	}
@@ -236,7 +245,7 @@ void ofxGLEditor::draw(){
 void ofxGLEditor::reShape(){
 	int w = (ofGetWindowMode() == OF_WINDOW)?ofGetViewportWidth():ofGetScreenWidth();
 	int h = (ofGetWindowMode() == OF_WINDOW)?ofGetViewportHeight():ofGetScreenHeight();
-	for(int i = 0; i < glEditor.size(); i++){
+	for(int i = 0; i < (int) glEditor.size(); i++){
 		glEditor[i]->Reshape(w, h);	
 	}
 }
@@ -254,7 +263,7 @@ void ofxGLEditor::copyToClipBoard(){
 //--------------------------------------------------------------
 bool ofxGLEditor::loadFile(string filename, int editor){
 	
-	if(editor < 0 && (editor - 1) >= glEditor.size()){
+	if(editor < 0 && (editor - 1) >= (int) glEditor.size()){
 		ofLogError("ofxGLEditor") << "cannot load into unknown editor " << editor;
 		return false;
 	}
@@ -282,7 +291,7 @@ bool ofxGLEditor::loadFile(string filename, int editor){
 //--------------------------------------------------------------
 bool ofxGLEditor::saveFile(string filename, int editor, bool addTimestamp){
 	
-	if(editor < 0 && (editor - 1) >= glEditor.size()){
+	if(editor < 0 && (editor - 1) >= (int) glEditor.size()){
 		ofLogError("ofxGLEditor") << "cannot save from unknown editor " << editor;
 		return "";
 	}
