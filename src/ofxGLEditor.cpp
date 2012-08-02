@@ -67,7 +67,7 @@ bool ofxGLEditor::setup(string fontFile){
 
 //--------------------------------------------------------------
 void ofxGLEditor::clear(){
-	for(int i = 1; i < glEditor.size(); i++){
+	for(int i = 1; i < (int) glEditor.size(); i++){
 		if(glEditor[i] != NULL)
 			delete glEditor[i];
 	}
@@ -150,7 +150,7 @@ void ofxGLEditor::keyPressed(int key){
 //--------------------------------------------------------------
 void ofxGLEditor::setText(string text, int editor){
 
-	if(editor < 0 || (editor - 1) >= glEditor.size()){
+	if(editor < 0 || (editor - 1) >= (int) glEditor.size()){
 		ofLogError("ofxGLEditor") << "cannot set text into unknown editor " << editor;
 		return;
 	}
@@ -166,7 +166,7 @@ void ofxGLEditor::setText(string text, int editor){
 //--------------------------------------------------------------
 string ofxGLEditor::getText(int editor){
     
-	if(editor < 0 || (editor - 1) >= glEditor.size()){
+	if(editor < 0 || (editor - 1) >= (int) glEditor.size()){
 		ofLogError("ofxGLEditor") << "cannot get text from unknown editor " << editor;
 		return "";
 	}
@@ -185,7 +185,7 @@ string ofxGLEditor::getText(int editor){
 
 //--------------------------------------------------------------
 void ofxGLEditor::clearText(int editor){
-	if(editor < 0 || (editor - 1) >= glEditor.size()){
+	if(editor < 0 || (editor - 1) >= (int) glEditor.size()){
 		ofLogError("ofxGLEditor") << "cannot clear text in unknown editor " << editor;
 		return;
 	}
@@ -201,7 +201,7 @@ void ofxGLEditor::clearText(int editor){
 
 //--------------------------------------------------------------
 void ofxGLEditor::clearAllText(){
-	for(int i = 1; i < glEditor.size(); i++) {
+	for(int i = 1; i < (int) glEditor.size(); i++) {
 		glEditor[i]->ClearAllText();
 	}
 	ofLogVerbose("ofxGLEditor") << "cleared text in all editors";
@@ -210,7 +210,7 @@ void ofxGLEditor::clearAllText(){
 //--------------------------------------------------------------
 void ofxGLEditor::setCurrentEditor(int editor){
 	
-	if(editor < 0 && (editor - 1) >= glEditor.size()){
+	if(editor < 0 && (editor - 1) >= (int) glEditor.size()){
 		ofLogError("ofxGLEditor") << "cannot set unkown editor " << editor;
 		return;
 	}
@@ -245,7 +245,7 @@ void ofxGLEditor::draw(){
 void ofxGLEditor::reShape(){
 	int w = (ofGetWindowMode() == OF_WINDOW)?ofGetViewportWidth():ofGetScreenWidth();
 	int h = (ofGetWindowMode() == OF_WINDOW)?ofGetViewportHeight():ofGetScreenHeight();
-	for(int i = 0; i < glEditor.size(); i++){
+	for(int i = 0; i < (int) glEditor.size(); i++){
 		glEditor[i]->Reshape(w, h);	
 	}
 }
@@ -263,7 +263,7 @@ void ofxGLEditor::copyToClipBoard(){
 //--------------------------------------------------------------
 bool ofxGLEditor::loadFile(string filename, int editor){
 	
-	if(editor < 0 && (editor - 1) >= glEditor.size()){
+	if(editor < 0 && (editor - 1) >= (int) glEditor.size()){
 		ofLogError("ofxGLEditor") << "cannot load into unknown editor " << editor;
 		return false;
 	}
@@ -291,7 +291,7 @@ bool ofxGLEditor::loadFile(string filename, int editor){
 //--------------------------------------------------------------
 bool ofxGLEditor::saveFile(string filename, int editor, bool addTimestamp){
 	
-	if(editor < 0 && (editor - 1) >= glEditor.size()){
+	if(editor < 0 && (editor - 1) >= (int) glEditor.size()){
 		ofLogError("ofxGLEditor") << "cannot save from unknown editor " << editor;
 		return "";
 	}
