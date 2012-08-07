@@ -43,10 +43,13 @@ public:
 	/// setup with the font to load
 	/// returns false if font is not found
 	///
+	/// drawCurrentEditor = true draws the current editor index in the upper
+	/// left corner of the viewport
+	///
 	/// NOTE: variable width fonts are not handled well, use fixed-width fonts
 	///
 	/// WARNING: the editor will crash your app if a font is not loaded!
-	bool setup(string fontFile = "fonts/DroidSansMono.ttf");
+	bool setup(string fontFile, bool drawCurrentEditor = true);
 	
 	/// clear resources
 	void clear();
@@ -95,7 +98,7 @@ public:
 	///
 	/// set editor to 0 for the current editor
 	/// or an editor index from 1 - 9
-	void setText(string text, int nEditor = 0);
+	void setText(string text, int editor = 0);
     
 	/// get the contents of an editor
 	///
@@ -136,11 +139,45 @@ public:
 	/// the number of editors
 	static const int s_numEditors = 10;
 	
+	/// draw a string using the current editor font
+	void drawString(const string& s, float x, float y);
+	void drawString(const string& s, ofPoint& p);
+
+// TODO: this works, but alpha blending/glyph size means it looks terrible
+// real fix is to replace PolyGlyph with ofTrueTypeFont
+//	/// text color (including alpha)
+//	/// default: white
+//	void setTextColor(ofColor c);
+//	ofColor getTextColor();
+//	
+	/// cursor color (including alpha)
+	/// default: yellow
+	void setCursorColor(ofColor c);
+	ofColor getCursorColor();
+	
+	/// overall alpha (0-1)
+	/// default: 1.0
+	void setAlpha(float a);
+	float getAlpha();
+	
+	/// current line pos of an editor (1-size)
+	/// set editor to 0 for the current editor
+	void setCurrentLine(unsigned int line, int editor = 0);
+	unsigned int getCurrentLine(int editor = 0);
+	
+	/// number of lines of of text in an editor
+	unsigned int getNumLines(int editor = 0);
+	
 private:
+
+	/// checks given index and autodecrements
+	/// editor = 0 sets current editor
+	/// returns -1 if index out of bounds
+	int getEditorIndex(int editor);
 
 	class Editor;
 	
-	vector<Editor*> glEditor;
+	vector<Editor*> glEditors;
 	ClipBoard clipBoard;
     
 	int currentEditor; ///< note: 0-9, while valid nums are 1 - 9
@@ -149,9 +186,18 @@ private:
 	bool bShiftPressed;
 	bool bControlPressed;
 	
+	bool bDrawCurrentEditor;
+	
 	// wrapper for added functionality
 	class Editor : public fluxus::GLEditor {
 	public:
+
+		// get the current num of lines in the buffer
+		unsigned int GetLineCount() {return m_LineCount;}
+		
+		// wrappers to current line pos
+		void SetCurLine(int line) {SetCurrentLine(line);}
+		int GetCurLine() {return GetCurrentLine();}
 
 		// insert text at the current position
 		void InsertText(const string& s);
@@ -159,5 +205,8 @@ private:
 		// render a string using the built in PolyGlyph,
 		// handles tabs and endlines
 		void RenderString(const string& s, float x, float y, ofFloatColor color=ofFloatColor::white);
+		
+		// manually count the number of lines
+		void CountLines();
 	};
 };

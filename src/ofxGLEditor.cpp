@@ -34,6 +34,7 @@ ofxGLEditor::ofxGLEditor(){
 	bShiftPressed = false;
 	bControlPressed = false;
 	currentEditor = 0;
+	bDrawCurrentEditor = false;
 }
 
 //--------------------------------------------------------------
@@ -42,7 +43,7 @@ ofxGLEditor::~ofxGLEditor(){
 }
 
 //--------------------------------------------------------------
-bool ofxGLEditor::setup(string fontFile){
+bool ofxGLEditor::setup(string fontFile, bool drawCurrentEditor){
 	
 	string path = ofToDataPath(fontFile);
 	if(!ofFile::doesFileExist(path)){
@@ -56,22 +57,23 @@ bool ofxGLEditor::setup(string fontFile){
 	
 	Editor::InitFont(string_to_wstring(path));
 	Editor::m_DoEffects = true;
-	for(int i = 1; i < s_numEditors; i++) {
+	for(int i = 1; i < s_numEditors; i++){
 		Editor* editor = new Editor();
-		glEditor.push_back(editor);
+		glEditors.push_back(editor);
 	}
 	reShape();	
 	
 	currentEditor = 0;
+	bDrawCurrentEditor = drawCurrentEditor;
 }
 
 //--------------------------------------------------------------
 void ofxGLEditor::clear(){
-	for(int i = 1; i < (int) glEditor.size(); i++){
-		if(glEditor[i] != NULL)
-			delete glEditor[i];
+	for(int i = 1; i < (int) glEditors.size(); i++){
+		if(glEditors[i] != NULL)
+			delete glEditors[i];
 	}
-	glEditor.clear();
+	glEditors.clear();
 }
 
 //--------------------------------------------------------------
@@ -113,7 +115,7 @@ void ofxGLEditor::keyPressed(int key){
 		int ed = currentEditor + 1;
 		ofNotifyEvent(runScriptEvent, ed, this);
 	}else if(bAltPressed && key == 'b'){
-		glEditor[currentEditor]->BlowupCursor();
+		glEditors[currentEditor]->BlowupCursor();
 	}else if(bAltPressed && key == 'a'){
 		clearText();
 	}else if(bAltPressed && key == 'c'){
@@ -144,40 +146,34 @@ void ofxGLEditor::keyPressed(int key){
 	}else if(bAltPressed && key == '9'){
 		currentEditor = 8;
 	}
-	glEditor[currentEditor]->Handle(-1, key, special, 0, ofGetMouseX(), ofGetMouseY(), mod);
+	glEditors[currentEditor]->Handle(-1, key, special, 0, ofGetMouseX(), ofGetMouseY(), mod);
 }
 
 //--------------------------------------------------------------
 void ofxGLEditor::setText(string text, int editor){
 
-	if(editor < 0 || (editor - 1) >= (int) glEditor.size()){
+	editor = getEditorIndex(editor);
+	if(editor == -1){
 		ofLogError("ofxGLEditor") << "cannot set text into unknown editor " << editor;
 		return;
 	}
-	else if(editor == 0){
-		editor = currentEditor;
-	}
-	else
-        editor--; 
-    
-	glEditor[editor]->SetText(string_to_wstring(text));
+
+    Editor *e = glEditors[editor];
+	e->SetText(string_to_wstring(text));
+	e->CountLines();
 };
 
 //--------------------------------------------------------------
 string ofxGLEditor::getText(int editor){
     
-	if(editor < 0 || (editor - 1) >= (int) glEditor.size()){
+	editor = getEditorIndex(editor);
+	if(editor == -1){
 		ofLogError("ofxGLEditor") << "cannot get text from unknown editor " << editor;
 		return "";
 	}
-	else if(editor == 0){
-		editor = currentEditor;
-	}
-	else
-		editor--;
 	
 	// add an endline if there isn't one already
-	string text = wstring_to_string(glEditor[editor]->GetAllText());
+	string text = wstring_to_string(glEditors[editor]->GetAllText());
 	if(text[text.size()-1] != '\n') 
 		text += "\n";
 	return text;
@@ -185,24 +181,21 @@ string ofxGLEditor::getText(int editor){
 
 //--------------------------------------------------------------
 void ofxGLEditor::clearText(int editor){
-	if(editor < 0 || (editor - 1) >= (int) glEditor.size()){
+
+	editor = getEditorIndex(editor);
+	if(editor == -1){
 		ofLogError("ofxGLEditor") << "cannot clear text in unknown editor " << editor;
 		return;
 	}
-	else if(editor == 0){
-		editor = currentEditor;
-	}
-	else
-		editor--;
 	
 	ofLogVerbose("ofxGLEditor") << "cleared text in editor" << currentEditor;
-	glEditor[editor]->ClearAllText();
+	glEditors[editor]->ClearAllText();
 }
 
 //--------------------------------------------------------------
 void ofxGLEditor::clearAllText(){
-	for(int i = 1; i < (int) glEditor.size(); i++) {
-		glEditor[i]->ClearAllText();
+	for(int i = 1; i < (int) glEditors.size(); i++){
+		glEditors[i]->ClearAllText();
 	}
 	ofLogVerbose("ofxGLEditor") << "cleared text in all editors";
 }
@@ -210,7 +203,7 @@ void ofxGLEditor::clearAllText(){
 //--------------------------------------------------------------
 void ofxGLEditor::setCurrentEditor(int editor){
 	
-	if(editor < 0 && (editor - 1) >= (int) glEditor.size()){
+	if(editor < 0 && (editor - 1) >= (int) glEditors.size()){
 		ofLogError("ofxGLEditor") << "cannot set unkown editor " << editor;
 		return;
 	}
@@ -229,8 +222,13 @@ void ofxGLEditor::draw(){
 	ofPushMatrix();
 	ofPushStyle();
 	
-	glEditor[currentEditor]->RenderString(ofToString(currentEditor+1), 0, 0);
-	glEditor[currentEditor]->Render();
+	ofEnableAlphaBlending();
+	
+	if(bDrawCurrentEditor)
+		glEditors[currentEditor]->RenderString(ofToString(currentEditor+1), 0, 15);
+	glEditors[currentEditor]->Render();
+	
+	ofDisableAlphaBlending();
 	
 	ofPopStyle();
 	ofPopMatrix();
@@ -245,25 +243,25 @@ void ofxGLEditor::draw(){
 void ofxGLEditor::reShape(){
 	int w = (ofGetWindowMode() == OF_WINDOW)?ofGetViewportWidth():ofGetScreenWidth();
 	int h = (ofGetWindowMode() == OF_WINDOW)?ofGetViewportHeight():ofGetScreenHeight();
-	for(int i = 0; i < (int) glEditor.size(); i++){
-		glEditor[i]->Reshape(w, h);	
+	for(int i = 0; i < (int) glEditors.size(); i++){
+		glEditors[i]->Reshape(w, h);	
 	}
 }
 
 //--------------------------------------------------------------
 void ofxGLEditor::pasteFromClipBoard(){
-	glEditor[currentEditor]->InsertText(clipBoard.getText());
+	glEditors[currentEditor]->InsertText(clipBoard.getText());
 }
 
 //--------------------------------------------------------------
 void ofxGLEditor::copyToClipBoard(){
-	clipBoard.setText(wstring_to_string(glEditor[currentEditor]->GetText()));
+	clipBoard.setText(wstring_to_string(glEditors[currentEditor]->GetText()));
 }
 
 //--------------------------------------------------------------
 bool ofxGLEditor::loadFile(string filename, int editor){
 	
-	if(editor < 0 && (editor - 1) >= (int) glEditor.size()){
+	if(editor < 0 && (editor - 1) >= (int) glEditors.size()){
 		ofLogError("ofxGLEditor") << "cannot load into unknown editor " << editor;
 		return false;
 	}
@@ -291,7 +289,7 @@ bool ofxGLEditor::loadFile(string filename, int editor){
 //--------------------------------------------------------------
 bool ofxGLEditor::saveFile(string filename, int editor, bool addTimestamp){
 	
-	if(editor < 0 && (editor - 1) >= (int) glEditor.size()){
+	if(editor < 0 && (editor - 1) >= (int) glEditors.size()){
 		ofLogError("ofxGLEditor") << "cannot save from unknown editor " << editor;
 		return "";
 	}
@@ -323,10 +321,119 @@ bool ofxGLEditor::saveFile(string filename, int editor, bool addTimestamp){
 	return true;
 }
 
+//--------------------------------------------------------------
+void ofxGLEditor::drawString(const string& s, float x, float y){
+	glEditors[currentEditor]->RenderString(s, x, y);//, ofFloatColor(ofGetStyle().color));
+}
+
+void ofxGLEditor::drawString(const string& s, ofPoint& p){
+	drawString(s, p.x, p.y);
+}
+
+//--------------------------------------------------------------
+// TODO: this works, but alpha blending/glyph size means it looks terrible
+//void ofxGLEditor::setTextColor(ofColor c){
+//	ofFloatColor fc(c);
+//	Editor::m_TextColourRed = fc.r;
+//	Editor::m_TextColourGreen = fc.g;
+//	Editor::m_TextColourBlue = fc.b;
+//	Editor::m_TextColourAlpha = fc.a;
+//}
+
+//--------------------------------------------------------------
+//ofColor ofxGLEditor::getTextColor(){
+//	return ofFloatColor(
+//		Editor::m_TextColourRed,
+//		Editor::m_TextColourGreen,
+//		Editor::m_TextColourBlue,
+//		Editor::m_TextColourAlpha);
+//}
+	
+//--------------------------------------------------------------
+void ofxGLEditor::setCursorColor(ofColor c){
+	ofFloatColor fc(c);
+	Editor::m_CursorColourRed = fc.r;
+	Editor::m_CursorColourGreen = fc.g;
+	Editor::m_CursorColourBlue = fc.b;
+	Editor::m_CursorColourAlpha = fc.a;
+}
+
+//--------------------------------------------------------------
+ofColor ofxGLEditor::getCursorColor(){
+	return ofFloatColor(
+		Editor::m_CursorColourRed,
+		Editor::m_CursorColourGreen,
+		Editor::m_CursorColourBlue,
+		Editor::m_CursorColourAlpha);
+}
+	
+//--------------------------------------------------------------
+void ofxGLEditor::setAlpha(float a){
+	Editor::m_Alpha = ofClamp(a, 0, 1.0);
+}
+
+//--------------------------------------------------------------
+float ofxGLEditor::getAlpha(){
+	return Editor::m_Alpha;
+}
+
+//--------------------------------------------------------------
+void ofxGLEditor::setCurrentLine(unsigned int line, int editor){
+	
+	editor = getEditorIndex(editor);
+	if(editor == -1){
+		ofLogError("ofxGLEditor") << "cannot set current line in unknown editor " << editor;
+		return;
+	}
+		
+	Editor *e = glEditors[editor];
+	if(line >= e->GetLineCount()){
+		ofLogError("ofxGLEditor") << "cannot set current line, given line "
+			<< line << " is >= num lines " << e->GetLineCount();
+		return;
+	}
+	e->SetCurLine(line);
+}
+
+//--------------------------------------------------------------
+unsigned int ofxGLEditor::getCurrentLine(int editor){
+	editor = getEditorIndex(editor);
+	if(editor == -1){
+		ofLogError("ofxGLEditor") << "cannot get current line from unknown editor " << editor;
+		return 0;
+	}
+	return glEditors[editor]->GetCurLine();
+}
+
+//--------------------------------------------------------------
+unsigned int ofxGLEditor::getNumLines(int editor){
+	editor = getEditorIndex(editor);
+	if(editor == -1){
+		ofLogError("ofxGLEditor") << "cannot get num lines from unknown editor " << editor;
+		return 0;
+	}
+	return glEditors[editor]->GetLineCount();
+}
+
+// PRIVATE
+
+//--------------------------------------------------------------
+int ofxGLEditor::getEditorIndex(int editor){
+	if(editor < 0 || (editor - 1) >= (int) glEditors.size()){
+		return -1;
+	}
+	else if(editor == 0){
+		editor = currentEditor;
+	}
+	else
+		editor--;
+	return editor;
+}
+
 // EDITOR
 
 //--------------------------------------------------------------
-void ofxGLEditor::Editor::InsertText(const string& s) {
+void ofxGLEditor::Editor::InsertText(const string& s){
 	m_CopyBuffer = string_to_wstring(s);
 	m_Text.insert(m_Position, m_CopyBuffer);
 	m_Selection = false;
@@ -335,7 +442,7 @@ void ofxGLEditor::Editor::InsertText(const string& s) {
 }
 
 //--------------------------------------------------------------
-void ofxGLEditor::Editor::RenderString(const string& s, float x, float y, ofFloatColor color) {
+void ofxGLEditor::Editor::RenderString(const string& s, float x, float y, ofFloatColor color){
 	wstring text = string_to_wstring(s);
 	
 	// the gl stuff is from GLEditor::render()
@@ -367,20 +474,20 @@ void ofxGLEditor::Editor::RenderString(const string& s, float x, float y, ofFloa
 	
 	// draw char by char
 	float xPos = x * 200, yPos = -y * 200; //< more magic nums here
-	for(int i = 0; i < text.size(); ++i) {
+	for(int i = 0; i < text.size(); ++i){
 	
 		// new line?
-		if(text[i] == '\n') {
+		if(text[i] == '\n'){
 			glPopMatrix();
 			glPushMatrix();
 			xPos = x * 200;
 			yPos -= m_PolyGlyph->CharacterHeight('N') * 0.5;
 			glTranslatef(xPos, yPos, 0);
 		}
-		else if(text[i] == '\t') {
+		else if(text[i] == '\t'){
 			xPos += m_PolyGlyph->CharacterWidth(text['N']) * 4;
 		}
-		else {
+		else{
 			m_PolyGlyph->Render(text[i], color.r, color.g, color.b, color.a, xPos, yPos);
 			xPos += m_PolyGlyph->CharacterWidth(text[i]) * 0.0005f;
 		}
@@ -396,5 +503,14 @@ void ofxGLEditor::Editor::RenderString(const string& s, float x, float y, ofFloa
 	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();
 	glMatrixMode(GL_MODELVIEW);
+}
+
+//--------------------------------------------------------------
+void ofxGLEditor::Editor::CountLines(){
+	m_LineCount = 0;
+	for(unsigned int i = 0; i < m_Text.size(); i++){
+		if(m_Text[i] == '\n')
+			m_LineCount++;
+	}
 }
 	

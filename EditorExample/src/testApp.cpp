@@ -9,14 +9,24 @@ void testApp::setup(){
 	ofSetLogLevel("ofxGLEditor", OF_LOG_VERBOSE);
 	
 	// setup the editor with a font
-	editor.setup("fonts/DroidSansMono.ttf");
+	// false to disable the current editor num in the upper left corner
+	editor.setup("fonts/DroidSansMono.ttf", false); 
 	
 	// load a file into the current editor (1)
 	editor.loadFile("hello.txt");
+	ofLog() << "number of lines: " << editor.getNumLines();
 
 	// add editor event listening
 	ofAddListener(editor.runScriptEvent, this, &testApp::runScriptEvent);
 	ofAddListener(editor.saveFileEvent, this, &testApp::saveFileEvent);
+	
+	//editor.setTextColor(ofColor::red); // dosen't work right yet ... sorry
+	editor.setCursorColor(ofColor::blue); // block cursor color
+	//editor.setAlpha(0.5); // main text, cursor, & highlight alpha
+	
+	// move the cursor
+	//editor.setCurrentLine(0);
+	ofLog() << "current line pos: " << editor.getCurrentLine();
 }
 
 //--------------------------------------------------------------
@@ -25,6 +35,17 @@ void testApp::update(){}
 //--------------------------------------------------------------
 void testApp::draw(){
 	editor.draw();
+	
+	ofSetColor(255, 0, 0);
+	
+	// draw using the same font as the editor
+	
+	// if you disable the editor num, you can also draw it manually
+	editor.drawString("Current editor: "+ofToString(editor.getCurrentEditor()), 10, 15);
+	
+	// draw the current & total line nums
+	editor.drawString("Current line: "+ofToString(editor.getCurrentLine())
+		+"/"+ofToString(editor.getNumLines()), ofGetWidth()-270, 15);
 }
 
 //--------------------------------------------------------------
