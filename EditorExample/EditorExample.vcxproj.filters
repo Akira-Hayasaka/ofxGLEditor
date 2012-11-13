@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<ItemGroup>
+		<ClCompile Include="src\testApp.cpp">
+			<Filter>src</Filter>
+		</ClCompile>
+		<ClCompile Include="src\main.cpp">
+			<Filter>src</Filter>
+		</ClCompile>
+		<ClCompile Include="..\..\..\addons\ofxGLEditor\src\ClipBoard.cpp">
+			<Filter>addons\ofxGLEditor\src</Filter>
+		</ClCompile>
+		<ClCompile Include="..\..\..\addons\ofxGLEditor\src\GLEditor.cpp">
+			<Filter>addons\ofxGLEditor\src</Filter>
+		</ClCompile>
+		<ClCompile Include="..\..\..\addons\ofxGLEditor\src\ofxGLEditor.cpp">
+			<Filter>addons\ofxGLEditor\src</Filter>
+		</ClCompile>
+		<ClCompile Include="..\..\..\addons\ofxGLEditor\src\PolyGlyph.cpp">
+			<Filter>addons\ofxGLEditor\src</Filter>
+		</ClCompile>
+		<ClCompile Include="..\..\..\addons\ofxGLEditor\src\Unicode.cpp">
+			<Filter>addons\ofxGLEditor\src</Filter>
+		</ClCompile>
+	</ItemGroup>
+	<ItemGroup>
+		<Filter Include="src">
+			<UniqueIdentifier>{d8376475-7454-4a24-b08a-aac121d3ad6f}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="addons">
+			<UniqueIdentifier>{71834f65-f3a9-211e-73b8-dc8563776aec}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="addons\ofxGLEditor">
+			<UniqueIdentifier>{0c5b546d-eae4-bda4-9b3a-331bfb2d25d2}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="addons\ofxGLEditor\src">
+			<UniqueIdentifier>{33cabb47-15fc-a44c-26ba-fee5e18d513e}</UniqueIdentifier>
+		</Filter>
+	</ItemGroup>
+	<ItemGroup>
+		<ClInclude Include="src\testApp.h">
+			<Filter>src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\addons\ofxGLEditor\src\ClipBoard.h">
+			<Filter>addons\ofxGLEditor\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\addons\ofxGLEditor\src\GLEditor.h">
+			<Filter>addons\ofxGLEditor\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\addons\ofxGLEditor\src\ofxGLEditor.h">
+			<Filter>addons\ofxGLEditor\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\addons\ofxGLEditor\src\PolyGlyph.h">
+			<Filter>addons\ofxGLEditor\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\addons\ofxGLEditor\src\Unicode.h">
+			<Filter>addons\ofxGLEditor\src</Filter>
+		</ClInclude>
+	</ItemGroup>
+</Project>
