@@ -150,11 +150,7 @@ void ofxGLEditor::keyPressed(int key){
 //--------------------------------------------------------------
 void ofxGLEditor::setText(string text, int editor){
 
-<<<<<<< HEAD
 	if(editor < 0 || (editor - 1) >= (int)glEditor.size()){
-=======
-	if(editor < 0 || (editor - 1) >= (int) glEditor.size()){
->>>>>>> 2264bac221d1cb55f58249a717543da836faefcf
 		ofLogError("ofxGLEditor") << "cannot set text into unknown editor " << editor;
 		return;
 	}
