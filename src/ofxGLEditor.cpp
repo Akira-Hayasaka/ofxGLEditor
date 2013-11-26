@@ -21,11 +21,14 @@
 
 // for mapping special keys
 #ifndef __APPLE__
-	#include <GL/glut.h>
+	#include "glut.h"
 #else
 	#include <GLUT/glut.h>
 #endif
-
+/*#ifdef TARGET_WIN32
+	#define GLUT_BUILDING_LIB
+	#include "glut.h"
+#endif*/
 using namespace fluxus;
 
 //--------------------------------------------------------------
