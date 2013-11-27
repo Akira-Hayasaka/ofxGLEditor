@@ -5,8 +5,7 @@
 #include <map>
 
 #ifndef __APPLE__
-#include "GL/gl.h"
-#include "GL/glu.h"
+#include "glut.h"
 #else
 #include "OpenGL/gl.h"
 #include "OpenGL/glu.h"

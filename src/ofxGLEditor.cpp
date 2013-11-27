@@ -21,11 +21,14 @@
 
 // for mapping special keys
 #ifndef __APPLE__
-	#include <GL/glut.h>
+	#include "glut.h"
 #else
 	#include <GLUT/glut.h>
 #endif
-
+/*#ifdef TARGET_WIN32
+	#define GLUT_BUILDING_LIB
+	#include "glut.h"
+#endif*/
 using namespace fluxus;
 
 //--------------------------------------------------------------
@@ -150,7 +153,7 @@ void ofxGLEditor::keyPressed(int key){
 //--------------------------------------------------------------
 void ofxGLEditor::setText(string text, int editor){
 
-	if(editor < 0 || (editor - 1) >= (int) glEditor.size()){
+	if(editor < 0 || (editor - 1) >= (int)glEditor.size()){
 		ofLogError("ofxGLEditor") << "cannot set text into unknown editor " << editor;
 		return;
 	}
