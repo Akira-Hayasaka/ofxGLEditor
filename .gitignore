@@ -28,6 +28,6 @@ example-output/obj
 # svn
 .svn/
 obj/
-bin/
+#bin/
 build/
-!data/
+!data/fonts/DroidSansMono.ttf
