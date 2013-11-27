@@ -7,10 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		34b64adf26314fa55e87ba6670618c45 /* ClipBoard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8e6c5f343e8ecdb940f5f5a4e0bfa485 /* ClipBoard.cpp */; };
-		507cedc155e968fcbd9ff33cf6c6d5ba /* ofxGLEditor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 24bc94dc303139bf39b613690920ae4a /* ofxGLEditor.cpp */; };
-		6e519bd2fb1f63665e6903b510635706 /* Unicode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8c9434c4d1346f228494101fbb609360 /* Unicode.cpp */; };
-		7fd9bb41e0bc5c92cced818ac5a9d112 /* GLEditor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9b1b14d56b45b4c8140b5d557a34b2ef /* GLEditor.cpp */; };
 		BBAB23CB13894F3D00AA2426 /* GLUT.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = BBAB23BE13894E4700AA2426 /* GLUT.framework */; };
 		E4328149138ABC9F0047C5CB /* openFrameworksDebug.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E4328148138ABC890047C5CB /* openFrameworksDebug.a */; };
 		E45BE97B0E8CC7DD009D7055 /* AGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E45BE9710E8CC7DD009D7055 /* AGL.framework */; };
@@ -28,7 +24,14 @@
 		E4C2424810CC5A17004149E2 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E4C2424510CC5A17004149E2 /* Cocoa.framework */; };
 		E4C2424910CC5A17004149E2 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E4C2424610CC5A17004149E2 /* IOKit.framework */; };
 		E4EB6799138ADC1D00A09F29 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBAB23BE13894E4700AA2426 /* GLUT.framework */; };
-		fea1eac05dd5e2be3f6b88be02e77f3d /* PolyGlyph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 275875369b8b9fcee839f90fd9bc11f8 /* PolyGlyph.cpp */; };
+		E7E077E515D3B63C0020DFD4 /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E7E077E415D3B63C0020DFD4 /* CoreVideo.framework */; };
+		E7E077E815D3B6510020DFD4 /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E7E077E715D3B6510020DFD4 /* QTKit.framework */; };
+		E7F985F815E0DEA3003869B5 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E7F985F515E0DE99003869B5 /* Accelerate.framework */; };
+		E9A569F518455F6400FA944B /* ClipBoard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E9A569EB18455F6400FA944B /* ClipBoard.cpp */; };
+		E9A569F618455F6400FA944B /* GLEditor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E9A569ED18455F6400FA944B /* GLEditor.cpp */; };
+		E9A569F718455F6400FA944B /* ofxGLEditor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E9A569EF18455F6400FA944B /* ofxGLEditor.cpp */; };
+		E9A569F818455F6400FA944B /* PolyGlyph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E9A569F118455F6400FA944B /* PolyGlyph.cpp */; };
+		E9A569F918455F6400FA944B /* Unicode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E9A569F318455F6400FA944B /* Unicode.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -62,13 +65,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		16440f42b6e23f2f6793334f32f22c76 /* ofxGLEditor.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxGLEditor.h; path = ../../../addons/ofxGLEditor/src/ofxGLEditor.h; sourceTree = SOURCE_ROOT; };
-		24bc94dc303139bf39b613690920ae4a /* ofxGLEditor.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = ofxGLEditor.cpp; path = ../../../addons/ofxGLEditor/src/ofxGLEditor.cpp; sourceTree = SOURCE_ROOT; };
-		275875369b8b9fcee839f90fd9bc11f8 /* PolyGlyph.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = PolyGlyph.cpp; path = ../../../addons/ofxGLEditor/src/PolyGlyph.cpp; sourceTree = SOURCE_ROOT; };
-		8bed9c523892e4699d2d5aa2509d4361 /* PolyGlyph.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = PolyGlyph.h; path = ../../../addons/ofxGLEditor/src/PolyGlyph.h; sourceTree = SOURCE_ROOT; };
-		8c9434c4d1346f228494101fbb609360 /* Unicode.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = Unicode.cpp; path = ../../../addons/ofxGLEditor/src/Unicode.cpp; sourceTree = SOURCE_ROOT; };
-		8e6c5f343e8ecdb940f5f5a4e0bfa485 /* ClipBoard.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = ClipBoard.cpp; path = ../../../addons/ofxGLEditor/src/ClipBoard.cpp; sourceTree = SOURCE_ROOT; };
-		9b1b14d56b45b4c8140b5d557a34b2ef /* GLEditor.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = GLEditor.cpp; path = ../../../addons/ofxGLEditor/src/GLEditor.cpp; sourceTree = SOURCE_ROOT; };
 		BBAB23BE13894E4700AA2426 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = ../../../libs/glut/lib/osx/GLUT.framework; sourceTree = "<group>"; };
 		E4328143138ABC890047C5CB /* openFrameworksLib.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = openFrameworksLib.xcodeproj; path = ../../../libs/openFrameworksCompiled/project/osx/openFrameworksLib.xcodeproj; sourceTree = SOURCE_ROOT; };
 		E45BE9710E8CC7DD009D7055 /* AGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AGL.framework; path = /System/Library/Frameworks/AGL.framework; sourceTree = "<absolute>"; };
@@ -90,9 +86,19 @@
 		E4C2424610CC5A17004149E2 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = /System/Library/Frameworks/IOKit.framework; sourceTree = "<absolute>"; };
 		E4EB691F138AFCF100A09F29 /* CoreOF.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = CoreOF.xcconfig; path = ../../../libs/openFrameworksCompiled/project/osx/CoreOF.xcconfig; sourceTree = SOURCE_ROOT; };
 		E4EB6923138AFD0F00A09F29 /* Project.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Project.xcconfig; sourceTree = "<group>"; };
-		a3864021dad568af1bb6d26d9ddd7680 /* Unicode.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = Unicode.h; path = ../../../addons/ofxGLEditor/src/Unicode.h; sourceTree = SOURCE_ROOT; };
-		b60f4d7fae003bce74c7d668e63c0fd9 /* GLEditor.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = GLEditor.h; path = ../../../addons/ofxGLEditor/src/GLEditor.h; sourceTree = SOURCE_ROOT; };
-		bf89b56aba8bf89922a8f2e2f023a9a2 /* ClipBoard.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ClipBoard.h; path = ../../../addons/ofxGLEditor/src/ClipBoard.h; sourceTree = SOURCE_ROOT; };
+		E7E077E415D3B63C0020DFD4 /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = /System/Library/Frameworks/CoreVideo.framework; sourceTree = "<absolute>"; };
+		E7E077E715D3B6510020DFD4 /* QTKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QTKit.framework; path = /System/Library/Frameworks/QTKit.framework; sourceTree = "<absolute>"; };
+		E7F985F515E0DE99003869B5 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = /System/Library/Frameworks/Accelerate.framework; sourceTree = "<absolute>"; };
+		E9A569EB18455F6400FA944B /* ClipBoard.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ClipBoard.cpp; sourceTree = "<group>"; };
+		E9A569EC18455F6400FA944B /* ClipBoard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ClipBoard.h; sourceTree = "<group>"; };
+		E9A569ED18455F6400FA944B /* GLEditor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GLEditor.cpp; sourceTree = "<group>"; };
+		E9A569EE18455F6400FA944B /* GLEditor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLEditor.h; sourceTree = "<group>"; };
+		E9A569EF18455F6400FA944B /* ofxGLEditor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxGLEditor.cpp; sourceTree = "<group>"; };
+		E9A569F018455F6400FA944B /* ofxGLEditor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxGLEditor.h; sourceTree = "<group>"; };
+		E9A569F118455F6400FA944B /* PolyGlyph.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PolyGlyph.cpp; sourceTree = "<group>"; };
+		E9A569F218455F6400FA944B /* PolyGlyph.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PolyGlyph.h; sourceTree = "<group>"; };
+		E9A569F318455F6400FA944B /* Unicode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Unicode.cpp; sourceTree = "<group>"; };
+		E9A569F418455F6400FA944B /* Unicode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Unicode.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -100,6 +106,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E7F985F815E0DEA3003869B5 /* Accelerate.framework in Frameworks */,
+				E7E077E815D3B6510020DFD4 /* QTKit.framework in Frameworks */,
 				E4EB6799138ADC1D00A09F29 /* GLUT.framework in Frameworks */,
 				E4328149138ABC9F0047C5CB /* openFrameworksDebug.a in Frameworks */,
 				E45BE97B0E8CC7DD009D7055 /* AGL.framework in Frameworks */,
@@ -114,41 +122,17 @@
 				E4C2424710CC5A17004149E2 /* AppKit.framework in Frameworks */,
 				E4C2424810CC5A17004149E2 /* Cocoa.framework in Frameworks */,
 				E4C2424910CC5A17004149E2 /* IOKit.framework in Frameworks */,
+				E7E077E515D3B63C0020DFD4 /* CoreVideo.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		08c52f241bdde296997d9343064527c5 /* src */ = {
-			isa = PBXGroup;
-			children = (
-				8e6c5f343e8ecdb940f5f5a4e0bfa485 /* ClipBoard.cpp */,
-				bf89b56aba8bf89922a8f2e2f023a9a2 /* ClipBoard.h */,
-				9b1b14d56b45b4c8140b5d557a34b2ef /* GLEditor.cpp */,
-				b60f4d7fae003bce74c7d668e63c0fd9 /* GLEditor.h */,
-				24bc94dc303139bf39b613690920ae4a /* ofxGLEditor.cpp */,
-				16440f42b6e23f2f6793334f32f22c76 /* ofxGLEditor.h */,
-				275875369b8b9fcee839f90fd9bc11f8 /* PolyGlyph.cpp */,
-				8bed9c523892e4699d2d5aa2509d4361 /* PolyGlyph.h */,
-				8c9434c4d1346f228494101fbb609360 /* Unicode.cpp */,
-				a3864021dad568af1bb6d26d9ddd7680 /* Unicode.h */,
-			);
-			name = src;
-			sourceTree = "<group>";
-		};
-		9cf97c9c767b62fad6f26efc17b3e419 /* ofxGLEditor */ = {
-			isa = PBXGroup;
-			children = (
-				08c52f241bdde296997d9343064527c5 /* src */,
-			);
-			name = ofxGLEditor;
-			sourceTree = "<group>";
-		};
 		BB4B014C10F69532006C3DED /* addons */ = {
 			isa = PBXGroup;
 			children = (
-				9cf97c9c767b62fad6f26efc17b3e419 /* ofxGLEditor */,
+				E9A569E318455F6400FA944B /* ofxGLEditor */,
 			);
 			name = addons;
 			sourceTree = "<group>";
@@ -156,6 +140,7 @@
 		BBAB23C913894ECA00AA2426 /* system frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				E7F985F515E0DE99003869B5 /* Accelerate.framework */,
 				E4C2424410CC5A17004149E2 /* AppKit.framework */,
 				E4C2424510CC5A17004149E2 /* Cocoa.framework */,
 				E4C2424610CC5A17004149E2 /* IOKit.framework */,
@@ -168,6 +153,8 @@
 				E45BE9770E8CC7DD009D7055 /* CoreServices.framework */,
 				E45BE9790E8CC7DD009D7055 /* OpenGL.framework */,
 				E45BE97A0E8CC7DD009D7055 /* QuickTime.framework */,
+				E7E077E415D3B63C0020DFD4 /* CoreVideo.framework */,
+				E7E077E715D3B6510020DFD4 /* QTKit.framework */,
 			);
 			name = "system frameworks";
 			sourceTree = "<group>";
@@ -229,6 +216,32 @@
 			name = openFrameworks;
 			sourceTree = "<group>";
 		};
+		E9A569E318455F6400FA944B /* ofxGLEditor */ = {
+			isa = PBXGroup;
+			children = (
+				E9A569EA18455F6400FA944B /* src */,
+			);
+			name = ofxGLEditor;
+			path = ../../../addons/ofxGLEditor;
+			sourceTree = "<group>";
+		};
+		E9A569EA18455F6400FA944B /* src */ = {
+			isa = PBXGroup;
+			children = (
+				E9A569EB18455F6400FA944B /* ClipBoard.cpp */,
+				E9A569EC18455F6400FA944B /* ClipBoard.h */,
+				E9A569ED18455F6400FA944B /* GLEditor.cpp */,
+				E9A569EE18455F6400FA944B /* GLEditor.h */,
+				E9A569EF18455F6400FA944B /* ofxGLEditor.cpp */,
+				E9A569F018455F6400FA944B /* ofxGLEditor.h */,
+				E9A569F118455F6400FA944B /* PolyGlyph.cpp */,
+				E9A569F218455F6400FA944B /* PolyGlyph.h */,
+				E9A569F318455F6400FA944B /* Unicode.cpp */,
+				E9A569F418455F6400FA944B /* Unicode.h */,
+			);
+			path = src;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -257,7 +270,7 @@
 		E4B69B4C0A3A1720003C02F2 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0430;
+				LastUpgradeCheck = 0460;
 			};
 			buildConfigurationList = E4B69B4D0A3A1720003C02F2 /* Build configuration list for PBXProject "EditorExample" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -307,7 +320,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cp -f ../../../libs/fmodex/lib/osx/libfmodex.dylib \"$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/MacOS/libfmodex.dylib\"; install_name_tool -change ./libfmodex.dylib @executable_path/libfmodex.dylib \"$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/MacOS/$PRODUCT_NAME\";";
+			shellScript = "cp -f ../../../libs/fmodex/lib/osx/libfmodex.dylib \"$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/MacOS/libfmodex.dylib\"; install_name_tool -change ./libfmodex.dylib @executable_path/libfmodex.dylib \"$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/MacOS/$PRODUCT_NAME\";\nmkdir -p \"$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/Resources/\"\ncp -f \"$ICON_FILE\" \"$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/Resources/\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -318,11 +331,11 @@
 			files = (
 				E4B69E200A3A1BDC003C02F2 /* main.cpp in Sources */,
 				E4B69E210A3A1BDC003C02F2 /* testApp.cpp in Sources */,
-				34b64adf26314fa55e87ba6670618c45 /* ClipBoard.cpp in Sources */,
-				7fd9bb41e0bc5c92cced818ac5a9d112 /* GLEditor.cpp in Sources */,
-				507cedc155e968fcbd9ff33cf6c6d5ba /* ofxGLEditor.cpp in Sources */,
-				fea1eac05dd5e2be3f6b88be02e77f3d /* PolyGlyph.cpp in Sources */,
-				6e519bd2fb1f63665e6903b510635706 /* Unicode.cpp in Sources */,
+				E9A569F718455F6400FA944B /* ofxGLEditor.cpp in Sources */,
+				E9A569F918455F6400FA944B /* Unicode.cpp in Sources */,
+				E9A569F518455F6400FA944B /* ClipBoard.cpp in Sources */,
+				E9A569F818455F6400FA944B /* PolyGlyph.cpp in Sources */,
+				E9A569F618455F6400FA944B /* GLEditor.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -351,7 +364,7 @@
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
-				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = NO;
+				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = YES;
 				GCC_WARN_ABOUT_INVALID_OFFSETOF_MACRO = NO;
 				GCC_WARN_ALLOW_INCOMPLETE_PROTOCOL = NO;
 				GCC_WARN_UNINITIALIZED_AUTOS = NO;
@@ -359,14 +372,15 @@
 				GCC_WARN_UNUSED_VARIABLE = NO;
 				HEADER_SEARCH_PATHS = (
 					"$(OF_CORE_HEADERS)",
-					../../../addons/ofxGLEditor/libs,
-					../../../addons/ofxGLEditor/src,
+					src,
 				);
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				OTHER_CPLUSPLUSFLAGS = (
 					"-D__MACOSX_CORE__",
 					"-lpthread",
 					"-mtune=native",
 				);
+				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
@@ -385,7 +399,7 @@
 				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_UNROLL_LOOPS = YES;
-				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = NO;
+				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = YES;
 				GCC_WARN_ABOUT_INVALID_OFFSETOF_MACRO = NO;
 				GCC_WARN_ALLOW_INCOMPLETE_PROTOCOL = NO;
 				GCC_WARN_UNINITIALIZED_AUTOS = NO;
@@ -393,20 +407,22 @@
 				GCC_WARN_UNUSED_VARIABLE = NO;
 				HEADER_SEARCH_PATHS = (
 					"$(OF_CORE_HEADERS)",
-					../../../addons/ofxGLEditor/libs,
-					../../../addons/ofxGLEditor/src,
+					src,
 				);
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				OTHER_CPLUSPLUSFLAGS = (
 					"-D__MACOSX_CORE__",
 					"-lpthread",
 					"-mtune=native",
 				);
+				SDKROOT = macosx;
 			};
 			name = Release;
 		};
 		E4B69B600A3A1757003C02F2 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -416,8 +432,8 @@
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_MODEL_TUNING = NONE;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
+				ICON = "$(ICON_NAME_DEBUG)";
+				ICON_FILE = "$(ICON_FILE_PATH)$(ICON)";
 				INFOPLIST_FILE = "openFrameworks-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
 				LIBRARY_SEARCH_PATHS = (
@@ -484,7 +500,7 @@
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_51)",
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_52)",
 				);
-				PRODUCT_NAME = "$(TARGET_NAME)Debug";
+				PRODUCT_NAME = EditorExampleDebug;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -492,6 +508,7 @@
 		E4B69B610A3A1757003C02F2 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -500,8 +517,8 @@
 				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/../../../libs/glut/lib/osx\"";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_MODEL_TUNING = NONE;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
+				ICON = "$(ICON_NAME_RELEASE)";
+				ICON_FILE = "$(ICON_FILE_PATH)$(ICON)";
 				INFOPLIST_FILE = "openFrameworks-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
 				LIBRARY_SEARCH_PATHS = (
@@ -568,7 +585,7 @@
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_50)",
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_51)",
 				);
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = EditorExample;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
