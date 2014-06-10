@@ -449,6 +449,15 @@ string ofxGLEditor::getReplPrompt() {
 }
 
 //--------------------------------------------------------------
+void ofxGLEditor::setReplWidth(unsigned int numChars) {
+	Repl::MAX_LINE_LENGTH = numChars;
+}
+
+unsigned int ofxGLEditor::getReplWidth() {
+	return Repl::MAX_LINE_LENGTH;
+}
+
+//--------------------------------------------------------------
 void ofxGLEditor::setPath(string path) {
 	// make sure there is a trailing /
 	glFileDialog->SetPath(string_to_wstring(ofFilePath::addTrailingSlash(path)));

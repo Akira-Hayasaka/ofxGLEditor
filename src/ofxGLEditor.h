@@ -159,6 +159,10 @@ public:
 	static void setReplPrompt(const string &text); //< call this before setup()
 	static string getReplPrompt();
 	
+	/// set/get the Repl console char width, default: 80
+	static void setReplWidth(unsigned int numChars);
+	static unsigned int getReplWidth();
+	
 	/// set the file browser path, default: data path when setup() is called
 	void setPath(string path);
     
