@@ -85,6 +85,7 @@ void ofxGLEditor::keyPressed(int key){
 #ifdef OFX_GL_EDITOR_GLUT // legacy Glut support
 	// from Rick Companje's ofxKeyMap 2009.09.17
 	// https://github.com/companje/ofxKeyMap
+	// note: no super key support in Glut
 	#ifdef TARGET_WIN32
 		bAltPressed = (bool) ((GetKeyState(VK_MENU) & 0x80) > 0);
 		bShiftPressed = (bool) ((GetKeyState(VK_SHIFT) & 0x80) > 0);
@@ -111,14 +112,14 @@ void ofxGLEditor::keyPressed(int key){
 			return;
 	}
 #if (OF_VERSION_MAJOR == 0) && (OF_VERSION_MINOR == 8) && (OF_VERSION_PATCH == 1)
-#pragma warning "using GLFW modifier key hack, may not work with non-US keybaords"
-	// TODO: hack for non shifted chars in OF 0.8.1 until fix comes with
+#pragma warning "using GLFW modifier key hack, may not work with non-US keyboards"
+	// TODO: hack for non shifted chars in OF 0.8.1 until a fix comes with the
 	//       updated GLFW in OF 0.8.2
 	// from https://github.com/openframeworks/openFrameworks/issues/2554
 	//
-	// WARNING: this probably does not work with non US keyboards, it's just a
-	//          hack to get it working in GLFW for now, in the meantime it's
-	//          recommended to use the ofAppGlutWindow
+	// WARNING: This probably does not work with non US keyboards, it's just a
+	//          hack to get it working in GLFW for now. In the meantime it's
+	//          recommended to use the ofAppGlutWindow:
 	//          see https://github.com/openframeworks/openFrameworks/issues/2562
 	//
 	// Another option is to simply edit the keymap below to match your keyboard
@@ -269,19 +270,15 @@ void ofxGLEditor::keyReleased(int key){
 	// GLFW
 	switch(key){
 		case OF_KEY_ALT: case OF_KEY_LEFT_ALT: case OF_KEY_RIGHT_ALT:
-			ofLog() << "alt released";
 			bAltPressed = false;
 			break;
 		case OF_KEY_SHIFT: case OF_KEY_LEFT_SHIFT: case OF_KEY_RIGHT_SHIFT:
-			ofLog() << "shift released";
 			bShiftPressed = false;
 			break;
 		case OF_KEY_CONTROL: case OF_KEY_LEFT_CONTROL: case OF_KEY_RIGHT_CONTROL:
-			ofLog() << "control released";
 			bControlPressed = false;
 			break;
 		case OF_KEY_SUPER: case OF_KEY_LEFT_COMMAND: case OF_KEY_RIGHT_COMMAND:
-			ofLog() << "super released";
 			bSuperPressed = false;
 			break;
 	}
