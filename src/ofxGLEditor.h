@@ -100,12 +100,12 @@ public:
 	///
 	/// set editor to 0 for the current editor
 	/// or an editor index from 1- 9
-	bool loadFile(string filename = "output.txt", int editor = 0);
+	bool loadFile(string filename, int editor = 0);
 	
 	/// save the text in the current editor to a file
 	///
 	/// set editor to 0 for the current editor or an editor index from 1- 9
-	bool saveFile(string filename = "output.txt", int editor = 0);
+	bool saveFile(string filename, int editor = 0);
 	
 	/// set the contents of an editor
 	///
