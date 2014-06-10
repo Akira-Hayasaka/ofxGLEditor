@@ -19,14 +19,16 @@
  */
 #include "ofxGLEditor.h"
 
-// for mapping special keys
-#ifndef __APPLE__
-	#include <GL/glut.h>
-#else
-	#include <GLUT/glut.h>
-#endif
-
 using namespace fluxus;
+
+#ifdef OFX_GL_EDITOR_GLUT
+	// for mapping special keys
+	#ifndef __APPLE__
+		#include <GL/glut.h>
+	#else
+		#include <GLUT/glut.h>
+	#endif
+#endif
 
 //--------------------------------------------------------------
 ofxGLEditor::ofxGLEditor(){
@@ -78,7 +80,11 @@ void ofxGLEditor::clear(){
 
 //--------------------------------------------------------------
 void ofxGLEditor::keyPressed(int key){
-	
+
+// check modifier keys
+#ifdef OFX_GL_EDITOR_GLUT // legacy Glut support
+	// from Rick Companje's ofxKeyMap 2009.09.17
+	// https://github.com/companje/ofxKeyMap
 	#ifdef TARGET_WIN32
 		bAltPressed = (bool) ((GetKeyState(VK_MENU) & 0x80) > 0);
 		bShiftPressed = (bool) ((GetKeyState(VK_SHIFT) & 0x80) > 0);
@@ -88,16 +94,122 @@ void ofxGLEditor::keyPressed(int key){
 		bShiftPressed = (bool) (glutGetModifiers() & GLUT_ACTIVE_SHIFT);
 		bControlPressed = (bool) (glutGetModifiers() & GLUT_ACTIVE_CTRL);
 	#endif
+#else // GLFW
+	// we get 2 key events for every modifier, so try to catch them all
+	switch(key){
+		case OF_KEY_ALT: case OF_KEY_LEFT_ALT: case OF_KEY_RIGHT_ALT:
+			bAltPressed = true;
+			return;
+		case OF_KEY_SHIFT: case OF_KEY_LEFT_SHIFT: case OF_KEY_RIGHT_SHIFT:
+			bShiftPressed = true;
+			return;
+		case OF_KEY_CONTROL: case OF_KEY_LEFT_CONTROL: case OF_KEY_RIGHT_CONTROL:
+			bControlPressed = true;
+			return;
+		case OF_KEY_SUPER: case OF_KEY_LEFT_COMMAND: case OF_KEY_RIGHT_COMMAND:
+			bSuperPressed = true;
+			return;
+	}
+#if (OF_VERSION_MAJOR == 0) && (OF_VERSION_MINOR == 8) && (OF_VERSION_PATCH == 1)
+#pragma warning "using GLFW modifier key hack, may not work with non-US keybaords"
+	// TODO: hack for non shifted chars in OF 0.8.1 until fix comes with
+	//       updated GLFW in OF 0.8.2
+	// from https://github.com/openframeworks/openFrameworks/issues/2554
+	//
+	// WARNING: this probably does not work with non US keyboards, it's just a
+	//          hack to get it working in GLFW for now, in the meantime it's
+	//          recommended to use the ofAppGlutWindow
+	//          see https://github.com/openframeworks/openFrameworks/issues/2562
+	//
+	// Another option is to simply edit the keymap below to match your keyboard
+	// for a quick fix.
+	if(bShiftPressed){
+		switch (key){
+		
+			case '1':
+				key = '!';
+				break;
+			case '2':
+				key = '@';
+				break;
+			case '3':
+				key = '#';
+				break;
+			case '4':
+				key = '$';
+				break;
+			case '5':
+				key = '%';
+				break;
+			case '6':
+				key = '^';
+				break;
+			case '7':
+				key = '&';
+				break;
+			case '8':
+				key = '*';
+				break;
+			case '9':
+				key = '(';
+				break;
+			case '0':
+				key = ')';
+				break;
+			case '-':
+				key = '_';
+				break;
+			case '=':
+				key = '+';
+				break;
+			
+			case '[':
+				key = '{';
+				break;
+			case ']':
+				key = '}';
+				break;
+			case '\\':
+				key = '|';
+				break;
+				
+			case ';':
+				key = ':';
+				break;
+			case '\'':
+				key = '"';
+				break;
+				
+			case ',':
+				key = '<';
+				break;
+			case '.':
+				key = '>';
+				break;
+			case '/':
+				key = '?';
+				break;
+			
+			default:
+				break;
+		}
+	}
+#endif
+#endif
+	
+	//ofLog() << "alt: " << bAltPressed << " shft: " << bShiftPressed
+	//        << " ctl: " << bControlPressed << " spr: " << bSuperPressed;
+	//ofLog() << "key " << key << " " << (char) key;
 	
 	int mod = 0;
 	if(bShiftPressed){
-		mod = 1;
+		mod = 1; // GLUT_ACTIVE_SHIFT
 	}
-	else if (bControlPressed){
-		mod = 2;
+	else if(bControlPressed){
+		mod = 2; // GLUT_ACTIVE_CTRL
 	}
-	else if (bAltPressed){
-		mod = 4;
+	else if(bAltPressed){
+		mod = 4; // GLUT_ACTIVE_ALT
 	}
 	
 	int special = 0;
@@ -146,7 +258,34 @@ void ofxGLEditor::keyPressed(int key){
 	}else if(bAltPressed && key == '9'){
 		currentEditor = 8;
 	}
-	glEditors[currentEditor]->Handle(-1, key, special, 0, ofGetMouseX(), ofGetMouseY(), mod);
+	else{
+		glEditors[currentEditor]->Handle(-1, key, special, 0, ofGetMouseX(), ofGetMouseY(), mod);
+	}
+}
+
+//--------------------------------------------------------------
+void ofxGLEditor::keyReleased(int key){
+#ifndef OFX_GLEDITOR_GLUT
+	// GLFW
+	switch(key){
+		case OF_KEY_ALT: case OF_KEY_LEFT_ALT: case OF_KEY_RIGHT_ALT:
+			ofLog() << "alt released";
+			bAltPressed = false;
+			break;
+		case OF_KEY_SHIFT: case OF_KEY_LEFT_SHIFT: case OF_KEY_RIGHT_SHIFT:
+			ofLog() << "shift released";
+			bShiftPressed = false;
+			break;
+		case OF_KEY_CONTROL: case OF_KEY_LEFT_CONTROL: case OF_KEY_RIGHT_CONTROL:
+			ofLog() << "control released";
+			bControlPressed = false;
+			break;
+		case OF_KEY_SUPER: case OF_KEY_LEFT_COMMAND: case OF_KEY_RIGHT_COMMAND:
+			ofLog() << "super released";
+			bSuperPressed = false;
+			break;
+	}
+#endif
 }
 
 //--------------------------------------------------------------

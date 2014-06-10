@@ -33,6 +33,13 @@
 
 /// a wrapper around the fluxus opengl text editor
 /// http://www.pawfal.org/fluxus/
+///
+/// As of OF 0.8.0+, the default windowing system uses the GLFW library.
+///
+/// If you are still using the ofAppGlutWindow, you need to add
+/// -DOFX_GL_EDITOR_GLUT to your C++ flags in order to enable Glut modifier key
+/// support.
+///
 class ofxGLEditor {
 
 public:
@@ -69,6 +76,7 @@ public:
 	/// ALT + d: switch to the default editor (1)
 	/// ALT + 1 to ALT + 9: switch to editor 1 - 9
 	void keyPressed(int key);
+	void keyReleased(int key);
 	
 	/// reshape the drawing area
 	/// call this if you change the window size (fullscreen, etc)
@@ -126,15 +134,13 @@ public:
 	/// returns the index of the current editor
 	ofEvent<int> saveFileEvent;
     
-	///
 	/// keep track of pressed modifer keys
 	///
-	/// from Rick Companje's ofxKeyMap 2009.09.17
-	/// https://github.com/companje/ofxKeyMap
-	///
+	/// note: Super is not tracked when using ofAppGlutWindow
 	inline bool isAltPressed()		{return bAltPressed;}
 	inline bool isShiftPressed()	{return bShiftPressed;}
 	inline bool isControlPressed()	{return bControlPressed;}
+	inline bool isSuperPressed()	{return bSuperPressed;} //< Win or CMD key
 	
 	/// the number of editors
 	static const int s_numEditors = 10;
@@ -185,6 +191,7 @@ private:
 	bool bAltPressed;
 	bool bShiftPressed;
 	bool bControlPressed;
+	bool bSuperPressed;
 	
 	bool bDrawCurrentEditor;
 	
