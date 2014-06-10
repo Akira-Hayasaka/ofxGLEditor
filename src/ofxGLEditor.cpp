@@ -164,9 +164,9 @@ void ofxGLEditor::keyPressed(int key){
 #endif
 #endif
 	
-	ofLog() << "alt: " << bAltPressed << " shft: " << bShiftPressed
-	        << " ctl: " << bControlPressed << " spr: " << bSuperPressed;
-	ofLog() << "key " << key << " " << (char) key;
+//	ofLog() << "alt: " << bAltPressed << " shft: " << bShiftPressed
+//	        << " ctl: " << bControlPressed << " spr: " << bSuperPressed;
+//	ofLog() << "key " << key << " " << (char) key;
 	
 	int mod = 0;
 	if(bShiftPressed){

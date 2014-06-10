@@ -111,5 +111,5 @@ void ofApp::executeScriptEvent(int &whichEditor){
 	// received on editor ALT + e
 
 	// if you have some scripting language (e.g. ofxLua)
-	ofLogNotice() << "recieved execute script event for editor " << whichEditor << endl;
+	ofLogNotice() << "received execute script event for editor " << whichEditor << endl;
 }
