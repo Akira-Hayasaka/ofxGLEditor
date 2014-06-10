@@ -90,6 +90,8 @@ public:
 	/// call this if you change the window size (fullscreen, etc)
 	void reShape();
 	
+/// \section Editor
+	
 	/// paste the latest text from the system clipboard
 	/// note: currently only supported on Mac OS X
 	void pasteFromClipBoard();
@@ -138,10 +140,20 @@ public:
 	
 	/// get the filename of the current editor (default: empty string "")
 	string getEditorFilename(int editor);
-    
+	
+	/// current line pos of an editor (1-size)
+	/// set editor to 0 for the current editor
+	void setCurrentLine(unsigned int line, int editor = 0);
+	unsigned int getCurrentLine(int editor = 0);
+	
+	/// number of lines of of text in an editor
+	unsigned int getNumLines(int editor = 0);
+	
 	/// this event is triggered when ALT + e is pressed
 	/// returns the index of the current editor
 	ofEvent<int> executeScriptEvent;
+	
+/// \section Repl (Read-Eval-Print Loop)
 	
 	/// this event is triggered when Enter is pressed in the Repl console
 	/// returns the text to be evaluated
@@ -162,6 +174,8 @@ public:
 	/// set/get the Repl console char width, default: 80
 	static void setReplWidth(unsigned int numChars);
 	static unsigned int getReplWidth();
+	
+/// \section Util
 	
 	/// set the file browser path, default: data path when setup() is called
 	void setPath(string path);
@@ -203,14 +217,6 @@ public:
 	/// default: 1.0
 	void setAlpha(float a);
 	float getAlpha();
-	
-	/// current line pos of an editor (1-size)
-	/// set editor to 0 for the current editor
-	void setCurrentLine(unsigned int line, int editor = 0);
-	unsigned int getCurrentLine(int editor = 0);
-	
-	/// number of lines of of text in an editor
-	unsigned int getNumLines(int editor = 0);
 
 	class Editor;
 	class FileDialog;

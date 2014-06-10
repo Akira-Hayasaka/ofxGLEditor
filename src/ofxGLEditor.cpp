@@ -101,6 +101,33 @@ void ofxGLEditor::clear(){
 	}
 }
 
+
+//--------------------------------------------------------------
+void ofxGLEditor::draw(){
+	ofPushView();
+	ofPushMatrix();
+	ofPushStyle();
+	
+	ofEnableAlphaBlending();
+	
+	if(bShowFileDialog) {
+		glFileDialog->Render();
+	}
+	else if(!bHideEditor) {
+		glEditors[currentEditor]->Render();
+	}
+	
+	ofDisableAlphaBlending();
+	
+	ofPopStyle();
+	ofPopMatrix();
+	ofPopView();
+	
+	glDisable(GL_LIGHTING);
+    glDisable(GL_DEPTH_TEST);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+}
+
 //--------------------------------------------------------------
 void ofxGLEditor::keyPressed(int key){
 
@@ -326,6 +353,82 @@ void ofxGLEditor::keyReleased(int key){
 }
 
 //--------------------------------------------------------------
+void ofxGLEditor::reShape(){
+	int w = (ofGetWindowMode() == OF_WINDOW)?ofGetViewportWidth():ofGetScreenWidth();
+	int h = (ofGetWindowMode() == OF_WINDOW)?ofGetViewportHeight():ofGetScreenHeight();
+	for(int i = 0; i < (int) glEditors.size(); i++){
+		if(glEditors[i]) glEditors[i]->Reshape(w, h);
+	}
+	glFileDialog->Reshape(w, h);
+}
+
+//--------------------------------------------------------------
+void ofxGLEditor::pasteFromClipBoard(){
+	glEditors[currentEditor]->InsertText(clipBoard.getText());
+}
+
+//--------------------------------------------------------------
+void ofxGLEditor::copyToClipBoard(){
+	clipBoard.setText(wstring_to_string(glEditors[currentEditor]->GetText()));
+}
+
+//--------------------------------------------------------------
+bool ofxGLEditor::loadFile(string filename, int editor){
+	
+	if(editor < 0 && (editor - 1) >= (int) glEditors.size()){
+		ofLogError("ofxGLEditor") << "cannot load into unknown editor " << editor;
+		return false;
+	}
+	else if(editor == 0){
+		editor = currentEditor;
+	}
+	
+	string path = ofToDataPath(filename);
+	ofLogVerbose("ofxGLEditor") << "loading \"" << ofFilePath::getFileName(path)
+		<< "\" into editor " << editor;
+	
+	ofFile file;
+	if(!file.open(ofToDataPath(path), ofFile::ReadOnly)){
+		ofLogError() << "ofxGLEditor: couldn't load \""
+			<< ofFilePath::getFileName(path) << "\"";
+		return false;
+	}
+	
+	setText(file.readToBuffer().getText(), editor);
+	file.close();
+	
+	return true;
+}
+
+//--------------------------------------------------------------
+bool ofxGLEditor::saveFile(string filename, int editor){
+	
+	if(editor < 0 && (editor - 1) >= (int) glEditors.size()){
+		ofLogError("ofxGLEditor") << "cannot save from unknown editor " << editor;
+		return "";
+	}
+	else if(editor == 0){
+		editor = currentEditor;
+	}
+	
+	string path = ofToDataPath(filename);
+	ofLogVerbose("ofxGLEditor") << "saving editor " << editor
+		<< " to \"" << ofFilePath::getFileName(path) << "\"";
+	
+	ofFile file;
+	if(!file.open(path, ofFile::WriteOnly)){
+		ofLogError() << "ofxGLEditor: couldn't open \""
+			<< ofFilePath::getFileName(path) << "\" for saving";
+		return false;
+	}
+	
+	file << getText(editor);
+	file.close();
+		
+	return true;
+}
+
+//--------------------------------------------------------------
 void ofxGLEditor::setText(string text, int editor){
 
 	editor = getEditorIndex(editor);
@@ -423,6 +526,45 @@ string ofxGLEditor::getEditorFilename(int editor) {
 }
 
 //--------------------------------------------------------------
+void ofxGLEditor::setCurrentLine(unsigned int line, int editor){
+	
+	editor = getEditorIndex(editor);
+	if(editor == -1){
+		ofLogError("ofxGLEditor") << "cannot set current line in unknown editor " << editor;
+		return;
+	}
+		
+	Editor *e = glEditors[editor];
+	if(line >= e->GetLineCount()){
+		ofLogError("ofxGLEditor") << "cannot set current line, given line "
+			<< line << " is >= num lines " << e->GetLineCount();
+		return;
+	}
+	e->SetCurLine(line);
+}
+
+//--------------------------------------------------------------
+unsigned int ofxGLEditor::getCurrentLine(int editor){
+	editor = getEditorIndex(editor);
+	if(editor == -1){
+		ofLogError("ofxGLEditor") << "cannot get current line from unknown editor " << editor;
+		return 0;
+	}
+	return glEditors[editor]->GetCurLine();
+}
+
+//--------------------------------------------------------------
+unsigned int ofxGLEditor::getNumLines(int editor){
+	editor = getEditorIndex(editor);
+	if(editor == -1){
+		ofLogError("ofxGLEditor") << "cannot get num lines from unknown editor " << editor;
+		return 0;
+	}
+	return glEditors[editor]->GetLineCount();
+}
+
+
+//--------------------------------------------------------------
 void ofxGLEditor::evalReplReturn(const string &text) {
 	if(glEditors[0]) {
 		Repl *repl = (Repl*) glEditors[0];
@@ -469,108 +611,6 @@ void ofxGLEditor::setPath(string path) {
 //--------------------------------------------------------------
 void ofxGLEditor::setHidden(bool hidden) {
 	bHideEditor = !bHideEditor;
-}
-
-//--------------------------------------------------------------
-void ofxGLEditor::draw(){
-	ofPushView();
-	ofPushMatrix();
-	ofPushStyle();
-	
-	ofEnableAlphaBlending();
-	
-	if(bShowFileDialog) {
-		glFileDialog->Render();
-	}
-	else if(!bHideEditor) {
-		glEditors[currentEditor]->Render();
-	}
-	
-	ofDisableAlphaBlending();
-	
-	ofPopStyle();
-	ofPopMatrix();
-	ofPopView();
-	
-	glDisable(GL_LIGHTING);
-    glDisable(GL_DEPTH_TEST);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-}
-
-//--------------------------------------------------------------
-void ofxGLEditor::reShape(){
-	int w = (ofGetWindowMode() == OF_WINDOW)?ofGetViewportWidth():ofGetScreenWidth();
-	int h = (ofGetWindowMode() == OF_WINDOW)?ofGetViewportHeight():ofGetScreenHeight();
-	for(int i = 0; i < (int) glEditors.size(); i++){
-		if(glEditors[i]) glEditors[i]->Reshape(w, h);
-	}
-	glFileDialog->Reshape(w, h);
-}
-
-//--------------------------------------------------------------
-void ofxGLEditor::pasteFromClipBoard(){
-	glEditors[currentEditor]->InsertText(clipBoard.getText());
-}
-
-//--------------------------------------------------------------
-void ofxGLEditor::copyToClipBoard(){
-	clipBoard.setText(wstring_to_string(glEditors[currentEditor]->GetText()));
-}
-
-//--------------------------------------------------------------
-bool ofxGLEditor::loadFile(string filename, int editor){
-	
-	if(editor < 0 && (editor - 1) >= (int) glEditors.size()){
-		ofLogError("ofxGLEditor") << "cannot load into unknown editor " << editor;
-		return false;
-	}
-	else if(editor == 0){
-		editor = currentEditor;
-	}
-	
-	string path = ofToDataPath(filename);
-	ofLogVerbose("ofxGLEditor") << "loading \"" << ofFilePath::getFileName(path)
-		<< "\" into editor " << editor;
-	
-	ofFile file;
-	if(!file.open(ofToDataPath(path), ofFile::ReadOnly)){
-		ofLogError() << "ofxGLEditor: couldn't load \""
-			<< ofFilePath::getFileName(path) << "\"";
-		return false;
-	}
-	
-	setText(file.readToBuffer().getText(), editor);
-	file.close();
-	
-	return true;
-}
-
-//--------------------------------------------------------------
-bool ofxGLEditor::saveFile(string filename, int editor){
-	
-	if(editor < 0 && (editor - 1) >= (int) glEditors.size()){
-		ofLogError("ofxGLEditor") << "cannot save from unknown editor " << editor;
-		return "";
-	}
-	else if(editor == 0){
-		editor = currentEditor;
-	}
-	
-	string path = ofToDataPath(filename);
-	ofLogVerbose("ofxGLEditor") << "saving editor " << editor
-		<< " to \"" << ofFilePath::getFileName(path) << "\"";
-	
-	ofFile file;
-	if(!file.open(path, ofFile::WriteOnly)){
-		ofLogError() << "ofxGLEditor: couldn't open \""
-			<< ofFilePath::getFileName(path) << "\" for saving";
-		return false;
-	}
-	
-	file << getText(editor);
-	file.close();
-		
-	return true;
 }
 
 //--------------------------------------------------------------
@@ -627,44 +667,6 @@ void ofxGLEditor::setAlpha(float a){
 //--------------------------------------------------------------
 float ofxGLEditor::getAlpha(){
 	return Editor::m_Alpha;
-}
-
-//--------------------------------------------------------------
-void ofxGLEditor::setCurrentLine(unsigned int line, int editor){
-	
-	editor = getEditorIndex(editor);
-	if(editor == -1){
-		ofLogError("ofxGLEditor") << "cannot set current line in unknown editor " << editor;
-		return;
-	}
-		
-	Editor *e = glEditors[editor];
-	if(line >= e->GetLineCount()){
-		ofLogError("ofxGLEditor") << "cannot set current line, given line "
-			<< line << " is >= num lines " << e->GetLineCount();
-		return;
-	}
-	e->SetCurLine(line);
-}
-
-//--------------------------------------------------------------
-unsigned int ofxGLEditor::getCurrentLine(int editor){
-	editor = getEditorIndex(editor);
-	if(editor == -1){
-		ofLogError("ofxGLEditor") << "cannot get current line from unknown editor " << editor;
-		return 0;
-	}
-	return glEditors[editor]->GetCurLine();
-}
-
-//--------------------------------------------------------------
-unsigned int ofxGLEditor::getNumLines(int editor){
-	editor = getEditorIndex(editor);
-	if(editor == -1){
-		ofLogError("ofxGLEditor") << "cannot get num lines from unknown editor " << editor;
-		return 0;
-	}
-	return glEditors[editor]->GetLineCount();
 }
 
 // PRIVATE
