@@ -494,7 +494,7 @@ bool ofxGLEditor::loadFile(string filename, int editor){
 }
 
 //--------------------------------------------------------------
-bool ofxGLEditor::saveFile(string filename, int editor, bool addTimestamp){
+bool ofxGLEditor::saveFile(string filename, int editor){
 	
 	if(editor < 0 && (editor - 1) >= (int) glEditors.size()){
 		ofLogError("ofxGLEditor") << "cannot save from unknown editor " << editor;
@@ -505,13 +505,6 @@ bool ofxGLEditor::saveFile(string filename, int editor, bool addTimestamp){
 	}
 	
 	string path = ofToDataPath(filename);
-	if(addTimestamp){
-		path =  ofFilePath::getEnclosingDirectory(path)
-				+ ofFilePath::getBaseName(path)
-				+ "-" + ofGetTimestampString()
-				+ "." + ofFilePath::getFileExt(path);
-	}
-	
 	ofLogVerbose("ofxGLEditor") << "saving editor " << editor
 		<< " to \"" << ofFilePath::getFileName(path) << "\"";
 	

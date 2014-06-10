@@ -105,8 +105,7 @@ public:
 	/// save the text in the current editor to a file
 	///
 	/// set editor to 0 for the current editor or an editor index from 1- 9
-	/// set addTimestamp = true if you want the filename prepended with a timestamp
-	bool saveFile(string filename = "output.txt", int editor = 0, bool addTimestamp = false);
+	bool saveFile(string filename = "output.txt", int editor = 0);
 	
 	/// set the contents of an editor
 	///
