@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		301C61FE19441E91001DB273 /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 301C61FD19441E91001DB273 /* CoreVideo.framework */; };
 		34b64adf26314fa55e87ba6670618c45 /* ClipBoard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8e6c5f343e8ecdb940f5f5a4e0bfa485 /* ClipBoard.cpp */; };
 		507cedc155e968fcbd9ff33cf6c6d5ba /* ofxGLEditor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 24bc94dc303139bf39b613690920ae4a /* ofxGLEditor.cpp */; };
 		6e519bd2fb1f63665e6903b510635706 /* Unicode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8c9434c4d1346f228494101fbb609360 /* Unicode.cpp */; };
@@ -65,6 +66,7 @@
 		16440f42b6e23f2f6793334f32f22c76 /* ofxGLEditor.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxGLEditor.h; path = ../../../addons/ofxGLEditor/src/ofxGLEditor.h; sourceTree = SOURCE_ROOT; };
 		24bc94dc303139bf39b613690920ae4a /* ofxGLEditor.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = ofxGLEditor.cpp; path = ../../../addons/ofxGLEditor/src/ofxGLEditor.cpp; sourceTree = SOURCE_ROOT; };
 		275875369b8b9fcee839f90fd9bc11f8 /* PolyGlyph.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = PolyGlyph.cpp; path = ../../../addons/ofxGLEditor/src/PolyGlyph.cpp; sourceTree = SOURCE_ROOT; };
+		301C61FD19441E91001DB273 /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = System/Library/Frameworks/CoreVideo.framework; sourceTree = SDKROOT; };
 		8bed9c523892e4699d2d5aa2509d4361 /* PolyGlyph.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = PolyGlyph.h; path = ../../../addons/ofxGLEditor/src/PolyGlyph.h; sourceTree = SOURCE_ROOT; };
 		8c9434c4d1346f228494101fbb609360 /* Unicode.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = Unicode.cpp; path = ../../../addons/ofxGLEditor/src/Unicode.cpp; sourceTree = SOURCE_ROOT; };
 		8e6c5f343e8ecdb940f5f5a4e0bfa485 /* ClipBoard.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = ClipBoard.cpp; path = ../../../addons/ofxGLEditor/src/ClipBoard.cpp; sourceTree = SOURCE_ROOT; };
@@ -100,6 +102,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				301C61FE19441E91001DB273 /* CoreVideo.framework in Frameworks */,
 				E4EB6799138ADC1D00A09F29 /* GLUT.framework in Frameworks */,
 				E4328149138ABC9F0047C5CB /* openFrameworksDebug.a in Frameworks */,
 				E45BE97B0E8CC7DD009D7055 /* AGL.framework in Frameworks */,
@@ -156,6 +159,7 @@
 		BBAB23C913894ECA00AA2426 /* system frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				301C61FD19441E91001DB273 /* CoreVideo.framework */,
 				E4C2424410CC5A17004149E2 /* AppKit.framework */,
 				E4C2424510CC5A17004149E2 /* Cocoa.framework */,
 				E4C2424610CC5A17004149E2 /* IOKit.framework */,
@@ -362,6 +366,7 @@
 					../../../addons/ofxGLEditor/libs,
 					../../../addons/ofxGLEditor/src,
 				);
+				OTHER_CFLAGS = "";
 				OTHER_CPLUSPLUSFLAGS = (
 					"-D__MACOSX_CORE__",
 					"-lpthread",
@@ -396,6 +401,7 @@
 					../../../addons/ofxGLEditor/libs,
 					../../../addons/ofxGLEditor/src,
 				);
+				OTHER_CFLAGS = "";
 				OTHER_CPLUSPLUSFLAGS = (
 					"-D__MACOSX_CORE__",
 					"-lpthread",

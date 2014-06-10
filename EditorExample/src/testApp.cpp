@@ -45,7 +45,7 @@ void testApp::draw(){
 	
 	// draw the current & total line nums
 	editor.drawString("Current line: "+ofToString(editor.getCurrentLine())
-		+"/"+ofToString(editor.getNumLines()), ofGetWidth()-270, 15);
+		+"/"+ofToString(editor.getNumLines()), 740, 15);
 }
 
 //--------------------------------------------------------------
@@ -58,23 +58,34 @@ void testApp::keyPressed(int key){
 	bool alt = editor.isAltPressed();
 	if(alt && key == 'f'){
 		ofToggleFullscreen();
-		editor.reShape();
 	}
 }
+
 //--------------------------------------------------------------
-void testApp::keyReleased(int key){}
+void testApp::keyReleased(int key){
+	editor.keyReleased(key);
+}
+
 //--------------------------------------------------------------
 void testApp::mouseMoved(int x, int y ){}
+
 //--------------------------------------------------------------
 void testApp::mouseDragged(int x, int y, int button){}
+
 //--------------------------------------------------------------
 void testApp::mousePressed(int x, int y, int button){}
+
 //--------------------------------------------------------------
 void testApp::mouseReleased(int x, int y, int button){}
+
 //--------------------------------------------------------------
-void testApp::windowResized(int w, int h){}
+void testApp::windowResized(int w, int h){
+	editor.reShape();
+}
+
 //--------------------------------------------------------------
 void testApp::gotMessage(ofMessage msg){}
+
 //--------------------------------------------------------------
 void testApp::dragEvent(ofDragInfo dragInfo){}
 
