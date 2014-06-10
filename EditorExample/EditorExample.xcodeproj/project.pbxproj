@@ -12,6 +12,7 @@
 		301C622119469B92001DB273 /* GLFileDialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 301C621419469B92001DB273 /* GLFileDialog.cpp */; };
 		301C622319469B92001DB273 /* PolyGlyph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 301C621819469B92001DB273 /* PolyGlyph.cpp */; };
 		301C622619469B92001DB273 /* Unicode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 301C621E19469B92001DB273 /* Unicode.cpp */; };
+		301C622919478ECD001DB273 /* Repl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 301C622719478ECD001DB273 /* Repl.cpp */; };
 		34b64adf26314fa55e87ba6670618c45 /* ClipBoard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8e6c5f343e8ecdb940f5f5a4e0bfa485 /* ClipBoard.cpp */; };
 		507cedc155e968fcbd9ff33cf6c6d5ba /* ofxGLEditor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 24bc94dc303139bf39b613690920ae4a /* ofxGLEditor.cpp */; };
 		BBAB23CB13894F3D00AA2426 /* GLUT.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = BBAB23BE13894E4700AA2426 /* GLUT.framework */; };
@@ -75,6 +76,8 @@
 		301C621919469B92001DB273 /* PolyGlyph.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PolyGlyph.h; sourceTree = "<group>"; };
 		301C621E19469B92001DB273 /* Unicode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Unicode.cpp; sourceTree = "<group>"; };
 		301C621F19469B92001DB273 /* Unicode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Unicode.h; sourceTree = "<group>"; };
+		301C622719478ECD001DB273 /* Repl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Repl.cpp; path = ../src/Repl.cpp; sourceTree = "<group>"; };
+		301C622819478ECD001DB273 /* Repl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Repl.h; path = ../src/Repl.h; sourceTree = "<group>"; };
 		8e6c5f343e8ecdb940f5f5a4e0bfa485 /* ClipBoard.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = ClipBoard.cpp; path = ../../../addons/ofxGLEditor/src/ClipBoard.cpp; sourceTree = SOURCE_ROOT; };
 		BBAB23BE13894E4700AA2426 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = ../../../libs/glut/lib/osx/GLUT.framework; sourceTree = "<group>"; };
 		E4328143138ABC890047C5CB /* openFrameworksLib.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = openFrameworksLib.xcodeproj; path = ../../../libs/openFrameworksCompiled/project/osx/openFrameworksLib.xcodeproj; sourceTree = SOURCE_ROOT; };
@@ -134,6 +137,8 @@
 				bf89b56aba8bf89922a8f2e2f023a9a2 /* ClipBoard.h */,
 				24bc94dc303139bf39b613690920ae4a /* ofxGLEditor.cpp */,
 				16440f42b6e23f2f6793334f32f22c76 /* ofxGLEditor.h */,
+				301C622719478ECD001DB273 /* Repl.cpp */,
+				301C622819478ECD001DB273 /* Repl.h */,
 			);
 			name = src;
 			sourceTree = "<group>";
@@ -334,6 +339,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				301C622919478ECD001DB273 /* Repl.cpp in Sources */,
 				E4B69E200A3A1BDC003C02F2 /* main.cpp in Sources */,
 				E4B69E210A3A1BDC003C02F2 /* ofApp.cpp in Sources */,
 				34b64adf26314fa55e87ba6670618c45 /* ClipBoard.cpp in Sources */,

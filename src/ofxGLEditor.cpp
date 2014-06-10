@@ -31,6 +31,8 @@ using namespace fluxus;
 	#endif
 #endif
 
+#include "Repl.h"
+
 //--------------------------------------------------------------
 ofxGLEditor::ofxGLEditor(){
 	bAltPressed = false;
@@ -48,7 +50,7 @@ ofxGLEditor::~ofxGLEditor(){
 }
 
 //--------------------------------------------------------------
-bool ofxGLEditor::setup(string fontFile){
+bool ofxGLEditor::setup(string fontFile, bool enableRepl){
 	
 	// handle ESC internally since we use it to exit the file browser
 	ofSetEscapeQuitsApp(false);
@@ -65,14 +67,24 @@ bool ofxGLEditor::setup(string fontFile){
 	
 	Editor::InitFont(string_to_wstring(path));
 	Editor::m_DoEffects = true;
+	
+	if(enableRepl) {
+		Repl *repl = new Repl(this);
+		glEditors.push_back(repl);
+	}
+	else {
+		glEditors.push_back(NULL); // no Repl
+	}
 	for(int i = 1; i < s_numEditors; i++){
 		Editor* editor = new Editor();
 		glEditors.push_back(editor);
 	}
+	
 	GLFileDialog::InitFont(string_to_wstring(path));
 	glFileDialog = new FileDialog();
 	glFileDialog->SetPath(string_to_wstring(ofToDataPath("")));
-	reShape();	
+	
+	reShape();
 	
 	currentEditor = 1;
 }
@@ -244,6 +256,11 @@ void ofxGLEditor::keyPressed(int key){
 					}
 				}
 				break;
+			case 'r': case '0': // Repl
+				if(glEditors[0]) {
+					currentEditor = 0;
+				}
+				break;
 			case '1': currentEditor = 1; break;
 			case '2': currentEditor = 2; break;
 			case '3': currentEditor = 3; break;
@@ -279,9 +296,9 @@ void ofxGLEditor::keyPressed(int key){
 			}
 		}
 		else if(!bHideEditor) {
-			if(key == OF_KEY_ESC) {
-				ofExit();
-			}
+//			if(key == OF_KEY_ESC) {
+//				ofExit();
+//			}
 			glEditors[currentEditor]->Handle(-1, key, special, 0, ofGetMouseX(), ofGetMouseY(), mod);
 		}
 	}
@@ -406,6 +423,32 @@ string ofxGLEditor::getEditorFilename(int editor) {
 }
 
 //--------------------------------------------------------------
+void ofxGLEditor::evalReplReturn(const string &text) {
+	if(glEditors[0]) {
+		Repl *repl = (Repl*) glEditors[0];
+		repl->printEvalReturn(string_to_wstring(text));
+	}
+}
+
+//--------------------------------------------------------------
+void ofxGLEditor::setReplBanner(const string &text) {
+	Repl::s_banner = string_to_wstring(text);
+}
+
+string ofxGLEditor::getReplBanner() {
+	return wstring_to_string(Repl::s_banner);
+}
+	
+//--------------------------------------------------------------
+void ofxGLEditor::setReplPrompt(const string &text) {
+	Repl::s_prompt = string_to_wstring(text);
+}
+
+string ofxGLEditor::getReplPrompt() {
+	return wstring_to_string(Repl::s_prompt);
+}
+
+//--------------------------------------------------------------
 void ofxGLEditor::setPath(string path) {
 	// make sure there is a trailing /
 	glFileDialog->SetPath(string_to_wstring(ofFilePath::addTrailingSlash(path)));
@@ -450,7 +493,7 @@ void ofxGLEditor::reShape(){
 	int w = (ofGetWindowMode() == OF_WINDOW)?ofGetViewportWidth():ofGetScreenWidth();
 	int h = (ofGetWindowMode() == OF_WINDOW)?ofGetViewportHeight():ofGetScreenHeight();
 	for(int i = 0; i < (int) glEditors.size(); i++){
-		glEditors[i]->Reshape(w, h);	
+		if(glEditors[i]) glEditors[i]->Reshape(w, h);
 	}
 	glFileDialog->Reshape(w, h);
 }

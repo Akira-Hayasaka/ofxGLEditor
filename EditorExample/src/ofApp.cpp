@@ -28,6 +28,10 @@ void ofApp::setup(){
 	// let's see what's going on inside
 	ofSetLogLevel("ofxGLEditor", OF_LOG_VERBOSE);
 	
+	// set a custom Repl banner & prompt (do this before setup())
+	ofxGLEditor::setReplBanner("Hello, welcome to ofxGLEditor!");
+	ofxGLEditor::setReplPrompt("prompt> ");
+	
 	// setup the editor with a font
 	editor.setup("fonts/DroidSansMono.ttf");
 	
@@ -37,6 +41,7 @@ void ofApp::setup(){
 
 	// add editor event listening
 	ofAddListener(editor.executeScriptEvent, this, &ofApp::executeScriptEvent);
+	ofAddListener(editor.evalReplEvent, this, &ofApp::evalReplEvent);
 	
 	//editor.setTextColor(ofColor::red); // dosen't work right yet ... sorry
 	editor.setCursorColor(ofColor::blue); // block cursor color
@@ -57,13 +62,15 @@ void ofApp::draw(){
 	ofSetColor(255, 0, 0);
 	
 	// draw using the same font as the editor
+	if(!editor.isHidden() && editor.getCurrentEditor() > 0) {
 	
-	// draw the current editor num
-	editor.drawString("Current editor: "+ofToString(editor.getCurrentEditor()), 10, 15);
-	
-	// draw the current & total line nums
-	editor.drawString("Current line: "+ofToString(editor.getCurrentLine())
-		+"/"+ofToString(editor.getNumLines()), 740, 15);
+		// draw the current editor num
+		editor.drawString("Current editor: "+ofToString(editor.getCurrentEditor()), 10, 15);
+		
+		// draw the current & total line nums
+		editor.drawString("Current line: "+ofToString(editor.getCurrentLine())
+			+"/"+ofToString(editor.getNumLines()), 740, 15);
+	}
 }
 
 //--------------------------------------------------------------
@@ -111,5 +118,12 @@ void ofApp::executeScriptEvent(int &whichEditor){
 	// received on editor ALT + e
 
 	// if you have some scripting language (e.g. ofxLua)
-	ofLogNotice() << "received execute script event for editor " << whichEditor << endl;
+	ofLogNotice() << "received execute script event for editor " << whichEditor;
+}
+
+//--------------------------------------------------------------
+void ofApp::evalReplEvent(string &text){
+	ofLogNotice() << "received eval repl event: " << text;
+	
+	editor.evalReplReturn("did something");
 }

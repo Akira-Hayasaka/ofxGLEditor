@@ -44,6 +44,7 @@ public:
 	
 	/// editor events
 	void executeScriptEvent(int &whichEditor);
+	void evalReplEvent(string &text);
 	
 private:
 	ofxGLEditor editor;

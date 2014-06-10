@@ -51,10 +51,12 @@ public:
 	/// setup with the font to load
 	/// returns false if font is not found
 	///
+	/// set enableRepl = false if you don't need the Read-eval-print loop console
+	///
 	/// NOTE: variable width fonts are not handled well, use fixed-width fonts
 	///
 	/// WARNING: the editor will crash your app if a font is not loaded!
-	bool setup(string fontFile);
+	bool setup(string fontFile, bool enableRepl=true);
 	
 	/// clear resources
 	void clear();
@@ -65,7 +67,7 @@ public:
 	/// handles editor key events
 	///
 	/// ALT + h: show/hide
-	/// ALT + r & ALT + 0: switch to REPL (console)
+	/// ALT + r & ALT + 0: switch to REPL (console), if enabled
 	/// ALT + 1 to ALT + 9: switch to editor 1 - 9
 	///
 	/// ALT + e: trigger an executeScript event
@@ -141,6 +143,22 @@ public:
 	/// returns the index of the current editor
 	ofEvent<int> executeScriptEvent;
 	
+	/// this event is triggered when Enter is pressed in the Repl console
+	/// returns the text to be evaluated
+	ofEvent<string> evalReplEvent;
+	
+	/// send a response to the last evalReplEvent to the Repl console
+	/// note: this does nothing if the repl was not enabled in setup()
+	void evalReplReturn(const string &text);
+	
+	/// set/get the Repl greeting banner, default: ""
+	static void setReplBanner(const string &text); //< call this before setup()
+	static string getReplBanner();
+	
+	/// set/get the Repl prompt, default: "> "
+	static void setReplPrompt(const string &text); //< call this before setup()
+	static string getReplPrompt();
+	
 	/// set the file browser path, default: data path when setup() is called
 	void setPath(string path);
     
@@ -189,16 +207,16 @@ public:
 	
 	/// number of lines of of text in an editor
 	unsigned int getNumLines(int editor = 0);
+
+	class Editor;
+	class FileDialog;
 	
 private:
-
+	
 	/// checks given index and autodecrements
 	/// editor = 0 sets current editor
 	/// returns -1 if index out of bounds
 	int getEditorIndex(int editor);
-
-	class Editor;
-	class FileDialog;
 	
 	vector<Editor*> glEditors;
 	FileDialog *glFileDialog;
@@ -216,6 +234,8 @@ private:
 	bool bHideEditor;
 	bool bShowFileDialog;
 	
+public:
+
 	// wrappers for added functionality
 	class Editor : public fluxus::GLEditor {
 	public:
@@ -237,6 +257,7 @@ private:
 		// manually count the number of lines
 		void CountLines();
 	};
+	
 	class FileDialog : public fluxus::GLFileDialog {
 	public:
 	
