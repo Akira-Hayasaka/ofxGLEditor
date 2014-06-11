@@ -246,13 +246,15 @@ void ofxGLEditor::keyPressed(int key){
 			case 'c': copyToClipBoard(); break;
 			case 'v': pasteFromClipBoard(); break;
 			case 's': {
-				// show save as dialog on empty name
-				if(saveFiles[currentEditor] == "") {
-					glFileDialog->SetSaveAsMode(true);
-					bShowFileDialog = !bShowFileDialog;
-				}
-				else {
-					saveFile(saveFiles[currentEditor]);
+				if(currentEditor != 0) {
+					// show save as dialog on empty name
+					if(saveFiles[currentEditor] == "") {
+						glFileDialog->SetSaveAsMode(true);
+						bShowFileDialog = !bShowFileDialog;
+					}
+					else {
+						saveFile(saveFiles[currentEditor]);
+					}
 				}
 				break;
 			}
@@ -471,6 +473,10 @@ void ofxGLEditor::clearText(int editor){
 	
 	ofLogVerbose("ofxGLEditor") << "cleared text in editor" << currentEditor;
 	glEditors[editor]->ClearAllText();
+	if(editor == 0 && glEditors[0]) {
+		Repl *repl = (Repl*) glEditors[0];
+		repl->clear();
+	}
 }
 
 //--------------------------------------------------------------

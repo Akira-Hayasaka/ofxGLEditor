@@ -43,6 +43,9 @@ public:
 	/// add a string to the console and print a return after
 	void printEvalReturn(const wstring &what);
 	
+	/// clear the console
+	void clear();
+	
 	/// text to be evaluated, needed for ofEvent
 	string evalText;
 

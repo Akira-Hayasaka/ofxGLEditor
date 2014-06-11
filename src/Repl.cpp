@@ -161,6 +161,13 @@ void Repl::printEvalReturn(const wstring &what) {
 	printPrompt();
 }
 
+void Repl::clear() {
+	ClearAllText();
+	m_PromptPos = 0;
+	m_InsertPos = 0;
+	printPrompt();
+}
+
 // PRIVATE
 
 //--------------------------------------------------------------
