@@ -491,9 +491,14 @@ void ofxGLEditor::clearText(int editor){
 	
 	ofLogVerbose("ofxGLEditor") << "cleared text in editor" << currentEditor;
 	glEditors[editor]->ClearAllText();
-	if(editor == 0 && glEditors[0]) {
-		Repl *repl = (Repl*) glEditors[0];
-		repl->clear();
+	if(editor == 0) {
+		if(glEditors[0]) {
+			Repl *repl = (Repl*) glEditors[0];
+			repl->clear();
+		}
+	}
+	else { // reset filename
+		saveFiles[editor] = "";
 	}
 }
 
@@ -501,6 +506,7 @@ void ofxGLEditor::clearText(int editor){
 void ofxGLEditor::clearAllText(){
 	for(int i = 1; i < (int) glEditors.size(); i++){
 		glEditors[i]->ClearAllText();
+		saveFiles[i] = "";
 	}
 	ofLogVerbose("ofxGLEditor") << "cleared text in all editors";
 }
