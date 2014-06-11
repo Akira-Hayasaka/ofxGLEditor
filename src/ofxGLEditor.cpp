@@ -526,6 +526,16 @@ string ofxGLEditor::getEditorFilename(int editor) {
 }
 
 //--------------------------------------------------------------
+unsigned int ofxGLEditor::getNumLines(int editor){
+	editor = getEditorIndex(editor);
+	if(editor == -1){
+		ofLogError("ofxGLEditor") << "cannot get num lines from unknown editor " << editor;
+		return 0;
+	}
+	return glEditors[editor]->GetLineCount();
+}
+
+//--------------------------------------------------------------
 void ofxGLEditor::setCurrentLine(unsigned int line, int editor){
 	
 	editor = getEditorIndex(editor);
@@ -554,15 +564,34 @@ unsigned int ofxGLEditor::getCurrentLine(int editor){
 }
 
 //--------------------------------------------------------------
-unsigned int ofxGLEditor::getNumLines(int editor){
+unsigned int ofxGLEditor::getCurrentLinePos(int editor){
 	editor = getEditorIndex(editor);
 	if(editor == -1){
-		ofLogError("ofxGLEditor") << "cannot get num lines from unknown editor " << editor;
+		ofLogError("ofxGLEditor") << "cannot get current line pos from unknown editor " << editor;
 		return 0;
 	}
-	return glEditors[editor]->GetLineCount();
+	return glEditors[editor]->GetCurLinePos();
 }
 
+//--------------------------------------------------------------
+unsigned int ofxGLEditor::getCurrentLineLen(int editor) {
+	editor = getEditorIndex(editor);
+	if(editor == -1){
+		ofLogError("ofxGLEditor") << "cannot get current line len from unknown editor " << editor;
+		return 0;
+	}
+	return glEditors[editor]->GetCurLineLength();
+}
+
+//--------------------------------------------------------------
+unsigned int ofxGLEditor::getCurrentPos(int editor) {
+	editor = getEditorIndex(editor);
+	if(editor == -1){
+		ofLogError("ofxGLEditor") << "cannot get current pos from unknown editor " << editor;
+		return 0;
+	}
+	return glEditors[editor]->GetCurPos();
+}
 
 //--------------------------------------------------------------
 void ofxGLEditor::evalReplReturn(const string &text) {
