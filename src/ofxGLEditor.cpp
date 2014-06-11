@@ -231,9 +231,11 @@ void ofxGLEditor::keyPressed(int key){
 	if(bAltPressed) {
 		switch(key) {
 			case 'e': {
-				string script = getText();
-				int ed = currentEditor;
-				ofNotifyEvent(executeScriptEvent, ed, this);
+				if(currentEditor != 0) {
+					string script = getText();
+					int ed = currentEditor;
+					ofNotifyEvent(executeScriptEvent, ed, this);
+				}
 				break;
 			}
 			case 'b':
