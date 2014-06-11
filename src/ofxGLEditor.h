@@ -51,12 +51,18 @@ public:
 	/// setup with the font to load
 	/// returns false if font is not found
 	///
-	/// set enableRepl = false if you don't need the Read-eval-print loop console
-	///
 	/// NOTE: variable width fonts are not handled well, use fixed-width fonts
 	///
+	/// set enableRepl = false if you don't need the Read-eval-print loop console
+	///
+	/// set useSuperKey = true if you want to use the Super (Windows key, Mac CMD)
+	/// key as the modifier key, default: CTRL key
+	///
+	/// Note: useSuperKey does nothing when OFX_GLEDITOR_GLUT is defined since
+	/// Glut does not support the Super key
+	///
 	/// WARNING: the editor will crash your app if a font is not loaded!
-	bool setup(string fontFile, bool enableRepl=true);
+	bool setup(string fontFile, bool enableRepl=true, bool useSuperKey=false);
 	
 	/// clear resources
 	void clear();
@@ -66,22 +72,24 @@ public:
 	
 	/// handles editor key events
 	///
-	/// ALT + h: show/hide
-	/// ALT + r & ALT + 0: switch to REPL (console), if enabled
-	/// ALT + 1 to ALT + 9: switch to editor 1 - 9
+	/// MOD -> CTRL or Super (Windows Key, Mac CMD)
 	///
-	/// ALT + e: trigger an executeScript event
-	/// ALT + b: blow up the cursor
-	/// ALT + a: clear all text in current editor
-	/// ALT + c: copy from the system clipboard to current editor (Mac OS X only)
-	/// ALT + v: paste from current editor to the system clipboard (Mac OS X only)
+	/// MOD + t: toggle whether to show or hide the editor
+	/// MOD + r & MOD + 0: switch to REPL (console), if enabled
+	/// MOD + 1 to MOD + 9: switch to editor 1 - 9
 	///
-	/// ALT + s: save file, shows save as dialog if no filename has been set
-	/// ALT + d: save as dialog, saves in current path (default: data path)
-	/// ALT + l: load a file via a file browser, starts in current path
+	/// MOD + e: trigger an executeScript event
+	/// MOD + b: blow up the cursor
+	/// MOD + a: clear all text in current editor
+	/// MOD + c: copy from the system clipboard to current editor (Mac OS X only)
+	/// MOD + v: paste from current editor to the system clipboard (Mac OS X only)
 	///
-	/// ALT + -: decrease current editor alpha
-	/// ALT + =: increase current editor alpha
+	/// MOD + s: save file, shows save as dialog if no filename has been set
+	/// MOD + d: save as dialog, saves in current path (default: data path)
+	/// MOD + o: open a file via a file browser, starts in current path
+	///
+	/// MOD + -: decrease current editor alpha
+	/// MOD + =: increase current editor alpha
 	///
 	void keyPressed(int key);
 	void keyReleased(int key);
@@ -100,11 +108,11 @@ public:
 	/// note: currently only supported on Mac OS X
 	void copyToClipBoard();
 	
-	/// load a file into the an editor, clears existing text
+	/// open & load a file into the an editor, clears existing text
 	///
 	/// set editor to 0 for the current editor
 	/// or an editor index from 1- 9
-	bool loadFile(string filename, int editor = 0);
+	bool openFile(string filename, int editor = 0);
 	
 	/// save the text in the current editor to a file
 	///
@@ -161,15 +169,7 @@ public:
 	/// set editor to 0 for the current editor
 	unsigned int getCurrentPos(int editor = 0);
 	
-	/// this event is triggered when ALT + e is pressed
-	/// returns the index of the current editor
-	ofEvent<int> executeScriptEvent;
-	
 /// \section Repl (Read-Eval-Print Loop)
-	
-	/// this event is triggered when Enter is pressed in the Repl console
-	/// returns the text to be evaluated
-	ofEvent<string> evalReplEvent;
 	
 	/// send a response to the last evalReplEvent to the Repl console
 	///
@@ -191,6 +191,24 @@ public:
 	static void setReplWidth(unsigned int numChars);
 	static unsigned int getReplWidth();
 	
+/// \section Events
+
+	/// triggered when CTRL/Super + e is pressed
+	/// returns the index of the current editor
+	ofEvent<int> executeScriptEvent;
+	
+	/// triggered when opening a file via CTRL/Super + o
+	/// returns the index of the current editor
+	ofEvent<int> openFileEvent;
+	
+	/// triggered when saving a file via CTRL/Super + s & CTRL/Super + d
+	/// returns the index of the current editor
+	ofEvent<int> saveFileEvent;
+	
+	/// this event is triggered when Enter is pressed in the Repl console
+	/// returns the text to be evaluated
+	ofEvent<string> evalReplEvent;
+	
 /// \section Util
 	
 	/// set the file browser path, default: data path when setup() is called
@@ -202,7 +220,10 @@ public:
 	inline bool isAltPressed()		{return bAltPressed;}
 	inline bool isShiftPressed()	{return bShiftPressed;}
 	inline bool isControlPressed()	{return bControlPressed;}
-	inline bool isSuperPressed()	{return bSuperPressed;} //< Win or CMD key
+	inline bool isSuperPressed()	{return bSuperPressed;} //< Win/CMD key
+	
+	/// the current modifier as set in setup(), either CTRL (default) or Super
+	inline bool isModifierPressed() {return bModifierPressed;}
 	
 	/// hide/unhide the editor
 	void setHidden(bool hidden);
@@ -256,6 +277,9 @@ private:
 	bool bShiftPressed;
 	bool bControlPressed;
 	bool bSuperPressed;
+	
+	bool bModifierPressed;
+	bool bUsesSuperKey;
 	
 	bool bHideEditor;
 	bool bShowFileDialog;

@@ -43,6 +43,8 @@ public:
 	void gotMessage(ofMessage msg);
 	
 	/// editor events
+	void saveFileEvent(int &whichEditor);
+	void openFileEvent(int &whichEditor);
 	void executeScriptEvent(int &whichEditor);
 	void evalReplEvent(string &text);
 	

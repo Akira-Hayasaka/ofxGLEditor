@@ -144,11 +144,12 @@ void Repl::print(const wstring &what)
 	m_PromptPos += to_print.length();
 	m_InsertPos += to_print.length();
 	
-	#ifdef WIN32
-		cout << wstring_to_string(to_print);
-	#else
-		wcout << to_print;
-	#endif
+// printing is done in custom logger clss, but keep this here for now
+//	#ifdef WIN32
+//		cout << wstring_to_string(to_print);
+//	#else
+//		wcout << to_print;
+//	#endif
 	ensureCursorVisible();
 }
 
@@ -158,6 +159,13 @@ void Repl::printEvalReturn(const wstring &what) {
 		print(what);
 		print(L"\n");
 	}
+	printPrompt();
+}
+
+void Repl::clear() {
+	ClearAllText();
+	m_PromptPos = 0;
+	m_InsertPos = 0;
 	printPrompt();
 }
 
@@ -294,11 +302,13 @@ bool isEmpty(wstring s) {
 
 //--------------------------------------------------------------
 void Repl::Logger::log(ofLogLevel level, const string & module, const string & message){
+	ofConsoleLoggerChannel::log(level, module, message);
 	m_Parent->print(string_to_wstring(message));
 	m_Parent->print(L"\n");
 }
 
 void Repl::Logger::log(ofLogLevel level, const string & module, const char* format, va_list args){
+	ofConsoleLoggerChannel::log(level, module, format, args);
 	m_Parent->print(string_to_wstring(ofVAArgsToString(format, args)));
 	m_Parent->print(L"\n");
 }

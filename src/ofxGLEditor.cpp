@@ -38,6 +38,8 @@ ofxGLEditor::ofxGLEditor(){
 	bAltPressed = false;
 	bShiftPressed = false;
 	bControlPressed = false;
+	bModifierPressed = false;
+	bUsesSuperKey = false;
 	currentEditor = 0;
 	bHideEditor = false;
 	bShowFileDialog = false;
@@ -50,7 +52,7 @@ ofxGLEditor::~ofxGLEditor(){
 }
 
 //--------------------------------------------------------------
-bool ofxGLEditor::setup(string fontFile, bool enableRepl){
+bool ofxGLEditor::setup(string fontFile, bool enableRepl, bool useSuperKey){
 	
 	// handle ESC internally since we use it to exit the file browser
 	ofSetEscapeQuitsApp(false);
@@ -86,6 +88,7 @@ bool ofxGLEditor::setup(string fontFile, bool enableRepl){
 	
 	reShape();
 	
+	bUsesSuperKey = useSuperKey;
 	currentEditor = 1;
 }
 
@@ -100,7 +103,6 @@ void ofxGLEditor::clear(){
 		delete glFileDialog;
 	}
 }
-
 
 //--------------------------------------------------------------
 void ofxGLEditor::draw(){
@@ -202,6 +204,12 @@ void ofxGLEditor::keyPressed(int key){
 	}
 #endif
 #endif
+
+#ifndef OFX_GLEDITOR_GLUT
+	bModifierPressed = bUsesSuperKey ? bSuperPressed : bControlPressed;
+#else
+	bModifierPressed = bControlPressed;
+#endif
 	
 //	ofLog() << "alt: " << bAltPressed << " shft: " << bShiftPressed
 //	        << " ctl: " << bControlPressed << " spr: " << bSuperPressed;
@@ -211,7 +219,7 @@ void ofxGLEditor::keyPressed(int key){
 	if(bShiftPressed){
 		mod = 1; // GLUT_ACTIVE_SHIFT
 	}
-	else if(bControlPressed){
+	else if(bModifierPressed){ // GLEditor expects CTL so we trick it here
 		mod = mod | 2; // GLUT_ACTIVE_CTRL
 	}
 	else if(bAltPressed){
@@ -228,9 +236,10 @@ void ofxGLEditor::keyPressed(int key){
 		key = 0;
 	}
 	
-	if(bAltPressed) {
+	// also check for ascii control chars: http://ascii-table.com/control-chars.php
+	if(bModifierPressed) {
 		switch(key) {
-			case 'e': {
+			case 'e': case 5: {
 				if(currentEditor != 0) {
 					string script = getText();
 					int ed = currentEditor;
@@ -238,32 +247,37 @@ void ofxGLEditor::keyPressed(int key){
 				}
 				break;
 			}
-			case 'b':
+			case 'b': case 2:
 				glEditors[currentEditor]->BlowupCursor();
 				break;
-			case 'h': bHideEditor = !bHideEditor; break;
-			case 'a': clearText(); break;
-			case 'c': copyToClipBoard(); break;
-			case 'v': pasteFromClipBoard(); break;
-			case 's': {
-				// show save as dialog on empty name
-				if(saveFiles[currentEditor] == "") {
-					glFileDialog->SetSaveAsMode(true);
-					bShowFileDialog = !bShowFileDialog;
-				}
-				else {
-					saveFile(saveFiles[currentEditor]);
+			case 't': case 20: bHideEditor = !bHideEditor; break;
+			case 'a': case 1: clearText(); break;
+			case 'c': case 3: copyToClipBoard(); break;
+			case 'v': case 22: pasteFromClipBoard(); break;
+			case 's': case 19: {
+				if(currentEditor != 0) {
+					// show save as dialog on empty name
+					if(saveFiles[currentEditor] == "") {
+						glFileDialog->SetSaveAsMode(true);
+						bShowFileDialog = !bShowFileDialog;
+					}
+					else {
+						if(saveFile(saveFiles[currentEditor])) {
+							int ed = currentEditor;
+							ofNotifyEvent(saveFileEvent, ed, this);
+						}
+					}
 				}
 				break;
 			}
-			case 'l':
+			case 'o': case 15:
 				if(currentEditor != 0) {
 					glFileDialog->SetSaveAsMode(false);
 					glFileDialog->Refresh();
 					bShowFileDialog = !bShowFileDialog;
 				}
 				break;
-			case 'd':
+			case 'd': case 4:
 				if(currentEditor != 0) {
 					glFileDialog->SetSaveAsMode(true);
 					bShowFileDialog = !bShowFileDialog;
@@ -285,7 +299,7 @@ void ofxGLEditor::keyPressed(int key){
 					}
 				}
 				break;
-			case 'r': case '0': // Repl
+			case 'r': case '0': case 18: // Repl
 				if(glEditors[0]) {
 					currentEditor = 0;
 				}
@@ -313,11 +327,16 @@ void ofxGLEditor::keyPressed(int key){
 			if(glFileDialog->GetOutput() != L"") {
 				if(glFileDialog->GetSaveAsMode()) {
 					saveFiles[currentEditor] = wstring_to_string(glFileDialog->GetOutput());
-					saveFile(saveFiles[currentEditor]);
+					if(saveFile(saveFiles[currentEditor])) {
+						int ed = currentEditor;
+						ofNotifyEvent(saveFileEvent, ed, this);
+					}
 				}
 				else {
-					if(loadFile(wstring_to_string(glFileDialog->GetOutput()))) {
+					if(openFile(wstring_to_string(glFileDialog->GetOutput()))) {
 						saveFiles[currentEditor] = wstring_to_string(glFileDialog->GetOutput());
+						int ed = currentEditor;
+						ofNotifyEvent(openFileEvent, ed, this);
 					}
 				}
 				glFileDialog->Clear();
@@ -351,6 +370,7 @@ void ofxGLEditor::keyReleased(int key){
 			bSuperPressed = false;
 			break;
 	}
+	bModifierPressed = bUsesSuperKey ? bSuperPressed : bControlPressed;
 #endif
 }
 
@@ -375,7 +395,7 @@ void ofxGLEditor::copyToClipBoard(){
 }
 
 //--------------------------------------------------------------
-bool ofxGLEditor::loadFile(string filename, int editor){
+bool ofxGLEditor::openFile(string filename, int editor){
 	
 	if(editor < 0 && (editor - 1) >= (int) glEditors.size()){
 		ofLogError("ofxGLEditor") << "cannot load into unknown editor " << editor;
@@ -471,12 +491,22 @@ void ofxGLEditor::clearText(int editor){
 	
 	ofLogVerbose("ofxGLEditor") << "cleared text in editor" << currentEditor;
 	glEditors[editor]->ClearAllText();
+	if(editor == 0) {
+		if(glEditors[0]) {
+			Repl *repl = (Repl*) glEditors[0];
+			repl->clear();
+		}
+	}
+	else { // reset filename
+		saveFiles[editor] = "";
+	}
 }
 
 //--------------------------------------------------------------
 void ofxGLEditor::clearAllText(){
 	for(int i = 1; i < (int) glEditors.size(); i++){
 		glEditors[i]->ClearAllText();
+		saveFiles[i] = "";
 	}
 	ofLogVerbose("ofxGLEditor") << "cleared text in all editors";
 }
