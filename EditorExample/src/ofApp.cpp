@@ -35,11 +35,13 @@ void ofApp::setup(){
 	// setup the editor with a font
 	editor.setup("fonts/DroidSansMono.ttf");
 	
-	// load a file into the current editor (1)
-	editor.loadFile("hello.txt");
+	// open & load a file into the current editor (1)
+	editor.openFile("hello.txt");
 	ofLogNotice() << "number of lines: " << editor.getNumLines();
 
 	// add editor event listening
+	ofAddListener(editor.openFileEvent, this, &ofApp::openFileEvent);
+	ofAddListener(editor.saveFileEvent, this, &ofApp::saveFileEvent);
 	ofAddListener(editor.executeScriptEvent, this, &ofApp::executeScriptEvent);
 	ofAddListener(editor.evalReplEvent, this, &ofApp::evalReplEvent);
 	
@@ -83,8 +85,16 @@ void ofApp::keyPressed(int key){
 	editor.keyPressed(key);
 	
 	// can also check modifiers from editor
-	if(editor.isAltPressed() && key == 'f'){
-		ofToggleFullscreen();
+	//
+	// note: CTRL + key might be an ascii control char so check for both
+	// the char 'f' and 6, the ascii value for CTRL + f
+	// see also: http://ascii-table.com/control-chars.php
+	switch(key) {
+		case 'f': case 6:
+			if(editor.isModifierPressed()) {
+				ofToggleFullscreen();
+			}
+		break;
 	}
 }
 
@@ -117,8 +127,24 @@ void ofApp::gotMessage(ofMessage msg){}
 void ofApp::dragEvent(ofDragInfo dragInfo){}
 
 //--------------------------------------------------------------
+void ofApp::openFileEvent(int &whichEditor){
+	// receievd an editor open via CTRL/Super + o
+	
+	ofLogNotice() << "received open event for editor " << whichEditor
+		<< " with filename " << editor.getEditorFilename(whichEditor);
+}
+
+//--------------------------------------------------------------
+void ofApp::saveFileEvent(int &whichEditor){
+	// receievd an editor save via CTRL/Super + s or CTRL/Super + d
+	
+	ofLogNotice() << "received save event for editor " << whichEditor
+		<< " with filename " << editor.getEditorFilename(whichEditor);
+}
+
+//--------------------------------------------------------------
 void ofApp::executeScriptEvent(int &whichEditor){
-	// received on editor ALT + e
+	// received on editor CTRL/Super + e
 	
 	// get the text buffer with:
 	// string txt = editor.getText(whichEditor);
