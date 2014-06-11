@@ -157,8 +157,8 @@ void Repl::printEvalReturn(const wstring &what) {
 	if(what.size() > 0) {
 		print(what);
 		print(L"\n");
-		printPrompt();
 	}
+	printPrompt();
 }
 
 // PRIVATE

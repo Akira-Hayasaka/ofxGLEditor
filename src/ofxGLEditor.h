@@ -160,8 +160,12 @@ public:
 	ofEvent<string> evalReplEvent;
 	
 	/// send a response to the last evalReplEvent to the Repl console
+	///
+	/// **important**: this must be called after an evalReplEvent in order to
+	/// print the next prompt ...
+	///
 	/// note: this does nothing if the repl was not enabled in setup()
-	void evalReplReturn(const string &text);
+	void evalReplReturn(const string &text="");
 	
 	/// set/get the Repl greeting banner, default: ""
 	static void setReplBanner(const string &text); //< call this before setup()

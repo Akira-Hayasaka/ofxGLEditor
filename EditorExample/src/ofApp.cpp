@@ -125,5 +125,7 @@ void ofApp::executeScriptEvent(int &whichEditor){
 void ofApp::evalReplEvent(string &text){
 	ofLogNotice() << "received eval repl event: " << text;
 	
-	editor.evalReplReturn("did something");
+	// mkae sure there is a response since this triggers printing the next conosle prompt
+	editor.evalReplReturn("did something"); // print this, then prompt
+	//editor.evalReplReturn(); // empty response, just prints prompt
 }
