@@ -47,9 +47,9 @@ void ofApp::setup(){
 	editor.setCursorColor(ofColor::blue); // block cursor color
 	//editor.setAlpha(0.5); // main text, cursor, & highlight alpha
 	
-	// move the cursor
-	//editor.setCurrentLine(0);
-	ofLogNotice() << "current line pos: " << editor.getCurrentLine();
+	// move the cursor to a specific line
+	//editor.setCurrentLine(4);
+	ofLogNotice() << "current line: " << editor.getCurrentLine();
 }
 
 //--------------------------------------------------------------
@@ -70,6 +70,9 @@ void ofApp::draw(){
 		// draw the current & total line nums
 		editor.drawString("Current line: "+ofToString(editor.getCurrentLine())
 			+"/"+ofToString(editor.getNumLines()), 740, 15);
+	
+		// draw the current pos & line length
+		editor.drawString("         pos: "+ofToString(editor.getCurrentLinePos()), 740, 35);
 	}
 }
 
@@ -116,7 +119,11 @@ void ofApp::dragEvent(ofDragInfo dragInfo){}
 //--------------------------------------------------------------
 void ofApp::executeScriptEvent(int &whichEditor){
 	// received on editor ALT + e
-
+	
+	// get the text buffer with:
+	// string txt = editor.getText(whichEditor);
+	// note: returns only the seleceted area when holding Shift + arrow keys
+	
 	// if you have some scripting language (e.g. ofxLua)
 	ofLogNotice() << "received execute script event for editor " << whichEditor;
 }
@@ -125,5 +132,7 @@ void ofApp::executeScriptEvent(int &whichEditor){
 void ofApp::evalReplEvent(string &text){
 	ofLogNotice() << "received eval repl event: " << text;
 	
-	editor.evalReplReturn("did something");
+	// make sure there is a response since this triggers printing the next conosle prompt
+	editor.evalReplReturn("did something"); // print this, then prompt
+	//editor.evalReplReturn(); // empty response, just prints prompt
 }

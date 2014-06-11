@@ -117,7 +117,7 @@ public:
 	/// or an editor index from 1 - 9
 	void setText(string text, int editor = 0);
     
-	/// get the contents of an editor
+	/// get the contents of an editor or contents of editor selection
 	///
 	/// set editor to 0 for the current editor
 	/// or an editor index of 1 - 9
@@ -141,13 +141,25 @@ public:
 	/// get the filename of the current editor (default: empty string "")
 	string getEditorFilename(int editor);
 	
-	/// current line pos of an editor (1-size)
+	/// number of lines of text in an editor
+	unsigned int getNumLines(int editor = 0);
+	
+	/// current line of an editor
 	/// set editor to 0 for the current editor
 	void setCurrentLine(unsigned int line, int editor = 0);
 	unsigned int getCurrentLine(int editor = 0);
 	
-	/// number of lines of of text in an editor
-	unsigned int getNumLines(int editor = 0);
+	/// current line pos of an editor
+	/// set editor to 0 for the current editor
+	unsigned int getCurrentLinePos(int editor = 0);
+	
+	/// current line pos of an editor
+	/// set editor to 0 for the current editor
+	unsigned int getCurrentLineLen(int editor = 0);
+	
+	/// current overall pos in the editor buffer
+	/// set editor to 0 for the current editor
+	unsigned int getCurrentPos(int editor = 0);
 	
 	/// this event is triggered when ALT + e is pressed
 	/// returns the index of the current editor
@@ -160,8 +172,12 @@ public:
 	ofEvent<string> evalReplEvent;
 	
 	/// send a response to the last evalReplEvent to the Repl console
+	///
+	/// **important**: this must be called after an evalReplEvent in order to
+	/// print the next prompt ...
+	///
 	/// note: this does nothing if the repl was not enabled in setup()
-	void evalReplReturn(const string &text);
+	void evalReplReturn(const string &text="");
 	
 	/// set/get the Repl greeting banner, default: ""
 	static void setReplBanner(const string &text); //< call this before setup()
@@ -256,7 +272,16 @@ public:
 		// wrappers to current line pos
 		void SetCurLine(int line) {SetCurrentLine(line);}
 		int GetCurLine() {return GetCurrentLine();}
+		
+		// get the length of the current line
+		int GetCurLineLength() {return LineLength(m_Position);}
+		
+		// get the position on the current line
+		int GetCurLinePos() {return OffsetToCurrentLineStart();}
 
+		// get the overall pos in the buffer
+		int GetCurPos() {return m_Position;}
+		
 		// insert text at the current position
 		void InsertText(const string& s);
 		
