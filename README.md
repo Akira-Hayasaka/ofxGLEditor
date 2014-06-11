@@ -1,9 +1,9 @@
 ofxGLEditor
 ===================================
 
-![image](https://github.com/danomatika/ofxGLEditor/raw/master/doc/screenshot.png)
+![image](https://github.com/Akira-Hayasaka/ofxGLEditor/raw/master/doc/screenshot.png)
 
-Copyright © Akira Hayasaka & [Dan Wilcox](http://danomatika.com) 2011-2012
+Copyright © [Akira Hayasaka](http://www.ampontang.com/) & [Dan Wilcox](http://danomatika.com) 2011-2012
 
 GNU Public License v2.
 

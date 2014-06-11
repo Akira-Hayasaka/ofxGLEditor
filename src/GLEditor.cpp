@@ -14,11 +14,16 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+
 #ifndef __APPLE__
-#include <GL/glut.h>
+	#include "glut.h"
 #else
-#include <GLUT/glut.h>
+	#include <GLUT/glut.h>
 #endif
+/*#ifdef TARGET_WIN32
+	#define GLUT_BUILDING_LIB
+	#include "glut.h"
+#endif*/
 #include <iostream>
 #include <vector>
 
