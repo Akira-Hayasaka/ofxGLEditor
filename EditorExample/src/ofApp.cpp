@@ -116,7 +116,11 @@ void ofApp::dragEvent(ofDragInfo dragInfo){}
 //--------------------------------------------------------------
 void ofApp::executeScriptEvent(int &whichEditor){
 	// received on editor ALT + e
-
+	
+	// get the text buffer with:
+	// string txt = editor.getText(whichEditor);
+	// note: returns only the selceted area when using Shift selection
+	
 	// if you have some scripting language (e.g. ofxLua)
 	ofLogNotice() << "received execute script event for editor " << whichEditor;
 }
@@ -125,7 +129,7 @@ void ofApp::executeScriptEvent(int &whichEditor){
 void ofApp::evalReplEvent(string &text){
 	ofLogNotice() << "received eval repl event: " << text;
 	
-	// mkae sure there is a response since this triggers printing the next conosle prompt
+	// make sure there is a response since this triggers printing the next conosle prompt
 	editor.evalReplReturn("did something"); // print this, then prompt
 	//editor.evalReplReturn(); // empty response, just prints prompt
 }

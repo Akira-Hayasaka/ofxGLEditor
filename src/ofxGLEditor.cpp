@@ -452,7 +452,7 @@ string ofxGLEditor::getText(int editor){
 	}
 	
 	// add an endline if there isn't one already
-	string text = wstring_to_string(glEditors[editor]->GetAllText());
+	string text = wstring_to_string(glEditors[editor]->GetText());
 	if(text[text.size()-1] != '\n') 
 		text += "\n";
 	return text;
