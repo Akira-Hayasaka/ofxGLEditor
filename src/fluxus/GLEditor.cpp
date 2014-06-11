@@ -883,7 +883,6 @@ void GLEditor::Handle(int button, int key, int special, int state, int x, int y,
 		}
 	}
 	
-	if (m_Position<0) m_Position=0;
 	if (m_Position>m_Text.size()) m_Position=m_Text.size();
 	
 	if (key==0 && !m_ShiftState && mod&GLUT_ACTIVE_SHIFT)
