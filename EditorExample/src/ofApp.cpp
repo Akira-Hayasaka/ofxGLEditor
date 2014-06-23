@@ -117,7 +117,8 @@ void ofApp::mouseReleased(int x, int y, int button){}
 
 //--------------------------------------------------------------
 void ofApp::windowResized(int w, int h){
-	editor.reShape();
+	editor.reShape(); // set new size using window or screen size
+	//editor.reShape(w, h); // set new size manually
 }
 
 //--------------------------------------------------------------

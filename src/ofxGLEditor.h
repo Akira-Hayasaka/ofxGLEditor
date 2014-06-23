@@ -97,7 +97,8 @@ public:
 	/// reshape the drawing area
 	/// call this if you change the window size (fullscreen, etc)
 	void reShape();
-	
+	void reShape(int width, int height); //< set your own size
+
 /// \section Editor
 	
 	/// paste the latest text from the system clipboard
@@ -137,7 +138,7 @@ public:
 	/// clear the contents of *all* editors
 	void clearAllText();
 	
-	/// set the current editor by index, from 1 - 9
+	/// set the current editor by index, from 1 - 9 (0 is Repl)
 	void setCurrentEditor(int editor);
 	
 	/// get the index of the current editor, from 1 - 9 (0 is REPL)
@@ -170,6 +171,7 @@ public:
 	unsigned int getCurrentPos(int editor = 0);
 	
 /// \section Repl (Read-Eval-Print Loop)
+/// switch to the Repl via setCurrentEditor(0)
 	
 	/// send a response to the last evalReplEvent to the Repl console
 	///
@@ -178,6 +180,12 @@ public:
 	///
 	/// note: this does nothing if the repl was not enabled in setup()
 	void evalReplReturn(const string &text="");
+	
+	/// clears text in Repl buffer, does not clear history
+	void clearRepl();
+	
+	/// clears Repl history, does not clear buffer text
+	void clearReplHistory();
 	
 	/// set/get the Repl greeting banner, default: ""
 	static void setReplBanner(const string &text); //< call this before setup()
@@ -270,8 +278,8 @@ private:
 	ClipBoard clipBoard;
     
 	unsigned int numEditors;
-	int currentEditor; ///< note: 0-9
-	vector<string> saveFiles; ///< one for each editor
+	int currentEditor; //< note: 0-9
+	vector<string> saveFiles; //< one for each editor
     
 	bool bAltPressed;
 	bool bShiftPressed;
