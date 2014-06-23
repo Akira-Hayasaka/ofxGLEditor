@@ -46,6 +46,9 @@ public:
 	/// clear the console
 	void clear();
 	
+	/// clear the command history
+	void clearHistory();
+	
 	/// text to be evaluated, needed for ofEvent
 	string evalText;
 

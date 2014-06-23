@@ -169,6 +169,10 @@ void Repl::clear() {
 	printPrompt();
 }
 
+void Repl::clearHistory() {
+	historyClear();
+}
+
 // PRIVATE
 
 //--------------------------------------------------------------

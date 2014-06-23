@@ -251,7 +251,14 @@ void ofxGLEditor::keyPressed(int key){
 				glEditors[currentEditor]->BlowupCursor();
 				break;
 			case 't': case 20: bHideEditor = !bHideEditor; break;
-			case 'a': case 1: clearText(); break;
+			case 'a': case 1:
+				if(currentEditor == 0) {
+					clearRepl();
+				}
+				else {
+					clearText();
+				}
+				break;
 			case 'c': case 3: copyToClipBoard(); break;
 			case 'v': case 22: pasteFromClipBoard(); break;
 			case 's': case 19: {
@@ -378,10 +385,15 @@ void ofxGLEditor::keyReleased(int key){
 void ofxGLEditor::reShape(){
 	int w = (ofGetWindowMode() == OF_WINDOW)?ofGetViewportWidth():ofGetScreenWidth();
 	int h = (ofGetWindowMode() == OF_WINDOW)?ofGetViewportHeight():ofGetScreenHeight();
+	reShape(w, h);
+}
+
+//--------------------------------------------------------------
+void ofxGLEditor::reShape(int width, int height) {
 	for(int i = 0; i < (int) glEditors.size(); i++){
-		if(glEditors[i]) glEditors[i]->Reshape(w, h);
+		if(glEditors[i]) glEditors[i]->Reshape(width, height);
 	}
-	glFileDialog->Reshape(w, h);
+	glFileDialog->Reshape(width, height);
 }
 
 //--------------------------------------------------------------
@@ -488,18 +500,14 @@ void ofxGLEditor::clearText(int editor){
 		ofLogError("ofxGLEditor") << "cannot clear text in unknown editor " << editor;
 		return;
 	}
+	else if(editor == 0){
+		editor = currentEditor;
+	}
 	
+	 // reset filename
 	ofLogVerbose("ofxGLEditor") << "cleared text in editor" << currentEditor;
 	glEditors[editor]->ClearAllText();
-	if(editor == 0) {
-		if(glEditors[0]) {
-			Repl *repl = (Repl*) glEditors[0];
-			repl->clear();
-		}
-	}
-	else { // reset filename
-		saveFiles[editor] = "";
-	}
+	saveFiles[editor] = "";
 }
 
 //--------------------------------------------------------------
@@ -630,6 +638,23 @@ void ofxGLEditor::evalReplReturn(const string &text) {
 	if(glEditors[0]) {
 		Repl *repl = (Repl*) glEditors[0];
 		repl->printEvalReturn(string_to_wstring(text));
+	}
+}
+
+//--------------------------------------------------------------
+void ofxGLEditor::clearRepl() {
+	if(glEditors[0]) {
+		Repl *repl = (Repl*) glEditors[0];
+		repl->clear();
+		ofLogVerbose("ofxGLEditor") << "cleared repl";
+	}
+}
+
+void ofxGLEditor::clearReplHistory() {
+	if(glEditors[0]) {
+		Repl *repl = (Repl*) glEditors[0];
+		repl->clearHistory();
+		ofLogVerbose("ofxGLEditor") << "cleared repl history";
 	}
 }
 
@@ -826,4 +851,3 @@ void ofxGLEditor::Editor::CountLines(){
 			m_LineCount++;
 	}
 }
-	
