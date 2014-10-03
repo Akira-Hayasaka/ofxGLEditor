@@ -6,7 +6,8 @@ int ofxEditor::s_charHeight = 1;
 unsigned int ofxEditor::s_tabWidth = 4;
 
 ofxEditor::ofxEditor() {
-	cursorXPos = 0;
+	cursorPos = 0;
+	cursorLine = 0;
 	viewport.position.set(0, 0, 0);
 	setSize(ofGetWidth(), ofGetHeight());
 }
@@ -39,37 +40,43 @@ void ofxEditor::draw() {
 		ofViewport(viewport);
 		
 		// draw text
-		ofSetColor(255);
 		ofFill();
 		int x = 0, y = s_charHeight; // pixel pos
-		int curPos = 0, curLine = 0; // char/line pos
+		int textPos = 0, textLine = 0; // char/line pos
 		for(int i = 0; i < text.length(); ++i) {
 		
 			// line wrap
-			if(curPos >= numCharsWidth) {
+			if(textPos >= numCharsWidth) {
 				x = 0;
 				y += s_charHeight;
-				curPos = 0;
-				curLine++;
+				textPos = 0;
+				textLine++;
 			}
 		
 			// endline
 			if(text[i] == '\n') {
 				x = 0;
 				y += s_charHeight;
-				curPos = 0;
-				curLine++;
+				textPos = 0;
+				textLine++;
 			}
 			// tab
 			else if(text[i] == '\t') {
 				x += s_charWidth * s_tabWidth;
-				curPos += s_tabWidth;
+				textPos += s_tabWidth;
 			}
 			// everything else
 			else {
+			
+				if(cursorPos == textPos && cursorLine == textLine) {
+					ofSetColor(255, 255, 0);
+					ofRect(x, y, s_charWidth, s_charHeight);
+				}
+				
+				ofSetColor(255);
 				s_font->drawCharacter(text[i], x, y);
 				x += s_charWidth;
-				curPos++;
+				textPos++;
 			}
 		}
 		
@@ -89,16 +96,20 @@ void ofxEditor::draw() {
 void ofxEditor::keyPressed(int key) {
 	switch(key) {
 		case OF_KEY_UP:
-			viewport.y -= s_charHeight;
+			//viewport.y -= s_charHeight;
+			cursorLine -= 1;
 			break;
 		case OF_KEY_DOWN:
-			viewport.y += s_charHeight;
+			//viewport.y += s_charHeight;
+			cursorLine += 1;
 			break;
 		case OF_KEY_LEFT:
-			viewport.x -= s_charWidth;
+			//viewport.x -= s_charWidth;
+			cursorPos -= 1;
 			break;
 		case OF_KEY_RIGHT:
-			viewport.x += s_charWidth;
+			//viewport.x += s_charWidth;
+			cursorPos += 1;
 			break;
 	}
 }

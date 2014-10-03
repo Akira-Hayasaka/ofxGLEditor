@@ -51,7 +51,7 @@ class ofxEditor {
 	
 		string text;
 		ofRectangle viewport;
-		int cursorXPos;
+		int cursorPos, cursorLine; // text pos
 		
 		int numCharsWidth;
 		int numLinesHeight;
