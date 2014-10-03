@@ -1,6 +1,7 @@
 #pragma once
 
-#include "ofMain.h"
+#include "ofxEditorHighlighter.h"
+
 
 class ofxEditor {
 
@@ -21,6 +22,9 @@ class ofxEditor {
 		string getText();
 		void setText(const string& text);
 		void clearText();
+		
+		void setHighlights(ofxEditorHighlights *highlights);
+		void clearHighlights();
 		
 //		int getNumLines();
 //		int getNumCharacters();
@@ -50,9 +54,50 @@ class ofxEditor {
 		static unsigned int s_tabWidth; // width in spaces
 	
 		string text;
+		
+		enum Type {
+			UNKNOWN,
+			WORD,
+			STRING,
+//			BRACKET,
+//			CURLY_BRACKET,
+//			PAREN,
+			SPACE,
+			TAB,
+			ENDLINE
+		};
+		class TextBlock {
+			public:
+				
+				Type type;
+				string text;
+				
+				TextBlock() {
+					clear();
+				}
+				
+				TextBlock(const TextBlock &from) {
+					type = from.type;
+					text = from.text;
+				}
+				
+				void clear() {
+					type = UNKNOWN;
+					text = "";
+				}
+		};
+		list<TextBlock> textList; // linked list
+		
 		ofRectangle viewport;
 		int cursorPos, cursorLine; // text pos
 		
 		int numCharsWidth;
 		int numLinesHeight;
+		
+		ofxEditorHighlights *highlights;
+		
+	private:
+	
+		void parseTextToList();
+		void clearList();
 };

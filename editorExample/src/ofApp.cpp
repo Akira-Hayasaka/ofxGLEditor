@@ -7,7 +7,12 @@ void ofApp::setup(){
 
 	ofxEditor::loadFont("fonts/PrintChar21.ttf", 30);
 	editor.setSize(ofGetWidth(), ofGetHeight());
-	editor.setText("# O 0 hello world\nline 2\nline 3\na tab\tdone\na really line line of text that hopefully wraps across the screen kaaa");
+	editor.setText("function setup\n\tprint(\"hello\")\nend\n\nfunction draw\n\tof.setColor(200)\n\tof.line(10, 10, 100, 100)\nend\n");
+	
+	highlights.setHighlight("function", ofColor(255, 0, 255));
+	highlights.setHighlight("end", ofColor(255, 0, 255));
+	highlights.setStringHighlight(ofColor(255, 255, 0));
+	editor.setHighlights(&highlights);
 	
 	ofBackground(0);
 
@@ -21,6 +26,7 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
 	editor.draw();
+	ofDrawBitmapString("fps: "+ofToString(ofGetFrameRate()), 10, 10);
 }
 
 //--------------------------------------------------------------
@@ -55,7 +61,7 @@ void ofApp::mouseReleased(int x, int y, int button){
 
 //--------------------------------------------------------------
 void ofApp::windowResized(int w, int h){
-
+	editor.setSize(w, h);
 }
 
 //--------------------------------------------------------------
