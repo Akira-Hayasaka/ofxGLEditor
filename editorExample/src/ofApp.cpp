@@ -5,7 +5,7 @@ void ofApp::setup(){
 
 	ofSetVerticalSync(true);
 
-	Editor::loadFont("fonts/PrintChar21.ttf", 30);
+	ofxEditor::loadFont("fonts/PrintChar21.ttf", 30);
 	editor.setSize(ofGetWidth(), ofGetHeight());
 	editor.setText("# O 0 hello world\nline 2\nline 3\na tab\tdone\na really line line of text that hopefully wraps across the screen kaaa");
 	

@@ -2,12 +2,12 @@
 
 #include "ofMain.h"
 
-class Editor {
+class ofxEditor {
 
 	public:
 	
-		Editor();
-		virtual ~Editor();
+		ofxEditor();
+		virtual ~ofxEditor();
 		
 		static bool loadFont(const string & font, int size);
 		static void setTabWidth(unsigned int numSpaces);

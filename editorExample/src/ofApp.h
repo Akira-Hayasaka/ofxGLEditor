@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ofMain.h"
-#include "Editor.h"
+#include "ofxEditor.h"
 
 class ofApp : public ofBaseApp{
 
@@ -20,5 +20,5 @@ class ofApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
 		
-		Editor editor;
+		ofxEditor editor;
 };

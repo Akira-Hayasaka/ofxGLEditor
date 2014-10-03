@@ -1,22 +1,22 @@
-#include "Editor.h"
+#include "ofxEditor.h"
 
-ofPtr<Editor::Font> Editor::s_font;
-int Editor::s_charWidth = 1;
-int Editor::s_charHeight = 1;
-unsigned int Editor::s_tabWidth = 4;
+ofPtr<ofxEditor::Font> ofxEditor::s_font;
+int ofxEditor::s_charWidth = 1;
+int ofxEditor::s_charHeight = 1;
+unsigned int ofxEditor::s_tabWidth = 4;
 
-Editor::Editor() {
+ofxEditor::ofxEditor() {
 	cursorXPos = 0;
 	viewport.position.set(0, 0, 0);
 	setSize(ofGetWidth(), ofGetHeight());
 }
 
-Editor::~Editor() {
+ofxEditor::~ofxEditor() {
 }
 
-bool Editor::loadFont(const string &font, int size) {
+bool ofxEditor::loadFont(const string &font, int size) {
 	if(s_font == NULL) {
-		s_font = ofPtr<Editor::Font>(new Editor::Font());
+		s_font = ofPtr<ofxEditor::Font>(new ofxEditor::Font());
 	}
 	if(s_font->loadFont(font, size, true, true, true)) {
 		s_charWidth = size;
@@ -24,15 +24,15 @@ bool Editor::loadFont(const string &font, int size) {
 	}
 }
 
-void Editor::setTabWidth(unsigned int numSpaces) {
+void ofxEditor::setTabWidth(unsigned int numSpaces) {
 	s_tabWidth = numSpaces;
 }
 
-unsigned int Editor::getTabWidth() {
+unsigned int ofxEditor::getTabWidth() {
 	return s_tabWidth;
 }
 
-void Editor::draw() {
+void ofxEditor::draw() {
 	ofPushStyle();
 	ofPushView();
 	
@@ -86,7 +86,7 @@ void Editor::draw() {
 	ofPopStyle();
 }
 
-void Editor::keyPressed(int key) {
+void ofxEditor::keyPressed(int key) {
 	switch(key) {
 		case OF_KEY_UP:
 			viewport.y -= s_charHeight;
@@ -103,25 +103,25 @@ void Editor::keyPressed(int key) {
 	}
 }
 
-void Editor::setSize(int width, int height) {
+void ofxEditor::setSize(int width, int height) {
 	viewport.width = width;
 	viewport.height = height;
 	
 	numCharsWidth = width/s_charWidth;
 	numLinesHeight = height/s_charHeight;
 	
-	ofLogVerbose("Editor") << "pixel size: " << width << " " << height;
-	ofLogVerbose("Editor") << "text size: " << numCharsWidth << " " << numLinesHeight;
+	ofLogVerbose("ofxEditor") << "pixel size: " << width << " " << height;
+	ofLogVerbose("ofxEditor") << "text size: " << numCharsWidth << " " << numLinesHeight;
 }
 
-string Editor::getText() {
+string ofxEditor::getText() {
 	return text;
 }
 
-void Editor::setText(const string& text) {
+void ofxEditor::setText(const string& text) {
 	this->text = text;
 }
 
-void Editor::clearText() {
+void ofxEditor::clearText() {
 	text = "";
 }
