@@ -14,7 +14,7 @@ void ofApp::setup(){
 	editor.setColorScheme(colorScheme);
 	
 	editor.setSize(ofGetWidth(), ofGetHeight());
-	editor.setText("\n\nfunction setup\n\tprint(\"123hello456\")\nend\n\nfunction draw\n\tof.setColor(200.1)\n\tof.line(10, 10, 100, 100)\nend\n5hj55hj44\n");
+	editor.setText("function setup\n\tprint(\"123hello456\")\nend\n\nfunction draw\n\tof.setColor(200.1)\n\tof.line(10, 10, 100, 100)\nend\n5hj55hj44\n");
 	
 	ofBackground(0);
 

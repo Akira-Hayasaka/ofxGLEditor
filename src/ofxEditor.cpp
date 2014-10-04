@@ -6,8 +6,7 @@ int ofxEditor::s_charHeight = 1;
 unsigned int ofxEditor::s_tabWidth = 4;
 
 ofxEditor::ofxEditor() {
-	cursorPos = 0;
-	cursorLine = 0;
+	cursorPos = 2;
 	viewport.position.set(0, 0, 0);
 	setSize(ofGetWidth(), ofGetHeight());
 	
@@ -29,7 +28,7 @@ bool ofxEditor::loadFont(const string &font, int size) {
 }
 
 void ofxEditor::setTabWidth(unsigned int numSpaces) {
-	s_tabWidth = numSpaces;
+	s_tabWidth = numSpaces < 1 ? 1 : numSpaces;
 }
 
 unsigned int ofxEditor::getTabWidth() {
@@ -46,14 +45,8 @@ void ofxEditor::draw() {
 		if(colorScheme) { // with colorScheme
 			ofFill();
 			int x = 0, y = s_charHeight; // pixel pos
-			int textPos = 0, textLine = 0; // char/line pos
+			int textPos = 0;//, textLine = 0; // char/line pos
 			for(list<TextBlock>::iterator iter = textList.begin(); iter != textList.end(); iter++) {
-			
-//				// cursor
-//				if(cursorPos == textPos && cursorLine == textLine) {
-//					ofSetColor(255, 255, 0);
-//					ofRect(x, y, s_charWidth, s_charHeight);
-//				}
 			
 				TextBlock &tb = (*iter);
 				
@@ -62,61 +55,58 @@ void ofxEditor::draw() {
 				if(lineWrapping && textPos >= numCharsWidth) {
 					x = 0;
 					y += s_charHeight;
-					textPos = 0;
-					textLine++;
 				}
 				
 				switch(tb.type) {
 				
 					case UNKNOWN:
-						break;
-				
-					case SPACE:
-						x += s_charWidth;
-						textPos++;
-						break;
-						
-					case ENDLINE:
-						x = 0;
-						y += s_charHeight;
-						textPos = 0;
-						textLine++;
-						break;
-						
-					case TAB:
-						x += s_charWidth * s_tabWidth;
-						textPos += s_tabWidth;
-						break;
+						ofLogWarning("ofxEditor") << "trying to draw UNKNOWN text block";
+						return;
 						
 					case WORD:
 						ofSetColor(colorScheme->getWordColor(tb.text));
-						for(int i = 0; i < tb.text.length(); ++i) {
-							s_font->drawCharacter(tb.text[i], x, y);
-							x += s_charWidth;
-							textPos++;
-						}
 						break;
 						
 					case STRING:
 						ofSetColor(colorScheme->getStringColor());
-						for(int i = 0; i < tb.text.length(); ++i) {
-							s_font->drawCharacter(tb.text[i], x, y);
-							x += s_charWidth;
-							textPos++;
-						}
 						break;
 						
 					case NUMBER:
 						ofSetColor(colorScheme->getNumberColor());
-						for(int i = 0; i < tb.text.length(); ++i) {
-							s_font->drawCharacter(tb.text[i], x, y);
-							x += s_charWidth;
-							textPos++;
-						}
 						break;
 					
 					default:
 						break;
+				}
+				
+				// draw block chars
+				for(int i = 0; i < tb.text.length(); ++i) {
+					
+					// cursor
+					if(textPos == cursorPos) {
+						ofPushStyle();
+							ofSetColor(255*0.7, 255*0.7, 0);
+							ofRect(x, y-s_charHeight, s_charWidth, s_charHeight);
+						ofPopStyle();
+					}
+					
+					// draw chars
+					switch(tb.type) {
+						case ENDLINE:
+							x = 0;
+							y += s_charHeight;
+							textPos++;
+							break;
+						case TAB:
+							x += s_charWidth * s_tabWidth;
+							textPos++;
+							break;
+						default:
+							s_font->drawCharacter(tb.text[i], x, y);
+							x += s_charWidth;
+							textPos++;
+							break;
+					}
 				}
 			}
 		}
@@ -133,6 +123,11 @@ void ofxEditor::draw() {
 					textPos = 0;
 					textLine++;
 				}
+				
+				if(i == cursorPos) {
+					ofSetColor(255*0.7, 255*0.7, 0);
+					ofRect(x, y-s_charHeight, s_charWidth, s_charHeight);
+				}
 			
 				// endline
 				if(text[i] == '\n') {
@@ -148,12 +143,6 @@ void ofxEditor::draw() {
 				}
 				// everything else
 				else {
-				
-					if(cursorPos == textPos && cursorLine == textLine) {
-						ofSetColor(255, 255, 0);
-						ofRect(x, y, s_charWidth, s_charHeight);
-					}
-					
 					ofSetColor(255);
 					s_font->drawCharacter(text[i], x, y);
 					x += s_charWidth;
@@ -179,19 +168,21 @@ void ofxEditor::keyPressed(int key) {
 	switch(key) {
 		case OF_KEY_UP:
 			//viewport.y -= s_charHeight;
-			cursorLine -= 1;
+			//cursorPos -= 1;
 			break;
 		case OF_KEY_DOWN:
 			//viewport.y += s_charHeight;
-			cursorLine += 1;
+			//cursorLine += 1;
 			break;
 		case OF_KEY_LEFT:
 			//viewport.x -= s_charWidth;
 			cursorPos -= 1;
+			if(cursorPos < 0) cursorPos = 0;
 			break;
 		case OF_KEY_RIGHT:
 			//viewport.x += s_charWidth;
 			cursorPos += 1;
+			if(cursorPos >= text.length()) cursorPos = text.length()-1;
 			break;
 	}
 }
@@ -344,12 +335,11 @@ void ofxEditor::parseTextToList() {
 				tb.text += text[i];
 				break;
 		
-			case '.': // number decimal point
+			case '.': // could be number decimal point
 				tb.text += text[i];
 				break;
 		
 			default: // everything else
-				
 				switch(tb.type) {
 					case NUMBER:
 						textList.push_back(tb);

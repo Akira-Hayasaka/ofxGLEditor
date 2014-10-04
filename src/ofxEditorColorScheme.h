@@ -9,15 +9,11 @@ class ofxEditorColorScheme {
 		ofxEditorColorScheme();
 		virtual ~ofxEditorColorScheme();
 		
+		void clear();
+		
 		// default text color
 		void setTextColor(ofColor &color);
 		ofColor& getTextColor();
-		
-		// specific word colors
-		void setWordColor(const string& word, ofColor color);
-		void clearWordColor(const string &word);
-		void clearAllWordColors();
-		ofColor& getWordColor(const string &word);
 		
 		// string coloring
 		void setStringColor(ofColor color);
@@ -26,6 +22,12 @@ class ofxEditorColorScheme {
 		// number coloring
 		void setNumberColor(ofColor color);
 		ofColor& getNumberColor();
+		
+		// colors for specfic keywords
+		void setWordColor(const string& word, ofColor color);
+		void clearWordColor(const string &word);
+		void clearAllWordColors();
+		ofColor& getWordColor(const string &word);
 		
 	protected:
 	

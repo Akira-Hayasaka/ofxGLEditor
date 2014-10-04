@@ -56,14 +56,13 @@ class ofxEditor {
 		static int s_charHeight;
 		static unsigned int s_tabWidth; // width in spaces
 	
-		string text;
+		string text; // string buffer
 		
 		enum Type {
 			UNKNOWN,
 			WORD,
 			STRING,
 			NUMBER,
-			
 			SPACE,
 			TAB,
 			ENDLINE
@@ -88,10 +87,10 @@ class ofxEditor {
 					text = "";
 				}
 		};
-		list<TextBlock> textList; // linked list
+		list<TextBlock> textList; // linked list for highlighting
 		
 		ofRectangle viewport;
-		int cursorPos, cursorLine; // text pos
+		int cursorPos; // 1D text pos within buffer
 		
 		int numCharsWidth;
 		int numLinesHeight;

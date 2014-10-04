@@ -7,12 +7,35 @@ ofxEditorColorScheme::~ofxEditorColorScheme() {
 	wordColors.clear();
 }
 
+void ofxEditorColorScheme::clear() {
+	textColor.set(255);
+	clearAllWordColors();
+	stringColor.set(255);
+	numberColor.set(255);
+}
+
 void ofxEditorColorScheme::setTextColor(ofColor &color) {
 	textColor = color;
 }
 
 ofColor& ofxEditorColorScheme::getTextColor() {
 	return textColor;
+}
+
+void ofxEditorColorScheme::setStringColor(ofColor color) {
+	stringColor = color;
+}
+
+ofColor& ofxEditorColorScheme::getStringColor() {
+	return stringColor;
+}
+
+void ofxEditorColorScheme::setNumberColor(ofColor color) {
+	numberColor = color;
+}
+
+ofColor& ofxEditorColorScheme::getNumberColor() {
+	return numberColor;
 }
 
 void ofxEditorColorScheme::setWordColor(const string& word, ofColor color) {
@@ -43,20 +66,4 @@ ofColor& ofxEditorColorScheme::getWordColor(const string &word) {
 		return (*iter).second;
 	}
 	return textColor;
-}
-
-void ofxEditorColorScheme::setStringColor(ofColor color) {
-	stringColor = color;
-}
-
-ofColor& ofxEditorColorScheme::getStringColor() {
-	return stringColor;
-}
-
-void ofxEditorColorScheme::setNumberColor(ofColor color) {
-	numberColor = color;
-}
-
-ofColor& ofxEditorColorScheme::getNumberColor() {
-	return numberColor;
 }
