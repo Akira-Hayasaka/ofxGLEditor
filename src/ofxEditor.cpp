@@ -54,15 +54,18 @@ void ofxEditor::draw() {
 		
 			TextBlock &tb = (*iter);
 			
-//			// line wrap
-//			if(textPos+tb.text.length() >= numCharsWidth) {
-//				x = 0;
-//				y += s_charHeight;
-//				textPos = 0;
-//				textLine++;
-//			}
+			// line wrap
+			if(textPos+tb.text.length() >= numCharsWidth) {
+				x = 0;
+				y += s_charHeight;
+				textPos = 0;
+				textLine++;
+			}
 			
 			switch(tb.type) {
+			
+				case UNKNOWN:
+					break;
 			
 				case SPACE:
 					x += s_charWidth;
@@ -81,14 +84,13 @@ void ofxEditor::draw() {
 					textPos += s_tabWidth;
 					break;
 					
-				case STRING:
+				case WORD:
 					if(highlights) {
-						ofSetColor(highlights->getStringHighlight());
+						ofSetColor(highlights->getHighlight(tb.text));
 					}
 					else {
 						ofSetColor(255);
 					}
-					cout << "STRING: " << tb.text << endl;
 					for(int i = 0; i < tb.text.length(); ++i) {
 						s_font->drawCharacter(tb.text[i], x, y);
 						x += s_charWidth;
@@ -96,9 +98,23 @@ void ofxEditor::draw() {
 					}
 					break;
 					
-				case WORD:
+				case STRING:
 					if(highlights) {
-						ofSetColor(highlights->getHighlight(tb.text));
+						ofSetColor(highlights->getStringHighlight());
+					}
+					else {
+						ofSetColor(255);
+					}
+					for(int i = 0; i < tb.text.length(); ++i) {
+						s_font->drawCharacter(tb.text[i], x, y);
+						x += s_charWidth;
+						textPos++;
+					}
+					break;
+					
+				case NUMBER:
+					if(highlights) {
+						ofSetColor(highlights->getNumberHighlight());
 					}
 					else {
 						ofSetColor(255);
@@ -156,14 +172,14 @@ void ofxEditor::draw() {
 //			}
 //		}
 		
-		// grid
-		ofSetColor(100, 100, 100);
-		for(int x = 0; x < ofGetWidth(); x = x+s_charWidth) {
-			ofLine(x, 0, x, ofGetHeight());
-		}
-		for(int y = s_charHeight; y < ofGetHeight(); y = y+s_charHeight) {
-			ofLine(0, y, ofGetWidth(), y);
-		}
+//		// grid
+//		ofSetColor(100, 100, 100);
+//		for(int x = 0; x < ofGetWidth(); x = x+s_charWidth) {
+//			ofLine(x, 0, x, ofGetHeight());
+//		}
+//		for(int y = s_charHeight; y < ofGetHeight(); y = y+s_charHeight) {
+//			ofLine(0, y, ofGetWidth(), y);
+//		}
 		
 	ofPopView();
 	ofPopStyle();
@@ -283,10 +299,23 @@ void ofxEditor::parseTextToList() {
 				tb.type = STRING;
 				tb.text += text[i];
 				break;
+				
+			case '0': case '1': case '2': case '3': case '4':
+			case '5': case '6': case '7': case '8': case '9':
+				if(tb.type != UNKNOWN && tb.type != NUMBER) {
+					textList.push_back(tb);
+					tb.clear();
+				}
+				tb.type = NUMBER;
+				tb.text += text[i];
+				break;
 		
 			default: // everything else
 				
 				switch(tb.type) {
+					case NUMBER:
+						textList.push_back(tb);
+						tb.clear();
 					case UNKNOWN:
 						tb.type = WORD;
 					case WORD: case STRING:

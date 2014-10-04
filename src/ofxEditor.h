@@ -59,6 +59,7 @@ class ofxEditor {
 			UNKNOWN,
 			WORD,
 			STRING,
+			NUMBER,
 //			BRACKET,
 //			CURLY_BRACKET,
 //			PAREN,

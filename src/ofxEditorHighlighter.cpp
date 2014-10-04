@@ -52,3 +52,11 @@ void ofxEditorHighlights::setStringHighlight(ofColor color) {
 ofColor& ofxEditorHighlights::getStringHighlight() {
 	return stringColor;
 }
+
+void ofxEditorHighlights::setNumberHighlight(ofColor color) {
+	numberColor = color;
+}
+
+ofColor& ofxEditorHighlights::getNumberHighlight() {
+	return numberColor;
+}

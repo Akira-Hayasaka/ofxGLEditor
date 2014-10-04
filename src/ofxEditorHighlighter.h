@@ -23,9 +23,14 @@ class ofxEditorHighlights {
 		void setStringHighlight(ofColor color);
 		ofColor& getStringHighlight();
 		
+		// number highlighting
+		void setNumberHighlight(ofColor color);
+		ofColor& getNumberHighlight();
+		
 	protected:
 	
 		ofColor textColor;
 		ofColor stringColor;
+		ofColor numberColor;
 		map<string,ofColor> highlights;
 };

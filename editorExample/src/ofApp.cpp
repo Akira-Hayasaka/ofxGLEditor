@@ -7,11 +7,12 @@ void ofApp::setup(){
 
 	ofxEditor::loadFont("fonts/PrintChar21.ttf", 30);
 	editor.setSize(ofGetWidth(), ofGetHeight());
-	editor.setText("function setup\n\tprint(\"hello\")\nend\n\nfunction draw\n\tof.setColor(200)\n\tof.line(10, 10, 100, 100)\nend\n");
+	editor.setText("\n\nfunction setup\n\tprint(\"hello\")\nend\n\nfunction draw\n\tof.setColor(200)\n\tof.line(10, 10, 100, 100)\nend\n");
 	
 	highlights.setHighlight("function", ofColor(255, 0, 255));
 	highlights.setHighlight("end", ofColor(255, 0, 255));
 	highlights.setStringHighlight(ofColor(255, 255, 0));
+	highlights.setNumberHighlight(ofColor(255, 100, 100));
 	editor.setHighlights(&highlights);
 	
 	ofBackground(0);
@@ -26,7 +27,7 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
 	editor.draw();
-	ofDrawBitmapString("fps: "+ofToString(ofGetFrameRate()), 10, 10);
+//	ofDrawBitmapString("fps: "+ofToString(ofGetFrameRate()), 10, 10);
 }
 
 //--------------------------------------------------------------
