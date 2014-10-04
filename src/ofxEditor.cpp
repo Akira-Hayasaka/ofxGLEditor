@@ -4,7 +4,7 @@ ofPtr<ofxEditor::Font> ofxEditor::s_font;
 int ofxEditor::s_charWidth = 1;
 int ofxEditor::s_charHeight = 1;
 unsigned int ofxEditor::s_tabWidth = 4;
-bool ofxEditor::s_convertTabs = true;
+bool ofxEditor::s_convertTabs = false;
 
 ofxEditor::ofxEditor() {
 	cursorPos = 0;

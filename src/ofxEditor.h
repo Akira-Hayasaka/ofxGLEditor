@@ -9,15 +9,33 @@ class ofxEditor {
 		ofxEditor();
 		virtual ~ofxEditor();
 		
+	/// \section Static Settings
+		
+		/// load font to be used by all editors, *must* be a fixed width font
+		///
+		/// call this before drawing any editor
+		///
 		static bool loadFont(const string & font, int size);
-		static void setTabWidth(unsigned int numSpaces); // default: 4
+		
+		/// set the displayed tab width, default: 4
+		static void setTabWidth(unsigned int numSpaces);
 		static unsigned int getTabWidth();
+		
+		/// convert tabs to spaces? performed when setting or editing text and
+		/// *cannot* be undone
 		static void setConvertTabsToSpaces(bool convert=true);
 		static bool getConvertTabsToSpaces();
 		
+	/// \section Main
+		
+		/// draw the editor, pushes view and applies viewport
 		void draw();
+		
+		/// required for interactive editing, etc
 		void keyPressed(int key);
 		
+		/// set the view port size,
+		/// size of text field calculated based on font size
 		void setSize(int width, int height);
 		
 		string getText();
@@ -45,7 +63,7 @@ class ofxEditor {
 	
 	protected:
 	
-		// custom font class to get access to protected functions
+		/// custom font class to get access to protected functions
 		class Font : public ofTrueTypeFont {
 			public:
 				void drawCharacter(int c, float x, float y) {
@@ -53,15 +71,28 @@ class ofxEditor {
 				}
 		};
 	
-		static ofPtr<Font> s_font;
-		static int s_charWidth;
-		static int s_charHeight;
-		static unsigned int s_tabWidth; // width in spaces
-		static bool s_convertTabs;
+		static ofPtr<Font> s_font;      //< global editor font
+		static int s_charWidth;         //< char block pixel width
+		static int s_charHeight;        //< char block pixel height
+		static unsigned int s_tabWidth; //< tab width in spaces
+		static bool s_convertTabs;      //< convert tabs to spaces?
 	
-		string text; // string buffer
+		string text; //< string buffer
 		
-		enum Type {
+		ofRectangle viewport;     //< viewport when drawing editor
+		unsigned int cursorPos;   //< 1D text pos within buffer
+		unsigned int desiredXPos; //< used to calculate pos based on desired line
+		
+		int numCharsWidth;  //< computed text field char width
+		int numLinesHeight; //< computed tex field num lines
+		
+		ofxEditorColorScheme *colorScheme; //< optional syntax color scheme
+		bool lineWrapping; //< enable line wrapping in this editor?
+		
+	/// \section Syntax Parser Types
+		
+		/// syntax parser TextBlock types
+		enum TextBlockType {
 			UNKNOWN,
 			WORD,
 			STRING,
@@ -70,11 +101,13 @@ class ofxEditor {
 			TAB,
 			ENDLINE
 		};
+		
+		/// syntax parser custom class to represent a contextual block of text
 		class TextBlock {
 			public:
 				
-				Type type;
-				string text;
+				TextBlockType type; ///< block type
+				string text; ///< block text string
 				
 				TextBlock() {
 					clear();
@@ -90,19 +123,10 @@ class ofxEditor {
 					text = "";
 				}
 		};
-		list<TextBlock> textList; // linked list for highlighting
+		list<TextBlock> textList; //< syntax parser text block linked list
 		
-		ofRectangle viewport;
-		unsigned int cursorPos; // 1D text pos within buffer
-		unsigned int desiredXPos;
+	/// \section Helper Functions
 		
-		int numCharsWidth;
-		int numLinesHeight;
-		
-		ofxEditorColorScheme *colorScheme;
-		bool lineWrapping;
-		
-		// helpers
 		void processTabs();
 		int offsetToCurrentLineStart();
 		int nextLineLength(int pos);
@@ -115,6 +139,9 @@ class ofxEditor {
 		
 	private:
 	
+		/// parses text into text blocks
 		void parseTextToList();
+		
+		/// clears current text block list
 		void clearList();
 };
