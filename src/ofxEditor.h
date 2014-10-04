@@ -1,7 +1,6 @@
 #pragma once
 
-#include "ofxEditorHighlighter.h"
-
+#include "ofxEditorColorScheme.h"
 
 class ofxEditor {
 
@@ -23,8 +22,12 @@ class ofxEditor {
 		void setText(const string& text);
 		void clearText();
 		
-		void setHighlights(ofxEditorHighlights *highlights);
-		void clearHighlights();
+		void setColorScheme(ofxEditorColorScheme &colorScheme);
+		void clearColorScheme();
+		ofxEditorColorScheme* getColorScheme();
+		
+		void setLineWrapping(bool wrap=true);
+		bool getLineWrapping();
 		
 //		int getNumLines();
 //		int getNumCharacters();
@@ -60,9 +63,7 @@ class ofxEditor {
 			WORD,
 			STRING,
 			NUMBER,
-//			BRACKET,
-//			CURLY_BRACKET,
-//			PAREN,
+			
 			SPACE,
 			TAB,
 			ENDLINE
@@ -95,7 +96,8 @@ class ofxEditor {
 		int numCharsWidth;
 		int numLinesHeight;
 		
-		ofxEditorHighlights *highlights;
+		ofxEditorColorScheme *colorScheme;
+		bool lineWrapping;
 		
 	private:
 	

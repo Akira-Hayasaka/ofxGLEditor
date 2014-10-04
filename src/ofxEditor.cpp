@@ -10,7 +10,9 @@ ofxEditor::ofxEditor() {
 	cursorLine = 0;
 	viewport.position.set(0, 0, 0);
 	setSize(ofGetWidth(), ofGetHeight());
-	highlights = NULL;
+	
+	colorScheme = NULL;
+	lineWrapping = false;
 }
 
 ofxEditor::~ofxEditor() {
@@ -41,137 +43,125 @@ void ofxEditor::draw() {
 		ofViewport(viewport);
 
 		// draw text
-		ofFill();
-		int x = 0, y = s_charHeight; // pixel pos
-		int textPos = 0, textLine = 0; // char/line pos
-		for(list<TextBlock>::iterator iter = textList.begin(); iter != textList.end(); iter++) {
-		
-			// cursor
-			if(cursorPos == textPos && cursorLine == textLine) {
-				ofSetColor(255, 255, 0);
-				ofRect(x, y, s_charWidth, s_charHeight);
-			}
-		
-			TextBlock &tb = (*iter);
+		if(colorScheme) { // with colorScheme
+			ofFill();
+			int x = 0, y = s_charHeight; // pixel pos
+			int textPos = 0, textLine = 0; // char/line pos
+			for(list<TextBlock>::iterator iter = textList.begin(); iter != textList.end(); iter++) {
 			
-			// line wrap
-			if(textPos+tb.text.length() >= numCharsWidth) {
-				x = 0;
-				y += s_charHeight;
-				textPos = 0;
-				textLine++;
-			}
-			
-			switch(tb.type) {
-			
-				case UNKNOWN:
-					break;
-			
-				case SPACE:
-					x += s_charWidth;
-					textPos++;
-					break;
-					
-				case ENDLINE:
-					x = 0;
-					y += s_charHeight;
-					textPos = 0;
-					textLine++;
-					break;
-					
-				case TAB:
-					x += s_charWidth * s_tabWidth;
-					textPos += s_tabWidth;
-					break;
-					
-				case WORD:
-					if(highlights) {
-						ofSetColor(highlights->getHighlight(tb.text));
-					}
-					else {
-						ofSetColor(255);
-					}
-					for(int i = 0; i < tb.text.length(); ++i) {
-						s_font->drawCharacter(tb.text[i], x, y);
-						x += s_charWidth;
-						textPos++;
-					}
-					break;
-					
-				case STRING:
-					if(highlights) {
-						ofSetColor(highlights->getStringHighlight());
-					}
-					else {
-						ofSetColor(255);
-					}
-					for(int i = 0; i < tb.text.length(); ++i) {
-						s_font->drawCharacter(tb.text[i], x, y);
-						x += s_charWidth;
-						textPos++;
-					}
-					break;
-					
-				case NUMBER:
-					if(highlights) {
-						ofSetColor(highlights->getNumberHighlight());
-					}
-					else {
-						ofSetColor(255);
-					}
-					for(int i = 0; i < tb.text.length(); ++i) {
-						s_font->drawCharacter(tb.text[i], x, y);
-						x += s_charWidth;
-						textPos++;
-					}
-					break;
-				
-				default:
-					break;
-			}
-		}
-		
-//		// draw text
-//		ofFill();
-//		int x = 0, y = s_charHeight; // pixel pos
-//		int textPos = 0, textLine = 0; // char/line pos
-//		for(int i = 0; i < text.length(); ++i) {
-//		
-//			// line wrap
-//			if(textPos >= numCharsWidth) {
-//				x = 0;
-//				y += s_charHeight;
-//				textPos = 0;
-//				textLine++;
-//			}
-//		
-//			// endline
-//			if(text[i] == '\n') {
-//				x = 0;
-//				y += s_charHeight;
-//				textPos = 0;
-//				textLine++;
-//			}
-//			// tab
-//			else if(text[i] == '\t') {
-//				x += s_charWidth * s_tabWidth;
-//				textPos += s_tabWidth;
-//			}
-//			// everything else
-//			else {
-//			
+//				// cursor
 //				if(cursorPos == textPos && cursorLine == textLine) {
 //					ofSetColor(255, 255, 0);
 //					ofRect(x, y, s_charWidth, s_charHeight);
 //				}
-//				
-//				ofSetColor(255);
-//				s_font->drawCharacter(text[i], x, y);
-//				x += s_charWidth;
-//				textPos++;
-//			}
-//		}
-		
+			
+				TextBlock &tb = (*iter);
+				
+				// line wrap
+				//if(lineWrapping && textPos+tb.text.length() >= numCharsWidth) {
+				if(lineWrapping && textPos >= numCharsWidth) {
+					x = 0;
+					y += s_charHeight;
+					textPos = 0;
+					textLine++;
+				}
+				
+				switch(tb.type) {
+				
+					case UNKNOWN:
+						break;
+				
+					case SPACE:
+						x += s_charWidth;
+						textPos++;
+						break;
+						
+					case ENDLINE:
+						x = 0;
+						y += s_charHeight;
+						textPos = 0;
+						textLine++;
+						break;
+						
+					case TAB:
+						x += s_charWidth * s_tabWidth;
+						textPos += s_tabWidth;
+						break;
+						
+					case WORD:
+						ofSetColor(colorScheme->getWordColor(tb.text));
+						for(int i = 0; i < tb.text.length(); ++i) {
+							s_font->drawCharacter(tb.text[i], x, y);
+							x += s_charWidth;
+							textPos++;
+						}
+						break;
+						
+					case STRING:
+						ofSetColor(colorScheme->getStringColor());
+						for(int i = 0; i < tb.text.length(); ++i) {
+							s_font->drawCharacter(tb.text[i], x, y);
+							x += s_charWidth;
+							textPos++;
+						}
+						break;
+						
+					case NUMBER:
+						ofSetColor(colorScheme->getNumberColor());
+						for(int i = 0; i < tb.text.length(); ++i) {
+							s_font->drawCharacter(tb.text[i], x, y);
+							x += s_charWidth;
+							textPos++;
+						}
+						break;
+					
+					default:
+						break;
+				}
+			}
+		}
+		else { // without highlighter
+			ofFill();
+			int x = 0, y = s_charHeight; // pixel pos
+			int textPos = 0, textLine = 0; // char/line pos
+			for(int i = 0; i < text.length(); ++i) {
+			
+				// line wrap
+				if(lineWrapping && textPos >= numCharsWidth) {
+					x = 0;
+					y += s_charHeight;
+					textPos = 0;
+					textLine++;
+				}
+			
+				// endline
+				if(text[i] == '\n') {
+					x = 0;
+					y += s_charHeight;
+					textPos = 0;
+					textLine++;
+				}
+				// tab
+				else if(text[i] == '\t') {
+					x += s_charWidth * s_tabWidth;
+					textPos += s_tabWidth;
+				}
+				// everything else
+				else {
+				
+					if(cursorPos == textPos && cursorLine == textLine) {
+						ofSetColor(255, 255, 0);
+						ofRect(x, y, s_charWidth, s_charHeight);
+					}
+					
+					ofSetColor(255);
+					s_font->drawCharacter(text[i], x, y);
+					x += s_charWidth;
+					textPos++;
+				}
+			}
+		}
+			
 //		// grid
 //		ofSetColor(100, 100, 100);
 //		for(int x = 0; x < ofGetWidth(); x = x+s_charWidth) {
@@ -223,20 +213,50 @@ string ofxEditor::getText() {
 
 void ofxEditor::setText(const string& text) {
 	this->text = text;
-	parseTextToList();
+	if(colorScheme) {
+		parseTextToList();
+	}
 }
 
 void ofxEditor::clearText() {
 	text = "";
+	if(colorScheme) {
+		clearList();
+	}
+}
+
+void ofxEditor::setColorScheme(ofxEditorColorScheme &colorScheme) {
+	
+	// clear to save memory
+	if(&colorScheme == NULL) {
+		clearList();
+		return;
+	}
+	
+	bool shouldReparse = (this->colorScheme == NULL);
+	this->colorScheme = &colorScheme;
+	
+	// reparse if enabling highlighting
+	if(shouldReparse) {
+		parseTextToList();
+	}
+}
+
+void ofxEditor::clearColorScheme() {
+	this->colorScheme = NULL;
 	clearList();
 }
 
-void ofxEditor::setHighlights(ofxEditorHighlights *highlights) {
-	this->highlights = highlights;
+ofxEditorColorScheme* ofxEditor::getColorScheme() {
+	return colorScheme;
 }
 
-void ofxEditor::clearHighlights() {
-	this->highlights = NULL;
+void ofxEditor::setLineWrapping(bool wrap) {
+	lineWrapping = wrap;
+}
+
+bool ofxEditor::getLineWrapping() {
+	return lineWrapping;
 }
 
 // PRIVATE
@@ -245,7 +265,6 @@ void ofxEditor::parseTextToList() {
 	
 	clearList();
 	
-	bool stringStarted = false;
 	TextBlock tb;
 	for(int i = 0; i < text.length(); ++i) {
 		
@@ -302,11 +321,30 @@ void ofxEditor::parseTextToList() {
 				
 			case '0': case '1': case '2': case '3': case '4':
 			case '5': case '6': case '7': case '8': case '9':
-				if(tb.type != UNKNOWN && tb.type != NUMBER) {
-					textList.push_back(tb);
-					tb.clear();
+				if(tb.type != UNKNOWN) {
+					if(tb.type == STRING) {
+						tb.text += text[i];
+						break;
+					}
+					else if(tb.type == WORD) {
+						// detect words after punctuation aka (, [, etc
+						if(i > 0 && ispunct(text[i-1]) ) {
+							textList.push_back(tb);
+							tb.clear();
+						}
+					}
+					else if(tb.type != NUMBER) {
+						textList.push_back(tb);
+						tb.clear();
+					}
 				}
-				tb.type = NUMBER;
+				if(tb.type != WORD) {
+					tb.type = NUMBER;
+				}
+				tb.text += text[i];
+				break;
+		
+			case '.': // number decimal point
 				tb.text += text[i];
 				break;
 		

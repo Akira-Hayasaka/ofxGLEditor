@@ -6,14 +6,15 @@ void ofApp::setup(){
 	ofSetVerticalSync(true);
 
 	ofxEditor::loadFont("fonts/PrintChar21.ttf", 30);
-	editor.setSize(ofGetWidth(), ofGetHeight());
-	editor.setText("\n\nfunction setup\n\tprint(\"hello\")\nend\n\nfunction draw\n\tof.setColor(200)\n\tof.line(10, 10, 100, 100)\nend\n");
 	
-	highlights.setHighlight("function", ofColor(255, 0, 255));
-	highlights.setHighlight("end", ofColor(255, 0, 255));
-	highlights.setStringHighlight(ofColor(255, 255, 0));
-	highlights.setNumberHighlight(ofColor(255, 100, 100));
-	editor.setHighlights(&highlights);
+	colorScheme.setWordColor("function", ofColor(255, 0, 255));
+	colorScheme.setWordColor("end", ofColor(255, 0, 255));
+	colorScheme.setStringColor(ofColor(255, 255, 0));
+	colorScheme.setNumberColor(ofColor(255, 100, 100));
+	editor.setColorScheme(colorScheme);
+	
+	editor.setSize(ofGetWidth(), ofGetHeight());
+	editor.setText("\n\nfunction setup\n\tprint(\"123hello456\")\nend\n\nfunction draw\n\tof.setColor(200.1)\n\tof.line(10, 10, 100, 100)\nend\n5hj55hj44\n");
 	
 	ofBackground(0);
 
@@ -32,6 +33,21 @@ void ofApp::draw(){
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
+
+	switch(key) {
+		case 'h':
+			if(editor.getColorScheme()) {
+				editor.clearColorScheme();
+			}
+			else {
+				editor.setColorScheme(colorScheme);
+			}
+			break;
+		case 'l':
+			editor.setLineWrapping(!editor.getLineWrapping());
+			break;
+	}
+
 	editor.keyPressed(key);
 }
 
