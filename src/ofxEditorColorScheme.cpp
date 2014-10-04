@@ -14,7 +14,7 @@ void ofxEditorColorScheme::clear() {
 	numberColor.set(255);
 }
 
-void ofxEditorColorScheme::setTextColor(ofColor &color) {
+void ofxEditorColorScheme::setTextColor(ofColor color) {
 	textColor = color;
 }
 

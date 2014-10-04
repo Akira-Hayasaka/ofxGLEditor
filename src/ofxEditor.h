@@ -89,6 +89,12 @@ class ofxEditor {
 		ofxEditorColorScheme *colorScheme; //< optional syntax color scheme
 		bool lineWrapping; //< enable line wrapping in this editor?
 		
+		float m_time; //< timestamp for calculating animations
+		float m_delta; //< difference from last timestamp
+		float m_cursorFlash; //< cursor flash animation time
+		//bool m_BlowupCursor;
+		//float m_Blowup;
+		
 	/// \section Syntax Parser Types
 		
 		/// syntax parser TextBlock types
@@ -126,6 +132,8 @@ class ofxEditor {
 		list<TextBlock> textList; //< syntax parser text block linked list
 		
 	/// \section Helper Functions
+		
+		void drawCursor(int x, int y);
 		
 		void processTabs();
 		int offsetToCurrentLineStart();

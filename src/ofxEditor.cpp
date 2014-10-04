@@ -1,5 +1,8 @@
 #include "ofxEditor.h"
 
+#define FLASH_RATE 1
+#define HALF_FLASH_RATE (FLASH_RATE*0.5)
+
 ofPtr<ofxEditor::Font> ofxEditor::s_font;
 int ofxEditor::s_charWidth = 1;
 int ofxEditor::s_charHeight = 1;
@@ -9,11 +12,16 @@ bool ofxEditor::s_convertTabs = false;
 ofxEditor::ofxEditor() {
 	cursorPos = 0;
 	desiredXPos = 0;
-	viewport.position.set(0, 0, 0);
-	setSize(ofGetWidth(), ofGetHeight());
 	
 	colorScheme = NULL;
 	lineWrapping = false;
+	
+	m_time = 0;
+	m_delta = 0;
+	m_cursorFlash = 0;
+
+	viewport.position.set(0, 0, 0);
+	setSize(ofGetWidth(), ofGetHeight());
 }
 
 ofxEditor::~ofxEditor() {
@@ -71,7 +79,7 @@ void ofxEditor::draw() {
 				
 					case UNKNOWN:
 						ofLogWarning("ofxEditor") << "trying to draw UNKNOWN text block";
-						return;
+						break;
 						
 					case WORD:
 						ofSetColor(colorScheme->getWordColor(tb.text));
@@ -94,10 +102,7 @@ void ofxEditor::draw() {
 					
 					// draw cursor
 					if(textPos == cursorPos) {
-						ofPushStyle();
-							ofSetColor(255*0.7, 255*0.7, 0);
-							ofRect(x, y-s_charHeight, floor((s_charWidth*0.25)), s_charHeight);
-						ofPopStyle();
+						drawCursor(x, y);
 					}
 					
 					// draw chars
@@ -120,7 +125,7 @@ void ofxEditor::draw() {
 				}
 			}
 		}
-		else { // without highlighter
+		else { // without syntax highlighting
 			ofFill();
 			int x = 0, y = s_charHeight; // pixel pos
 			int textPos = 0, textLine = 0; // char/line pos
@@ -136,8 +141,9 @@ void ofxEditor::draw() {
 				
 				// draw cursor
 				if(i == cursorPos) {
-					ofSetColor(255*0.7, 255*0.7, 0);
-					ofRect(x, y-s_charHeight, floor(s_charWidth*0.25), s_charHeight);
+					drawCursor(x, y);
+//					ofSetColor(255*0.7, 255*0.7, 0);
+//					ofRect(x, y-s_charHeight, floor(s_charWidth*0.25), s_charHeight);
 				}
 			
 				// endline
@@ -173,6 +179,13 @@ void ofxEditor::draw() {
 		
 	ofPopView();
 	ofPopStyle();
+	
+	// update animation timestamps
+	m_delta = ofGetElapsedTimef() - m_time;
+	m_time = ofGetElapsedTimef();
+	if (m_delta > 100.0f) {
+		m_delta = 0.000001f;
+	}
 }
 
 void ofxEditor::keyPressed(int key) {
@@ -187,6 +200,8 @@ void ofxEditor::keyPressed(int key) {
 					cursorPos = lineStart(lineStart(cursorPos)-1) + desiredXPos; // start of previous+offset
 				}
 				//if(cursorPos < m_TopTextPosition) m_TopTextPosition=LineStart(cursorPos);
+				
+				m_cursorFlash = HALF_FLASH_RATE; // show cursor after moving
 			}
 			break;
 		case OF_KEY_DOWN:
@@ -199,6 +214,8 @@ void ofxEditor::keyPressed(int key) {
 					cursorPos = lineStart(lineEnd(cursorPos)+1) + desiredXPos; // start of next+offset
 				}
 				//if (m_Position>=m_BottomTextPosition) m_TopTextPosition=LineEnd(m_TopTextPosition)+1;
+				
+				m_cursorFlash = HALF_FLASH_RATE; // show cursor after moving
 			}
 			break;
 		case OF_KEY_LEFT:
@@ -206,12 +223,14 @@ void ofxEditor::keyPressed(int key) {
 				cursorPos--;
 			}
 			desiredXPos = offsetToCurrentLineStart();
+			m_cursorFlash = HALF_FLASH_RATE; // show cursor after moving
 			break;
 		case OF_KEY_RIGHT:
 			if(!text.empty()) {
 				cursorPos++;
 			}
 			desiredXPos = offsetToCurrentLineStart();
+			m_cursorFlash = HALF_FLASH_RATE; // show cursor after moving
 			break;
 	}
 }
@@ -283,6 +302,19 @@ bool ofxEditor::getLineWrapping() {
 }
 
 // PROTECTED
+
+void ofxEditor::drawCursor(int x, int y) {
+	m_cursorFlash += m_delta;
+	if (m_cursorFlash > FLASH_RATE) {
+		m_cursorFlash = 0;
+	}
+	if (m_cursorFlash > HALF_FLASH_RATE) {
+		ofPushStyle();
+			ofSetColor(255*0.8, 255*0.8, 0);
+			ofRect(x, y-s_charHeight, floor((s_charWidth*0.5)), s_charHeight);
+		ofPopStyle();
+	}
+}
 
 void ofxEditor::processTabs() {
 	size_t pos = text.find("\t", 0);

@@ -7,10 +7,10 @@ void ofApp::setup(){
 
 	ofxEditor::loadFont("fonts/PrintChar21.ttf", 30);
 	
-	colorScheme.setWordColor("function", ofColor(255, 0, 255));
-	colorScheme.setWordColor("end", ofColor(255, 0, 255));
-	colorScheme.setStringColor(ofColor(255, 255, 0));
-	colorScheme.setNumberColor(ofColor(255, 100, 100));
+	colorScheme.setWordColor("function", ofColor::fuchsia);
+	colorScheme.setWordColor("end", ofColor::fuchsia);
+	colorScheme.setStringColor(ofColor::yellow);
+	colorScheme.setNumberColor(ofColor::orangeRed);
 	editor.setColorScheme(colorScheme);
 	
 	editor.setSize(ofGetWidth(), ofGetHeight());
