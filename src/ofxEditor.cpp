@@ -4,9 +4,11 @@ ofPtr<ofxEditor::Font> ofxEditor::s_font;
 int ofxEditor::s_charWidth = 1;
 int ofxEditor::s_charHeight = 1;
 unsigned int ofxEditor::s_tabWidth = 4;
+bool ofxEditor::s_convertTabs = true;
 
 ofxEditor::ofxEditor() {
-	cursorPos = 2;
+	cursorPos = 0;
+	desiredXPos = 0;
 	viewport.position.set(0, 0, 0);
 	setSize(ofGetWidth(), ofGetHeight());
 	
@@ -33,6 +35,14 @@ void ofxEditor::setTabWidth(unsigned int numSpaces) {
 
 unsigned int ofxEditor::getTabWidth() {
 	return s_tabWidth;
+}
+
+void ofxEditor::setConvertTabsToSpaces(bool convert) {
+	s_convertTabs = convert;
+}
+
+bool ofxEditor::getConvertTabsToSpaces() {
+	return s_convertTabs;
 }
 
 void ofxEditor::draw() {
@@ -82,11 +92,11 @@ void ofxEditor::draw() {
 				// draw block chars
 				for(int i = 0; i < tb.text.length(); ++i) {
 					
-					// cursor
+					// draw cursor
 					if(textPos == cursorPos) {
 						ofPushStyle();
 							ofSetColor(255*0.7, 255*0.7, 0);
-							ofRect(x, y-s_charHeight, s_charWidth, s_charHeight);
+							ofRect(x, y-s_charHeight, floor((s_charWidth*0.25)), s_charHeight);
 						ofPopStyle();
 					}
 					
@@ -124,9 +134,10 @@ void ofxEditor::draw() {
 					textLine++;
 				}
 				
+				// draw cursor
 				if(i == cursorPos) {
 					ofSetColor(255*0.7, 255*0.7, 0);
-					ofRect(x, y-s_charHeight, s_charWidth, s_charHeight);
+					ofRect(x, y-s_charHeight, floor(s_charWidth*0.25), s_charHeight);
 				}
 			
 				// endline
@@ -167,22 +178,40 @@ void ofxEditor::draw() {
 void ofxEditor::keyPressed(int key) {
 	switch(key) {
 		case OF_KEY_UP:
-			//viewport.y -= s_charHeight;
-			//cursorPos -= 1;
+			if((int)lineStart(cursorPos) > 0) { // if we're not on the first line
+				unsigned int previouslinelength = previousLineLength(cursorPos);
+				if(previouslinelength < desiredXPos) {
+					cursorPos = lineStart(cursorPos)-1; // end of previous
+				}
+				else {
+					cursorPos = lineStart(lineStart(cursorPos)-1) + desiredXPos; // start of previous+offset
+				}
+				//if(cursorPos < m_TopTextPosition) m_TopTextPosition=LineStart(cursorPos);
+			}
 			break;
 		case OF_KEY_DOWN:
-			//viewport.y += s_charHeight;
-			//cursorLine += 1;
+			if(lineEnd(cursorPos) < text.size()) { // if we're not on the last line
+				unsigned int nextlinelength = nextLineLength(cursorPos);
+				if(nextlinelength < desiredXPos) {
+					cursorPos = lineEnd(lineEnd(cursorPos)+1); // end of next
+				}
+				else {
+					cursorPos = lineStart(lineEnd(cursorPos)+1) + desiredXPos; // start of next+offset
+				}
+				//if (m_Position>=m_BottomTextPosition) m_TopTextPosition=LineEnd(m_TopTextPosition)+1;
+			}
 			break;
 		case OF_KEY_LEFT:
-			//viewport.x -= s_charWidth;
-			cursorPos -= 1;
-			if(cursorPos < 0) cursorPos = 0;
+			if(cursorPos > 0) {
+				cursorPos--;
+			}
+			desiredXPos = offsetToCurrentLineStart();
 			break;
 		case OF_KEY_RIGHT:
-			//viewport.x += s_charWidth;
-			cursorPos += 1;
-			if(cursorPos >= text.length()) cursorPos = text.length()-1;
+			if(!text.empty()) {
+				cursorPos++;
+			}
+			desiredXPos = offsetToCurrentLineStart();
 			break;
 	}
 }
@@ -204,6 +233,9 @@ string ofxEditor::getText() {
 
 void ofxEditor::setText(const string& text) {
 	this->text = text;
+	if(s_convertTabs) {
+		processTabs();
+	}
 	if(colorScheme) {
 		parseTextToList();
 	}
@@ -248,6 +280,94 @@ void ofxEditor::setLineWrapping(bool wrap) {
 
 bool ofxEditor::getLineWrapping() {
 	return lineWrapping;
+}
+
+// PROTECTED
+
+void ofxEditor::processTabs() {
+	size_t pos = text.find("\t", 0);
+	while(pos != string::npos) {
+		text.erase(pos, 1);
+		text.insert(pos, string(s_tabWidth, ' '));
+		pos = text.find("\t",pos);
+	}
+}
+
+int ofxEditor::offsetToCurrentLineStart() {
+	return cursorPos - lineStart(cursorPos);
+}
+
+int ofxEditor::nextLineLength(int pos) {
+	size_t nextlinestart = text.find("\n", cursorPos);
+	if(nextlinestart != string::npos) {
+		return lineLength(nextlinestart+1);
+	}
+	return 0;
+
+}
+
+int ofxEditor::previousLineLength(int pos) {
+	size_t previouslineend = string::npos;
+	if(pos > 0) {
+		previouslineend = text.rfind("\n", pos-1);
+	}
+	if(previouslineend != string::npos) {
+		return lineLength(previouslineend);
+	}
+	return 0;
+}
+
+int ofxEditor::lineLength(int pos) {
+	unsigned int linestart = lineStart(pos);
+	unsigned int lineend = lineEnd(pos);
+	return lineend-linestart;
+}
+
+unsigned int ofxEditor::lineStart(int pos) {
+	unsigned int linestart = string::npos;
+
+	if(pos > 0) {
+		// take one off if we're over a newline
+		if(text[pos] == '\n') {
+			linestart = text.rfind("\n", pos-1);
+		}
+		else {
+			linestart = text.rfind("\n", pos);
+		}
+	}
+	
+	if(linestart != string::npos) {
+		linestart++; // move the start off the newline
+	}
+	else {
+		linestart = 0; // if are on the first line, set the start to 0
+	}
+	
+	return linestart;
+}
+
+unsigned int ofxEditor::lineEnd(int pos) {
+	if(text.empty()) {
+		return 0;
+	}
+	size_t end = text.find("\n", pos);
+	if(end == string::npos) {
+		end = text.size()-1;
+	}
+	return end;
+}
+
+unsigned int ofxEditor::countTabs(int startPos, int endPos) {
+	if(text.empty()) {
+		return 0;
+	}
+	unsigned int found = 0;
+	for(int i = startPos; i < endPos; ++i) {
+		if(text[i] == '\t') {
+			found++;
+		}
+	}
+	return found;
 }
 
 // PRIVATE
