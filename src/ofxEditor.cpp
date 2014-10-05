@@ -3,11 +3,24 @@
 #define FLASH_RATE 1
 #define HALF_FLASH_RATE (FLASH_RATE*0.5)
 
+// max time in secs for cursor to "blow up"
+#define BLOWUP_FLASHES 1.8
+
+// max cursor blow up size in chars
+#define CURSOR_MAX_WIDTH 40
+#define CURSOR_MAX_HEIGHT 40
+
 ofPtr<ofxEditor::Font> ofxEditor::s_font;
 int ofxEditor::s_charWidth = 1;
 int ofxEditor::s_charHeight = 1;
+int ofxEditor::s_cursorWidth = 1;
+
 unsigned int ofxEditor::s_tabWidth = 4;
 bool ofxEditor::s_convertTabs = false;
+
+float ofxEditor::s_alpha = 1.0f;
+ofColor ofxEditor::s_textColor = ofColor(255);
+ofColor ofxEditor::s_cursorColor = ofColor(255, 255, 0);
 
 ofxEditor::ofxEditor() {
 	cursorPos = 0;
@@ -19,6 +32,8 @@ ofxEditor::ofxEditor() {
 	m_time = 0;
 	m_delta = 0;
 	m_cursorFlash = 0;
+	m_blowupCursor = false;
+	m_blowup = 0;
 
 	viewport.position.set(0, 0, 0);
 	setSize(ofGetWidth(), ofGetHeight());
@@ -34,6 +49,7 @@ bool ofxEditor::loadFont(const string &font, int size) {
 	if(s_font->loadFont(font, size, true, true, true)) {
 		s_charWidth = size;
 		s_charHeight = s_font->getLineHeight();
+		s_cursorWidth = floor(s_charWidth*0.3);
 	}
 }
 
@@ -53,6 +69,30 @@ bool ofxEditor::getConvertTabsToSpaces() {
 	return s_convertTabs;
 }
 
+void ofxEditor::setAlpha(float alpha) {
+	s_alpha = ofClamp(alpha, 0.0f, 1.0f);
+}
+
+float ofxEditor::getAlpha() {
+	return s_alpha;
+}
+
+void ofxEditor::setTextColor(ofColor &color) {
+	s_textColor = color;
+}
+
+ofColor& ofxEditor::getTextColor() {
+	return s_textColor;
+}
+
+void ofxEditor::setCursorColor(ofColor &color) {
+	s_cursorColor = color;
+}
+
+ofColor& ofxEditor::getCursorColor() {
+	return s_cursorColor;
+}
+
 void ofxEditor::draw() {
 	ofPushStyle();
 	ofPushView();
@@ -63,7 +103,7 @@ void ofxEditor::draw() {
 		if(colorScheme) { // with colorScheme
 			ofFill();
 			int x = 0, y = s_charHeight; // pixel pos
-			int textPos = 0;//, textLine = 0; // char/line pos
+			int textPos = 0; // char/line pos
 			for(list<TextBlock>::iterator iter = textList.begin(); iter != textList.end(); iter++) {
 			
 				TextBlock &tb = (*iter);
@@ -81,17 +121,23 @@ void ofxEditor::draw() {
 						ofLogWarning("ofxEditor") << "trying to draw UNKNOWN text block";
 						break;
 						
-					case WORD:
-						ofSetColor(colorScheme->getWordColor(tb.text));
+					case WORD: {
+						ofColor &c = colorScheme->getWordColor(tb.text);
+						ofSetColor(c.r, c.g, c.b, c.a * s_alpha);
 						break;
+					}
 						
-					case STRING:
-						ofSetColor(colorScheme->getStringColor());
+					case STRING: {
+						ofColor &c = colorScheme->getStringColor();
+						ofSetColor(c.r, c.g, c.b, c.a * s_alpha);
 						break;
+					}
 						
-					case NUMBER:
-						ofSetColor(colorScheme->getNumberColor());
+					case NUMBER: {
+						ofColor &c = colorScheme->getNumberColor();
+						ofSetColor(c.r, c.g, c.b, c.a * s_alpha);
 						break;
+					}
 					
 					default:
 						break;
@@ -142,8 +188,6 @@ void ofxEditor::draw() {
 				// draw cursor
 				if(i == cursorPos) {
 					drawCursor(x, y);
-//					ofSetColor(255*0.7, 255*0.7, 0);
-//					ofRect(x, y-s_charHeight, floor(s_charWidth*0.25), s_charHeight);
 				}
 			
 				// endline
@@ -160,7 +204,7 @@ void ofxEditor::draw() {
 				}
 				// everything else
 				else {
-					ofSetColor(255);
+					ofSetColor(s_textColor.r, s_textColor.g, s_textColor.b, s_textColor.a * s_alpha);
 					s_font->drawCharacter(text[i], x, y);
 					x += s_charWidth;
 					textPos++;
@@ -232,6 +276,9 @@ void ofxEditor::keyPressed(int key) {
 			desiredXPos = offsetToCurrentLineStart();
 			m_cursorFlash = HALF_FLASH_RATE; // show cursor after moving
 			break;
+		case 'b' :
+			blowupCursor();
+			break;
 	}
 }
 
@@ -301,18 +348,55 @@ bool ofxEditor::getLineWrapping() {
 	return lineWrapping;
 }
 
+void ofxEditor::blowupCursor() {
+	m_blowupCursor = true;
+	m_blowup = 0;
+}
+
+void ofxEditor::reset() {
+//	m_PosX=m_PosY=0;
+//	m_Scale=1;
+//	m_TextWidth=1;
+//	m_TextColourRed=1;
+//	m_TextColourGreen=1;
+//	m_TextColourBlue=1;
+	m_blowupCursor = false;
+	m_blowup = 0.0f;
+}
+
 // PROTECTED
 
 void ofxEditor::drawCursor(int x, int y) {
-	m_cursorFlash += m_delta;
-	if (m_cursorFlash > FLASH_RATE) {
-		m_cursorFlash = 0;
+	
+	if(m_blowupCursor) {
+		
+		// set this to zero when starting
+		m_blowup += m_delta;
+		if (m_blowup >= BLOWUP_FLASHES) {
+			m_blowupCursor = false;
+		}
+		else {
+			float maxCW = (BLOWUP_FLASHES - m_blowup) / BLOWUP_FLASHES * (CURSOR_MAX_WIDTH * s_cursorWidth * 0.5f) + s_cursorWidth * 0.5f;
+			float maxCH = (BLOWUP_FLASHES - m_blowup) / BLOWUP_FLASHES * (CURSOR_MAX_HEIGHT * s_charHeight) + s_charHeight;
+			ofPushStyle();
+				ofSetRectMode(OF_RECTMODE_CENTER);
+				ofSetColor(s_cursorColor.r, s_cursorColor.g, s_cursorColor.b, s_cursorColor.a * s_alpha * m_blowup/BLOWUP_FLASHES);
+				ofRect(x+maxCW/2, y-s_charHeight+maxCH/2, maxCW, maxCH);
+				ofSetRectMode(OF_RECTMODE_CORNER);
+			ofPopStyle();
+		}
 	}
-	if (m_cursorFlash > HALF_FLASH_RATE) {
-		ofPushStyle();
-			ofSetColor(255*0.8, 255*0.8, 0);
-			ofRect(x, y-s_charHeight, floor((s_charWidth*0.5)), s_charHeight);
-		ofPopStyle();
+	else {
+		m_cursorFlash += m_delta;
+		if (m_cursorFlash > FLASH_RATE) {
+			m_cursorFlash = 0;
+		}
+		if (m_cursorFlash > HALF_FLASH_RATE) {
+			ofPushStyle();
+				ofSetColor(s_cursorColor.r, s_cursorColor.g, s_cursorColor.b, s_cursorColor.a * s_alpha);
+				ofRect(x, y-s_charHeight, s_cursorWidth, s_charHeight);
+			ofPopStyle();
+		}
 	}
 }
 

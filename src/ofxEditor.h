@@ -26,6 +26,18 @@ class ofxEditor {
 		static void setConvertTabsToSpaces(bool convert=true);
 		static bool getConvertTabsToSpaces();
 		
+		/// set overall text alpha
+		static void setAlpha(float alpha);
+		static float getAlpha();
+		
+		/// text color color, default: white
+		static void setTextColor(ofColor &color);
+		static ofColor& getTextColor();
+		
+		/// cursor color, default: yellow
+		static void setCursorColor(ofColor &color);
+		static ofColor& getCursorColor();
+		
 	/// \section Main
 		
 		/// draw the editor, pushes view and applies viewport
@@ -49,6 +61,8 @@ class ofxEditor {
 		void setLineWrapping(bool wrap=true);
 		bool getLineWrapping();
 		
+		void blowupCursor();
+		
 //		int getNumLines();
 //		int getNumCharacters();
 //		
@@ -59,7 +73,7 @@ class ofxEditor {
 //		void setCursorPos(int pos);
 //		void setCursorLinePos(int line, int character);
 //		
-//		void reset();
+		void reset();
 	
 	protected:
 	
@@ -74,8 +88,14 @@ class ofxEditor {
 		static ofPtr<Font> s_font;      //< global editor font
 		static int s_charWidth;         //< char block pixel width
 		static int s_charHeight;        //< char block pixel height
+		static int s_cursorWidth;		///< cursor width, 1/3 char width
+		
 		static unsigned int s_tabWidth; //< tab width in spaces
 		static bool s_convertTabs;      //< convert tabs to spaces?
+		
+		static float s_alpha;           //< overall text alpha
+		static ofColor s_textColor;		//< general text color, overridden by color scheme
+		static ofColor s_cursorColor;	//< color of the text pos cursor
 	
 		string text; //< string buffer
 		
@@ -92,8 +112,8 @@ class ofxEditor {
 		float m_time; //< timestamp for calculating animations
 		float m_delta; //< difference from last timestamp
 		float m_cursorFlash; //< cursor flash animation time
-		//bool m_BlowupCursor;
-		//float m_Blowup;
+		bool m_blowupCursor; //< blow up the cursor?
+		float m_blowup; //< how much the cursor is being blown up
 		
 	/// \section Syntax Parser Types
 		
