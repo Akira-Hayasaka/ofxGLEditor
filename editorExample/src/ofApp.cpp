@@ -4,6 +4,7 @@
 void ofApp::setup(){
 
 	ofSetVerticalSync(true);
+	ofSetFrameRate(30);
 
 	ofxEditor::loadFont("fonts/PrintChar21.ttf", 30);
 	
@@ -11,7 +12,7 @@ void ofApp::setup(){
 	colorScheme.setWordColor("end", ofColor::fuchsia);
 	colorScheme.setStringColor(ofColor::yellow);
 	colorScheme.setNumberColor(ofColor::orangeRed);
-	editor.setColorScheme(colorScheme);
+	//editor.setColorScheme(colorScheme);
 	
 	editor.setSize(ofGetWidth(), ofGetHeight());
 	editor.setText("function setup\n\tprint(\"123hello456\")\nend\n\nfunction draw\n\tof.setColor(200.1)\n\tof.line(10, 10, 100, 100)\nend\n5hj55hj44\n");
@@ -34,20 +35,21 @@ void ofApp::draw(){
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
 
-	switch(key) {
-		case 'h':
-			if(editor.getColorScheme()) {
-				editor.clearColorScheme();
-			}
-			else {
-				editor.setColorScheme(colorScheme);
-			}
-			break;
-		case 'l':
-			editor.setLineWrapping(!editor.getLineWrapping());
-			break;
+	if(ofGetKeyPressed(OF_KEY_SUPER)) {
+		switch(key) {
+			case 'g':
+				if(editor.getColorScheme()) {
+					editor.clearColorScheme();
+				}
+				else {
+					editor.setColorScheme(colorScheme);
+				}
+				return;
+			case 'l':
+				editor.setLineWrapping(!editor.getLineWrapping());
+				return;
+		}
 	}
-
 	editor.keyPressed(key);
 }
 
