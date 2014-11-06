@@ -361,10 +361,13 @@ void ofxEditor::keyPressed(int key) {
 	bool modifierPressed = s_superAsModifier ? ofGetKeyPressed(OF_KEY_SUPER) : ofGetKeyPressed(OF_KEY_CONTROL);
 	if(modifierPressed) {
 	
+		// check control chars too if CTRL is modifier
 		switch(key) {
-		
-			case 'q': case 17:
-				clearAllText();
+				
+			case 'a': case 10: // select all
+				m_selection = true;
+				m_highlightStart = 0;
+				m_highlightEnd = m_text.size();
 				break;
 				
 			case 'x': case 24: // cut
@@ -393,14 +396,12 @@ void ofxEditor::keyPressed(int key) {
 				}
 				break;
 			
-			case 'b' :
+			case 'b' : // show cursor location
 				blowupCursor();
 				break;
 		}
 	}
 	else {
-	
-		unsigned int startpos = m_position;
 		
 		// also check for ascii control chars: http://ascii-table.com/control-chars.php
 		switch(key) {
@@ -520,23 +521,31 @@ void ofxEditor::keyPressed(int key) {
 				
 			case OF_KEY_SHIFT:
 				if(!m_shiftState) {
-					m_highlightStart = startpos;
-					m_highlightEnd = startpos;
+					m_highlightStart = m_position;
+					m_highlightEnd = m_position;
 					m_shiftState = true;
 					m_selection = true;
 				}
 				break;
 				
 			case OF_KEY_DEL:
-				m_text.erase(m_position, 1);
-				if(m_colorScheme) {
-					parseTextBlocks();
+				if(m_selection) {
+					m_selection = false;
+					m_highlightStart = 0;
+					m_highlightEnd = 0;
+					clearAllText();
+				}
+				else {
+					m_text.erase(m_position, 1);
+					if(m_colorScheme) {
+						parseTextBlocks();
+					}
 				}
 				break;
 				
 			case OF_KEY_BACKSPACE:
 				
-				if(!m_text.empty() && m_position != 0) {
+				if(!m_text.empty()) {
 					if(m_selection) {
 						m_text.erase(m_highlightStart, m_highlightEnd-m_highlightStart);
 						if(m_position >= m_highlightEnd) {
@@ -544,7 +553,7 @@ void ofxEditor::keyPressed(int key) {
 						}						
 						m_selection = false;
 					}
-					else {
+					else if(m_position != 0) {
 						m_text.erase(m_position-1, 1);
 						m_position--;
 					}
