@@ -37,19 +37,19 @@ class ofxEditor {
 		
 		/// text color color, default: white
 		/// overridden by color scheme if a scheme is set
-		static void setTextColor(ofColor &color);
+		static void setTextColor(ofColor color);
 		static ofColor& getTextColor();
 		
 		/// cursor color, default: yellow w/ alpha
-		static void setCursorColor(ofColor &color);
+		static void setCursorColor(ofColor color);
 		static ofColor& getCursorColor();
 		
 		/// selection color, default: green w/ alpha
-		static void setSelectionColor(ofColor& color);
+		static void setSelectionColor(ofColor color);
 		static ofColor& getSelectionColor();
 	
 		/// matching chars highlight color, default: blue w/ alpha
-		static void setMatchingCharsColor(ofColor& color);
+		static void setMatchingCharsColor(ofColor color);
 		static ofColor& getMatchingCharsColor();
 		
 		/// set useSuper = true if you want to use the Super (Windows key, Mac CMD)
@@ -62,11 +62,12 @@ class ofxEditor {
 		static bool getHighlightMatchingChars();
 	
 		/// set the matching open/close chars to highlight,
-		/// default: "([<{" & ")]>}", note: strings should not be empty
+		/// default: "([<{" & ")]>}", strings should not be empty
+		/// note: matching chars are not highlighted inside comments
 		static void setMatchingChars(string openChars, string closeChars);
 		static string getOpenChars();
 		static string getCloseChars();
-		
+	
 	/// \section Main
 		
 		/// draw the editor, pushes view and applies viewport
@@ -158,7 +159,7 @@ class ofxEditor {
 		static ofColor s_cursorColor;	 //< text pos cursor color
 		static ofColor s_selectionColor; //< char selection background color
 		static ofColor s_matchingCharsColor; //< matching chars background color
-		
+	
 		static bool s_superAsModifier;   //< use the super key as modifier?
 		
 		static string s_copyBuffer;      //< shared copy/paste buffer
@@ -210,7 +211,9 @@ class ofxEditor {
 			NUMBER,
 			SPACE,
 			TAB,
-			ENDLINE
+			ENDLINE,
+			COMMENT_BEGIN, // tag only, no text
+			COMMENT_END    // tag only, no text
 		};
 		
 		/// syntax parser custom class to represent a contextual block of text

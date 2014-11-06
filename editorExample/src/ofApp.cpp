@@ -12,8 +12,11 @@ void ofApp::setup(){
 	colorScheme.setWordColor("end", ofColor::fuchsia);
 	colorScheme.setStringColor(ofColor::yellow);
 	colorScheme.setNumberColor(ofColor::orangeRed);
+	colorScheme.setCommentColor(ofColor::gray);
+	colorScheme.setSingleLineComment("--"); // lua style
+	colorScheme.setMultiLineComment("--[[", "]]"); // lua style
 	
-	editor.setText("function setup\n\tprint(\"hello world\")\n\tprint(\"123string456\")\nend\n\nfunction draw\n\tof.setColor(200.1)\n\tof.line(10, 10, 100, 100)\nend\n\n--mix of numbers & text\n5hj55hj44\n");
+	editor.setText("-- a single line comment\n--[[\n\ta multi line comment\n]]\n\nfunction setup\n\tprint(\"hello world\")\n\tprint(\"123string456\")\nend\n\nfunction draw\n\tof.setColor(200.1)\n\tof.line(10, 10, 100, 100)\nend\n\n--mix of numbers & text\n5hj55hj44\n");
 	editor.setHighlightMatchingChars(true);
 	editor.setMatchingChars("f", "n");
 	
@@ -29,7 +32,7 @@ void ofApp::update(){
 void ofApp::draw(){
 	
 	editor.draw();
-	editor.drawGrid();
+	//editor.drawGrid();
 	
 	ofSetColor(255);
 	ofDrawBitmapString("fps: "+ofToString((int)ofGetFrameRate()), ofGetWidth()-70, ofGetHeight()-10);

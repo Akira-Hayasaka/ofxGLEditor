@@ -103,7 +103,7 @@ float ofxEditor::getAlpha() {
 	return s_alpha;
 }
 
-void ofxEditor::setTextColor(ofColor &color) {
+void ofxEditor::setTextColor(ofColor color) {
 	s_textColor = color;
 }
 
@@ -111,7 +111,7 @@ ofColor& ofxEditor::getTextColor() {
 	return s_textColor;
 }
 
-void ofxEditor::setCursorColor(ofColor &color) {
+void ofxEditor::setCursorColor(ofColor color) {
 	s_cursorColor = color;
 }
 
@@ -119,7 +119,7 @@ ofColor& ofxEditor::getCursorColor() {
 	return s_cursorColor;
 }
 
-void ofxEditor::setSelectionColor(ofColor& color) {
+void ofxEditor::setSelectionColor(ofColor color) {
 	s_selectionColor = color;
 }
 
@@ -127,7 +127,7 @@ ofColor& ofxEditor::getSelectionColor() {
 	return s_selectionColor;
 }
 
-void ofxEditor::setMatchingCharsColor(ofColor& color) {
+void ofxEditor::setMatchingCharsColor(ofColor color) {
 	s_matchingCharsColor = color;
 }
 
@@ -196,6 +196,7 @@ void ofxEditor::draw() {
 		// draw text
 		if(m_colorScheme) { // with colorScheme
 			ofFill();
+			bool comment = false;
 			for(list<TextBlock>::iterator iter = m_textBlocks.begin(); iter != m_textBlocks.end() && m_lineCount < m_visibleLines; iter++) {
 			
 				TextBlock &tb = (*iter);
@@ -219,22 +220,48 @@ void ofxEditor::draw() {
 						break;
 						
 					case WORD: {
-						ofColor &c = m_colorScheme->getWordColor(tb.text);
-						ofSetColor(c.r, c.g, c.b, c.a * s_alpha);
+						if(comment) {
+							ofColor &c = m_colorScheme->getCommentColor();
+							ofSetColor(c.r, c.g, c.b, c.a * s_alpha);
+						}
+						else {
+							ofColor &c = m_colorScheme->getWordColor(tb.text);
+							ofSetColor(c.r, c.g, c.b, c.a * s_alpha);
+						}
 						break;
 					}
 						
 					case STRING: {
-						ofColor &c = m_colorScheme->getStringColor();
-						ofSetColor(c.r, c.g, c.b, c.a * s_alpha);
+						if(comment) {
+							ofColor &c = m_colorScheme->getCommentColor();
+							ofSetColor(c.r, c.g, c.b, c.a * s_alpha);
+						}
+						else {
+							ofColor &c = m_colorScheme->getStringColor();
+							ofSetColor(c.r, c.g, c.b, c.a * s_alpha);
+						}
 						break;
 					}
 						
 					case NUMBER: {
-						ofColor &c = m_colorScheme->getNumberColor();
-						ofSetColor(c.r, c.g, c.b, c.a * s_alpha);
+						if(comment) {
+							ofColor &c = m_colorScheme->getCommentColor();
+							ofSetColor(c.r, c.g, c.b, c.a * s_alpha);
+						}
+						else {
+							ofColor &c = m_colorScheme->getNumberColor();
+							ofSetColor(c.r, c.g, c.b, c.a * s_alpha);
+						}
 						break;
 					}
+					
+					case COMMENT_BEGIN:
+						comment = true;
+						continue; // nothing to draw
+						
+					case COMMENT_END:
+						comment = false;
+						continue; // nothing to draw
 					
 					default:
 						break;
@@ -251,7 +278,7 @@ void ofxEditor::draw() {
 					}
 					
 					// draw matching chars highlight
-					if(!m_selection && textPos >= m_matchingCharsHighlight[0] && textPos <= m_matchingCharsHighlight[1]) {
+					if(!comment && !m_selection && textPos >= m_matchingCharsHighlight[0] && textPos <= m_matchingCharsHighlight[1]) {
 						drawMatchingCharBlock(x, y);
 					}
 					
@@ -657,7 +684,7 @@ void ofxEditor::keyPressed(int key) {
 				
 			default:
 				
-				if(key < ' ' || key > 0x80) { // ignore UTF chars for now ...
+				if(key != '\n' && (key < ' ' || key > 0x80)) { // ignore UTF chars for now ...
 					break;
 				}
 				
@@ -1037,6 +1064,12 @@ void ofxEditor::parseTextBlocks() {
 	
 	clearAllTextBlocks();
 	
+	bool singleComment = false;
+	bool multiComment = false;
+	string singleLineComment = m_colorScheme->getSingleLineComment();
+	string multiLineCommentBegin = m_colorScheme->getMultiLineCommentBegin();
+	string multiLineCommentEnd = m_colorScheme->getMultiLineCommentEnd();
+	
 	TextBlock tb;
 	for(int i = 0; i < m_text.length(); ++i) {
 		
@@ -1064,6 +1097,12 @@ void ofxEditor::parseTextBlocks() {
 				if(tb.type != UNKNOWN) {
 					m_textBlocks.push_back(tb);
 					tb.clear();
+				}
+				if(singleComment) {
+					TextBlock commentBlock;
+					commentBlock.type = COMMENT_END;
+					m_textBlocks.push_back(commentBlock);
+					singleComment = false;
 				}
 				tb.type = ENDLINE;
 				tb.text = m_text[i];
@@ -1138,8 +1177,64 @@ void ofxEditor::parseTextBlocks() {
 						tb.type = WORD;
 					case WORD: case STRING:
 						tb.text += m_text[i];
-						break;
 					default:
+						if(tb.type == WORD) {
+							
+							// detect comments
+							if(!multiComment) {
+								
+								// check beginning of word for multi line comment begin
+								if(tb.text.length() >= multiLineCommentBegin.length() &&
+								   tb.text.substr(0, multiLineCommentBegin.length()) == multiLineCommentBegin) {
+									
+									if(singleComment) {
+										// already pushed comment begin
+										singleComment = false;
+									}
+									else {
+										// push comment begin
+										TextBlock commentBlock;
+										commentBlock.type = COMMENT_BEGIN;
+										m_textBlocks.push_back(commentBlock);
+									}
+									
+									multiComment = true;
+									continue;
+								}
+								
+								// check beginning of word for single line comment
+								else if(!singleComment && tb.text.length() >= singleLineComment.length()) {
+									if(tb.text.substr(0, singleLineComment.length()) == singleLineComment) {
+										
+										// push comment begin
+										TextBlock commentBlock;
+										commentBlock.type = COMMENT_BEGIN;
+										m_textBlocks.push_back(commentBlock);
+										
+										singleComment = true;
+										continue;
+									}
+								}
+							}
+							else { // check end of word for multi line comment end
+								if(tb.text.length() >= multiLineCommentEnd.length() &&
+								   tb.text.substr(tb.text.length()-multiLineCommentEnd.length(),
+								                  multiLineCommentEnd.length()) == multiLineCommentEnd) {
+									
+									// push latest block
+									m_textBlocks.push_back(tb);
+									tb.clear();
+									
+									// push comment end
+									TextBlock commentBlock;
+									commentBlock.type = COMMENT_END;
+									m_textBlocks.push_back(commentBlock);
+									
+									multiComment = false;
+									continue;
+								}
+							}
+						}
 						break;
 				}
 				break;
@@ -1149,6 +1244,14 @@ void ofxEditor::parseTextBlocks() {
 	// catch any unfinished blocks at the end
 	if(tb.type != UNKNOWN) {
 		m_textBlocks.push_back(tb);
+	}
+	
+	// catch any unfinished comments, unfinished multiline comments are a
+	// syntax error so don't close them
+	if(singleComment) {
+		TextBlock commentBlock;
+		commentBlock.type = COMMENT_END;
+		m_textBlocks.push_back(commentBlock);
 	}
 }
 

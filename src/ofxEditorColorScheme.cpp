@@ -12,6 +12,7 @@ void ofxEditorColorScheme::clear() {
 	clearAllWordColors();
 	stringColor.set(255);
 	numberColor.set(255);
+	commentColor.set(255);
 }
 
 void ofxEditorColorScheme::setTextColor(ofColor color) {
@@ -36,6 +37,37 @@ void ofxEditorColorScheme::setNumberColor(ofColor color) {
 
 ofColor& ofxEditorColorScheme::getNumberColor() {
 	return numberColor;
+}
+
+void ofxEditorColorScheme::setCommentColor(ofColor color) {
+	commentColor = color;
+}
+
+ofColor& ofxEditorColorScheme::getCommentColor() {
+	return commentColor;
+}
+
+void ofxEditorColorScheme::setSingleLineComment(string begin) {
+	singleLineComment = begin;
+}
+
+string ofxEditorColorScheme::getSingleLineComment() {
+	return singleLineComment;
+}
+
+/// set the beginning and ending strings to match for a multi line comment,
+/// blank by default
+void ofxEditorColorScheme::setMultiLineComment(string begin, string end) {
+	multiLineCommentBegin = begin;
+	multiLineCommentEnd = end;
+}
+
+string ofxEditorColorScheme::getMultiLineCommentBegin() {
+	return multiLineCommentBegin;
+}
+
+string ofxEditorColorScheme::getMultiLineCommentEnd() {
+	return multiLineCommentEnd;
 }
 
 void ofxEditorColorScheme::setWordColor(const string& word, ofColor color) {
