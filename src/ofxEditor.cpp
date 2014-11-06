@@ -144,11 +144,19 @@ void ofxEditor::draw() {
 		// draw text
 		if(m_colorScheme) { // with colorScheme
 			ofFill();
-			for(list<TextBlock>::iterator iter = m_textBlocks.begin(); iter != m_textBlocks.end(); iter++) {
+			for(list<TextBlock>::iterator iter = m_textBlocks.begin(); iter != m_textBlocks.end() && m_lineCount < m_visibleLines; iter++) {
 			
 				TextBlock &tb = (*iter);
+				
+				// burn through text blocks until we get to the first visible line
 				if(textPos < m_topTextPosition) {
-					textPos += tb.text.length();
+					if(tb.type == ENDLINE) {
+						textPos++;
+					}
+					else {
+						textPos += tb.text.length();
+					}
+					
 					continue;
 				}
 				
@@ -623,8 +631,9 @@ void ofxEditor::keyPressed(int key) {
 		if(!ofGetKeyPressed(OF_KEY_SHIFT)) {
 			m_shiftState = false;
 			m_selection = false;
+			return;
 		}
-	
+		
 		if(m_position < m_highlightStart) {
 			m_highlightStart = m_position;
 		}
