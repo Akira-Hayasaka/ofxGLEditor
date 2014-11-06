@@ -50,7 +50,7 @@ ofxEditor::ofxEditor() {
 	m_leftTextPosition = 0;
 	m_topTextPosition = 0;
 	m_bottomTextPosition = 0;
-	m_lineCount = 0;
+	m_displayedLineCount = 0;
 	
 	m_shiftState = false;
 	
@@ -187,7 +187,7 @@ void ofxEditor::draw() {
 			parseMatchingChars();
 		}
 	
-		m_lineCount = 0;
+		m_displayedLineCount = 0;
 		bool drawnCursor = false;
 		int x = 0, y = s_charHeight; // pixel pos
 		unsigned int textPos = 0;
@@ -197,7 +197,7 @@ void ofxEditor::draw() {
 		if(m_colorScheme) { // with colorScheme
 			ofFill();
 			bool comment = false;
-			for(list<TextBlock>::iterator iter = m_textBlocks.begin(); iter != m_textBlocks.end() && m_lineCount < m_visibleLines; iter++) {
+			for(list<TextBlock>::iterator iter = m_textBlocks.begin(); iter != m_textBlocks.end() && m_displayedLineCount < m_visibleLines; iter++) {
 			
 				TextBlock &tb = (*iter);
 				
@@ -307,7 +307,7 @@ void ofxEditor::draw() {
 							y += s_charHeight;
 							xcount = 0;
 							textPos++;
-							m_lineCount++;
+							m_displayedLineCount++;
 							break;
 						case TAB:
 							x += s_charWidth * s_tabWidth;
@@ -327,7 +327,7 @@ void ofxEditor::draw() {
 		else { // without syntax highlighting
 			ofFill();
 			textPos = m_topTextPosition;
-			for(int i = m_topTextPosition; i < m_text.length() && m_lineCount < m_visibleLines; ++i) {
+			for(int i = m_topTextPosition; i < m_text.length() && m_displayedLineCount < m_visibleLines; ++i) {
 			
 				// line wrap
 				if(m_lineWrapping) {
@@ -366,7 +366,7 @@ void ofxEditor::draw() {
 					y += s_charHeight;
 					textPos++;
 					xcount = 0;
-					m_lineCount++;
+					m_displayedLineCount++;
 				}
 				// tab
 				else if(m_text[i] == '\t') {
@@ -394,7 +394,7 @@ void ofxEditor::draw() {
 			}
 		}
 		
-		if(m_lineCount >= m_visibleLines-1) {
+		if(m_displayedLineCount >= m_visibleLines-1) {
 			m_bottomTextPosition = textPos;
 		}
 		else {
@@ -488,9 +488,7 @@ void ofxEditor::keyPressed(int key) {
 				m_text.insert(m_position, s_copyBuffer);
 				m_selection = false;
 				m_position += s_copyBuffer.size();
-				if(m_colorScheme) {
-					parseTextBlocks();
-				}
+				textBufferUpdated();
 				break;
 			
 			case 'b' : // show cursor location
@@ -634,9 +632,7 @@ void ofxEditor::keyPressed(int key) {
 				}
 				else {
 					m_text.erase(m_position, 1);
-					if(m_colorScheme) {
-						parseTextBlocks();
-					}
+					textBufferUpdated();
 				}
 				break;
 				
@@ -656,9 +652,7 @@ void ofxEditor::keyPressed(int key) {
 					}
 				}
 				
-				if(m_colorScheme) {
-					parseTextBlocks();
-				}
+				textBufferUpdated();
 				
 				break;
 				
@@ -681,6 +675,7 @@ void ofxEditor::keyPressed(int key) {
 				
 			case OF_KEY_RETURN:
 				key = '\n'; // fallthrough (replacement of newline)
+				m_numLines++;
 				
 			default:
 				
@@ -699,7 +694,7 @@ void ofxEditor::keyPressed(int key) {
 				m_text.insert(m_position, (const char*)&key);
 				m_position++;
 				
-				if(key == '\n' && m_position >= m_bottomTextPosition && m_lineCount+1 >= m_visibleLines) {
+				if(key == '\n' && m_position >= m_bottomTextPosition && m_displayedLineCount+1 >= m_visibleLines) {
 					m_topTextPosition = lineEnd(m_topTextPosition)+1;
 				}
 				
@@ -730,6 +725,8 @@ void ofxEditor::keyPressed(int key) {
 			m_highlightEnd = m_position;
 		}
 	}
+	
+	cout << "line count: " << m_numLines << endl;
 }
 
 void ofxEditor::setSize(int width, int height) {
@@ -765,9 +762,7 @@ void ofxEditor::setText(const string& text) {
 	if(s_convertTabs) {
 		processTabs();
 	}
-	if(m_colorScheme) {
-		parseTextBlocks();
-	}
+	textBufferUpdated();
 }
 
 void ofxEditor::clearAllText() {
@@ -775,7 +770,8 @@ void ofxEditor::clearAllText() {
 	if(m_colorScheme) {
 		clearAllTextBlocks();
 	}
-	m_position=0;
+	m_position = 0;
+	m_numLines = 0;
 	setCurrentLine(0);
 	m_shiftState = false;
 	m_selection = false;
@@ -835,12 +831,44 @@ bool ofxEditor::getLineWrapping() {
 	return m_lineWrapping;
 }
 
+// CURSOR POSITION & INFO
+
 void ofxEditor::blowupCursor() {
 	m_blowupCursor = true;
 	m_blowup = 0;
 }
 
-void ofxEditor::setCurrentLine(int line) {
+unsigned int ofxEditor::getNumLines() {
+	return m_numLines;
+}
+
+unsigned int ofxEditor::getNumCharacters() {
+	return m_text.length();
+}
+
+unsigned int ofxEditor::getCurrentPos() {
+	return m_position;
+}
+
+void ofxEditor::setCurrentPos(unsigned int pos) {
+	if(pos >= m_text.length()) {
+		ofLogWarning("ofxEditor") << "ignoring invalid position " << pos;
+		return;
+	}
+	m_position = pos;
+}
+	
+unsigned int ofxEditor::getCurrentLine() {
+	int ret = 0;
+	for(unsigned int i = 0; i < m_position; i++) {
+		if(m_text[i] == '\n') {
+			ret++;
+		}
+	}
+	return ret;
+}
+
+void ofxEditor::setCurrentLine(unsigned int line) {
 	m_position = 0;
 	int count = 0;
 	for(unsigned int i = 0; i < m_text.size(); i++) {
@@ -860,14 +888,13 @@ void ofxEditor::setCurrentLine(int line) {
 	m_position = lineStart(m_position);
 }
 
-int ofxEditor::getCurrentLine() {
-	int ret = 0;
-	for(unsigned int i = 0; i< m_position; i++) {
-		if(m_text[i] == '\n') {
-			ret++;
-		}
-	}
-	return ret;
+unsigned int ofxEditor::getCurrentLinePos() {
+	return m_position - lineStart(m_position);
+}
+
+void ofxEditor::setCurrentLinePos(unsigned int line, unsigned int character) {
+	setCurrentLine(line);
+	m_position += character;
 }
 
 void ofxEditor::reset() {
@@ -1060,9 +1087,20 @@ void ofxEditor::parseCloseChars(int pos, int type) {
 
 // PRIVATE
 
+void ofxEditor::textBufferUpdated() {
+	if(m_colorScheme) {
+		parseTextBlocks();
+	}
+	else {
+		// compute number of lines here
+		m_numLines = count(m_text.begin(), m_text.end(), '\n');
+	}
+}
+
 void ofxEditor::parseTextBlocks() {
 	
 	clearAllTextBlocks();
+	m_numLines = 0;
 	
 	bool singleComment = false;
 	bool multiComment = false;
@@ -1094,6 +1132,7 @@ void ofxEditor::parseTextBlocks() {
 				break;
 		
 			case '\n':
+				m_numLines++; // compute number of lines while parsing
 				if(tb.type != UNKNOWN) {
 					m_textBlocks.push_back(tb);
 					tb.clear();

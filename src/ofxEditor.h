@@ -112,25 +112,35 @@ class ofxEditor {
 		/// get line wrapping value
 		bool getLineWrapping();
 	
+	/// \section Current Position & Info
+	
 		/// animate the cursor so it's easy to find
 		void blowupCursor();
 	
-		/// set the current line for the cursor
-		void setCurrentLine(int line);
+		/// get the total number of lines in the text buffer
+		unsigned int getNumLines();
 	
-		/// get the current line the cursor is on
-		int getCurrentLine();
-		
-//		int getNumLines();
-//		int getNumCharacters();
-//		
-//		int getCursorPos();
-//		int getCursorLine();
-//		int getCursorLinePos();
-//		
-//		void setCursorPos(int pos);
-//		void setCursorLinePos(int line, int character);
-//
+		/// get the total number of characters in the text buffer
+		unsigned int getNumCharacters();
+	
+		/// get the 1D cursor position in the text buffer
+		unsigned int getCurrentPos();
+	
+		/// set the 1D cursor position in the text buffer
+		void setCurrentPos(unsigned int pos);
+	
+		/// get the line the cursor is on
+		unsigned int getCurrentLine();
+	
+		/// set the current line for the cursor
+		void setCurrentLine(unsigned int line);
+	
+		/// get the current line character position of the cursor
+		unsigned int getCurrentLinePos();
+	
+		/// get the cursor position by line and line character
+		void setCurrentLinePos(unsigned int line, unsigned int character);
+	
 		/// reset position & selection
 		void reset();
 	
@@ -171,6 +181,7 @@ class ofxEditor {
 	/// \section Member Variables
 	
 		string m_text; //< text buffer
+		unsigned int m_numLines; //< number of lines in the text buffer
 		
 		ofRectangle m_viewport;     //< viewport when drawing editor
 		unsigned int m_position;    //< 1D text pos within buffer
@@ -179,7 +190,7 @@ class ofxEditor {
 		int m_visibleChars; //< computed text field char width
 		int m_visibleLines; //< computed text field num lines
 	
-		int m_matchingCharsHighlight[2];
+		int m_matchingCharsHighlight[2]; //< start & end pos for matching chars highlight
 	
 		bool m_selection; //< is text being selected (shift+arrows)
 		unsigned int m_highlightStart; //< highlight start pos in buffer
@@ -188,8 +199,8 @@ class ofxEditor {
 		unsigned int m_leftTextPosition;   //< left start char pos for horz scrolling
 		unsigned int m_topTextPosition;    //< top start pos in buffer for vert scrolling
 		unsigned int m_bottomTextPosition; //< bottom end pos in buffer for vert scrolling
-		unsigned int m_lineCount;
-		
+		unsigned int m_displayedLineCount; //< current number of displayed lines (may be diff from m_visibleLines)
+	
 		bool m_shiftState; //< is shift pressed?
 		
 		ofxEditorColorScheme *m_colorScheme; //< optional syntax color scheme
@@ -281,6 +292,9 @@ class ofxEditor {
 		void parseCloseChars(int pos, int type);
 		
 	private:
+	
+		/// text buffer changed, so update syntax text blocks and/or other info
+		void textBufferUpdated();
 	
 		/// parses text into text blocks
 		void parseTextBlocks();
