@@ -2,6 +2,11 @@
 
 #include "ofxEditorColorScheme.h"
 
+/// basic full screen text editor with optional syntax highlighting,
+/// based on the Fluxus GLEditor
+///
+/// TODO: support UTF-8 characters
+///
 class ofxEditor {
 
 	public:
@@ -39,7 +44,7 @@ class ofxEditor {
 		static void setCursorColor(ofColor &color);
 		static ofColor& getCursorColor();
 		
-		///selection color, default: green w/ alpha
+		/// selection color, default: green w/ alpha
 		static void setSelectionColor(ofColor& color);
 		static ofColor& getSelectionColor();
 		
@@ -52,6 +57,9 @@ class ofxEditor {
 		
 		/// draw the editor, pushes view and applies viewport
 		void draw();
+	
+		/// draw the text field character grid
+		void drawGrid();
 		
 		/// required for interactive editing, etc
 		void keyPressed(int key);
@@ -59,21 +67,43 @@ class ofxEditor {
 		/// set the view port size,
 		/// size of text field calculated based on font size
 		void setSize(int width, int height);
-		
+	
+		/// get text buffer contents or selection
 		string getText();
+	
+		/// set text buffer contents
 		void setText(const string& text);
+	
+		/// clear text buffer contents
 		void clearAllText();
-		
-		void setColorScheme(ofxEditorColorScheme &colorScheme);
+	
+	/// \section Color Scheme
+	
+		/// set color scheme for this editor and highlight syntax
+		/// note: pointer is never deleted
+		void setColorScheme(ofxEditorColorScheme *colorScheme);
+	
+		/// clear the current color scheme
 		void clearColorScheme();
+	
+		/// get the current color scheme, returns NULL if not set
 		ofxEditorColorScheme* getColorScheme();
-		
+	
+	/// \section Settings
+	
+		/// enable/disable line wrapping
 		void setLineWrapping(bool wrap=true);
+	
+		/// get line wrapping value
 		bool getLineWrapping();
-		
+	
+		/// animate the cursor so it's easy to find
 		void blowupCursor();
-		
+	
+		/// set the current line for the cursor
 		void setCurrentLine(int line);
+	
+		/// get the current line the cursor is on
 		int getCurrentLine();
 		
 //		int getNumLines();
@@ -85,7 +115,8 @@ class ofxEditor {
 //		
 //		void setCursorPos(int pos);
 //		void setCursorLinePos(int line, int character);
-//		
+//
+		/// reset position & selection
 		void reset();
 	
 	protected:
@@ -98,47 +129,49 @@ class ofxEditor {
 				}
 		};
 	
-		static ofPtr<Font> s_font;      //< global editor font
-		static int s_charWidth;         //< char block pixel width
-		static int s_charHeight;        //< char block pixel height
-		static int s_cursorWidth;		///< cursor width, 1/3 char width
+	/// \section Static Variables
+	
+		static ofPtr<Font> s_font;       //< global editor font
+		static int s_charWidth;          //< char block pixel width
+		static int s_charHeight;         //< char block pixel height
+		static int s_cursorWidth;		 //< cursor width, 1/3 char width
 		
-		static unsigned int s_tabWidth; //< tab width in spaces
-		static bool s_convertTabs;      //< convert tabs to spaces?
+		static unsigned int s_tabWidth;  //< tab width in spaces
+		static bool s_convertTabs;       //< convert tabs to spaces?
 		
 		static float s_alpha;            //< overall text alpha
 		static ofColor s_textColor;		 //< general text color, overridden by color scheme
 		static ofColor s_cursorColor;	 //< text pos cursor color
 		static ofColor s_selectionColor; //< char selection background color
 		
-		static unsigned int s_visibleLines;  //< visible text field height in lines
-		static unsigned int s_visibleChars;  //< visible text field width in chars
+		static bool s_superAsModifier;   //< use the super key as modifier?
 		
-		static bool s_superAsModifier; //< use the super key as modifier?
-		
-		static string s_copyBuffer; //< shared copy/paste buffer
+		static string s_copyBuffer;      //< shared copy/paste buffer
 	
-		string m_text; //< string buffer
+		static string s_openChars;       //< open chars (parens, brackets, etc) for matching highlight
+		static string s_closeChars;      //< close chars (parens, bracket, etc) for matching highlight
+	
+	/// \section Member Variables
+	
+		string m_text; //< text buffer
 		
 		ofRectangle m_viewport;     //< viewport when drawing editor
 		unsigned int m_position;    //< 1D text pos within buffer
-		unsigned int m_desiredXPos; //< used to calculate pos based on desired line
+		unsigned int m_desiredXPos; //< desired char pos on current line
 		
-		int m_numCharsWidth;  //< computed text field char width
-		int m_numLinesHeight; //< computed tex field num lines
+		int m_visibleChars;  //< computed text field char width
+		int m_visibleLines; //< computed text field num lines
 		
-		bool m_selection;
-		unsigned int m_highlightStart;
-		unsigned int m_highlightEnd;
-		
-		string m_openChars;
-		string m_closeChars;
-		unsigned int m_leftTextPosition;
-		unsigned int m_topTextPosition;
-		unsigned int m_bottomTextPosition;
+		bool m_selection; //< is text being selected (shift+arrows)
+		unsigned int m_highlightStart; //< highlight start pos in buffer
+		unsigned int m_highlightEnd;   //< highlight end pos in buffer
+	
+		unsigned int m_leftTextPosition;   //< left start char pos for horz scrolling
+		unsigned int m_topTextPosition;    //< top start pos in buffer for vert scrolling
+		unsigned int m_bottomTextPosition; //< bottom end pos in buffer for vert scrolling
 		unsigned int m_lineCount;
 		
-		bool m_shiftState;
+		bool m_shiftState; //< is shift pressed?
 		
 		ofxEditorColorScheme *m_colorScheme; //< optional syntax color scheme
 		bool m_lineWrapping; //< enable line wrapping in this editor?
@@ -186,16 +219,32 @@ class ofxEditor {
 		list<TextBlock> m_textBlocks; //< syntax parser text block linked list
 		
 	/// \section Helper Functions
-		
+	
+		/// draws a char block rectangle at pos
 		void drawCharBlock(int x, int y);
+	
+		/// draw the cursor at pos
 		void drawCursor(int x, int y);
-		
+	
+		/// replace tabs in buffer with spaces
 		void processTabs();
+	
+		/// get offset in buffer to the current line
 		int offsetToCurrentLineStart();
+	
+		/// get the length of the next line from the current buffer pos
 		int nextLineLength(int pos);
+	
+		/// get the length of the previous line from the current buffer pos
 		int previousLineLength(int pos);
+	
+		/// get the length of the curent line from the current buffer pos
 		int lineLength(int pos);
+	
+		/// get the start of the current line from the current buffer pos
 		unsigned int lineStart(int pos);
+	
+		/// get the end of the current line from the current buffer pos
 		unsigned int lineEnd(int pos);
 		
 	private:

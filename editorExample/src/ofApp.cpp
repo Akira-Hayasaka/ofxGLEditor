@@ -12,13 +12,10 @@ void ofApp::setup(){
 	colorScheme.setWordColor("end", ofColor::fuchsia);
 	colorScheme.setStringColor(ofColor::yellow);
 	colorScheme.setNumberColor(ofColor::orangeRed);
-	//editor.setColorScheme(colorScheme);
 	
-	editor.setSize(ofGetWidth(), ofGetHeight());
-	editor.setText("function setup\n\tprint(\"123hello456\")\nend\n\nfunction draw\n\tof.setColor(200.1)\n\tof.line(10, 10, 100, 100)\nend\n5hj55hj44\n");
+	editor.setText("function setup\n\tprint(\"hello world\")\n\tprint(\"123string456\")\nend\n\nfunction draw\n\tof.setColor(200.1)\n\tof.line(10, 10, 100, 100)\nend\n\n--mix of numbers & text\n5hj55hj44\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 	
 	ofBackground(0);
-
 }
 
 //--------------------------------------------------------------
@@ -28,8 +25,12 @@ void ofApp::update(){
 
 //--------------------------------------------------------------
 void ofApp::draw(){
+	
 	editor.draw();
-//	ofDrawBitmapString("fps: "+ofToString(ofGetFrameRate()), 10, 10);
+	editor.drawGrid();
+	
+	ofSetColor(255);
+	ofDrawBitmapString("fps: "+ofToString((int)ofGetFrameRate()), ofGetWidth()-70, ofGetHeight()-10);
 }
 
 //--------------------------------------------------------------
@@ -42,7 +43,7 @@ void ofApp::keyPressed(int key){
 					editor.clearColorScheme();
 				}
 				else {
-					editor.setColorScheme(colorScheme);
+					editor.setColorScheme(&colorScheme);
 				}
 				return;
 			case 'l':
@@ -80,6 +81,8 @@ void ofApp::mouseReleased(int x, int y, int button){
 
 //--------------------------------------------------------------
 void ofApp::windowResized(int w, int h){
+
+	// update size
 	editor.setSize(w, h);
 }
 

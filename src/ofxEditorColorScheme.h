@@ -2,6 +2,7 @@
 
 #include "ofMain.h"
 
+/// syntax highlighter color scheme
 class ofxEditorColorScheme {
 
 	public:
