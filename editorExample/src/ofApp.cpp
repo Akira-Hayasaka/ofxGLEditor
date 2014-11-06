@@ -14,6 +14,8 @@ void ofApp::setup(){
 	colorScheme.setNumberColor(ofColor::orangeRed);
 	
 	editor.setText("function setup\n\tprint(\"hello world\")\n\tprint(\"123string456\")\nend\n\nfunction draw\n\tof.setColor(200.1)\n\tof.line(10, 10, 100, 100)\nend\n\n--mix of numbers & text\n5hj55hj44\n");
+	editor.setHighlightMatchingChars(true);
+	editor.setMatchingChars("f", "n");
 	
 	ofBackground(0);
 }

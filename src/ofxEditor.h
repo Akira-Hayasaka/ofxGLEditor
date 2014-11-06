@@ -47,11 +47,25 @@ class ofxEditor {
 		/// selection color, default: green w/ alpha
 		static void setSelectionColor(ofColor& color);
 		static ofColor& getSelectionColor();
+	
+		/// matching chars highlight color, default: blue w/ alpha
+		static void setMatchingCharsColor(ofColor& color);
+		static ofColor& getMatchingCharsColor();
 		
 		/// set useSuper = true if you want to use the Super (Windows key, Mac CMD)
 		/// key as the modifier key, default: false for CTRL key
 		static void setSuperAsModifier(bool useSuper);
 		static bool getSuperAsModifier();
+	
+		/// highlight matching open/close chars?, default: true
+		static void setHighlightMatchingChars(bool highlight);
+		static bool getHighlightMatchingChars();
+	
+		/// set the matching open/close chars to highlight,
+		/// default: "([<{" & ")]>}", note: strings should not be empty
+		static void setMatchingChars(string openChars, string closeChars);
+		static string getOpenChars();
+		static string getCloseChars();
 		
 	/// \section Main
 		
@@ -143,11 +157,13 @@ class ofxEditor {
 		static ofColor s_textColor;		 //< general text color, overridden by color scheme
 		static ofColor s_cursorColor;	 //< text pos cursor color
 		static ofColor s_selectionColor; //< char selection background color
+		static ofColor s_matchingCharsColor; //< matching chars background color
 		
 		static bool s_superAsModifier;   //< use the super key as modifier?
 		
 		static string s_copyBuffer;      //< shared copy/paste buffer
 	
+		static bool s_highlightMatchingChars; //< highlight matching open/close chars?
 		static string s_openChars;       //< open chars (parens, brackets, etc) for matching highlight
 		static string s_closeChars;      //< close chars (parens, bracket, etc) for matching highlight
 	
@@ -159,9 +175,11 @@ class ofxEditor {
 		unsigned int m_position;    //< 1D text pos within buffer
 		unsigned int m_desiredXPos; //< desired char pos on current line
 		
-		int m_visibleChars;  //< computed text field char width
+		int m_visibleChars; //< computed text field char width
 		int m_visibleLines; //< computed text field num lines
-		
+	
+		int m_matchingCharsHighlight[2];
+	
 		bool m_selection; //< is text being selected (shift+arrows)
 		unsigned int m_highlightStart; //< highlight start pos in buffer
 		unsigned int m_highlightEnd;   //< highlight end pos in buffer
@@ -220,8 +238,11 @@ class ofxEditor {
 		
 	/// \section Helper Functions
 	
-		/// draws a char block rectangle at pos
-		void drawCharBlock(int x, int y);
+		// draw a matching char hilight char block rectanlge at pos
+		void drawMatchingCharBlock(int x, int y);
+	
+		/// draw a selection char block rectangle at pos
+		void drawSelectionCharBlock(int x, int y);
 	
 		/// draw the cursor at pos
 		void drawCursor(int x, int y);
@@ -246,6 +267,15 @@ class ofxEditor {
 	
 		/// get the end of the current line from the current buffer pos
 		unsigned int lineEnd(int pos);
+	
+		/// find matching open/close char highlight positions base on current buffer pos
+		void parseMatchingChars();
+	
+		/// look forward for a close char
+		void parseOpenChars(int pos, int type);
+	
+		/// look backward for an open char
+		void parseCloseChars(int pos, int type);
 		
 	private:
 	

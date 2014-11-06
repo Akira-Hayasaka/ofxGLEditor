@@ -22,9 +22,11 @@ float ofxEditor::s_alpha = 1.0f;
 ofColor ofxEditor::s_textColor = ofColor(255);
 ofColor ofxEditor::s_cursorColor = ofColor(255, 255, 0, 200);
 ofColor ofxEditor::s_selectionColor = ofColor(0, 255, 0, 127);
+ofColor ofxEditor::s_matchingCharsColor = ofColor(0, 127, 255, 127);
 
 string ofxEditor::s_copyBuffer;
 
+bool ofxEditor::s_highlightMatchingChars = true;
 string ofxEditor::s_openChars = "([<{";
 string ofxEditor::s_closeChars = ")]>}";
 
@@ -63,6 +65,8 @@ ofxEditor::ofxEditor() {
 }
 
 ofxEditor::~ofxEditor() {}
+
+// STATIC SETTINGS
 
 bool ofxEditor::loadFont(const string &font, int size) {
 	if(s_font == NULL) {
@@ -115,6 +119,22 @@ ofColor& ofxEditor::getCursorColor() {
 	return s_cursorColor;
 }
 
+void ofxEditor::setSelectionColor(ofColor& color) {
+	s_selectionColor = color;
+}
+
+ofColor& ofxEditor::getSelectionColor() {
+	return s_selectionColor;
+}
+
+void ofxEditor::setMatchingCharsColor(ofColor& color) {
+	s_matchingCharsColor = color;
+}
+
+ofColor& ofxEditor::getMatchingCharsColor() {
+	return s_matchingCharsColor;
+}
+
 void ofxEditor::setSuperAsModifier(bool useSuper) {
 	s_superAsModifier = useSuper;
 }
@@ -122,6 +142,32 @@ void ofxEditor::setSuperAsModifier(bool useSuper) {
 bool ofxEditor::getSuperAsModifier() {
 	return s_superAsModifier;
 }
+
+void ofxEditor::setHighlightMatchingChars(bool highlight) {
+	s_highlightMatchingChars = highlight;
+}
+
+bool ofxEditor::getHighlightMatchingChars() {
+	return s_highlightMatchingChars;
+}
+
+void ofxEditor::setMatchingChars(string openChars, string closeChars) {
+	if(openChars.length() == 0 || closeChars.length() == 0) {
+		ofLogWarning("ofxEditor") << "empty open or close char string";
+	}
+	s_openChars = openChars;
+	s_closeChars = closeChars;
+}
+
+string ofxEditor::getOpenChars() {
+	return s_openChars;
+}
+
+string ofxEditor::getCloseChars() {
+	return s_closeChars;
+}
+
+// MAIN
 
 void ofxEditor::draw() {
 
@@ -134,7 +180,13 @@ void ofxEditor::draw() {
 	ofPushView();
 	
 		ofViewport(m_viewport);
-		
+	
+		m_matchingCharsHighlight[0] = -1;
+		m_matchingCharsHighlight[1] = -1;
+		if(s_highlightMatchingChars) {
+			parseMatchingChars();
+		}
+	
 		m_lineCount = 0;
 		bool drawnCursor = false;
 		int x = 0, y = s_charHeight; // pixel pos
@@ -198,15 +250,20 @@ void ofxEditor::draw() {
 						xcount = 0;
 					}
 					
+					// draw matching chars highlight
+					if(!m_selection && textPos >= m_matchingCharsHighlight[0] && textPos <= m_matchingCharsHighlight[1]) {
+						drawMatchingCharBlock(x, y);
+					}
+					
 					// draw selection
 					if(m_selection && textPos >= m_highlightStart && textPos < m_highlightEnd) {
 						if(tb.type == TAB) {
 							for(int i = 0; i < s_tabWidth; ++i) {
-								drawCharBlock(x+s_charWidth*i, y);
+								drawSelectionCharBlock(x+s_charWidth*i, y);
 							}
 						}
 						else {
-							drawCharBlock(x, y);
+							drawSelectionCharBlock(x, y);
 						}
 					}
 					
@@ -254,6 +311,11 @@ void ofxEditor::draw() {
 					}
 				}
 				
+				// draw matching chars highlight
+				if(!m_selection && textPos >= m_matchingCharsHighlight[0] && textPos <= m_matchingCharsHighlight[1]) {
+					drawMatchingCharBlock(x, y);
+				}
+				
 				// draw selection
 				if(m_selection && i >= m_highlightStart && i < m_highlightEnd) {
 					if(xcount > m_visibleChars) {
@@ -262,7 +324,7 @@ void ofxEditor::draw() {
 					else {
 						m_leftTextPosition = 0;
 					}
-					drawCharBlock(x, y);
+					drawSelectionCharBlock(x, y);
 				}
 				
 				// draw cursor
@@ -285,7 +347,7 @@ void ofxEditor::draw() {
 					if(m_selection && i >= m_highlightStart && i < m_highlightEnd) {
 						int tabX = x+s_charWidth;
 						for(int i = 0; i < s_tabWidth-1; ++i) {
-							drawCharBlock(tabX, y);
+							drawSelectionCharBlock(tabX, y);
 							tabX += s_charWidth;
 						}
 					}
@@ -692,6 +754,8 @@ void ofxEditor::clearAllText() {
 	m_selection = false;
 }
 
+// COLOR SCHEME
+
 void ofxEditor::setColorScheme(ofxEditorColorScheme *colorScheme) {
 	
 	// clear to save memory
@@ -718,6 +782,8 @@ void ofxEditor::clearColorScheme() {
 ofxEditorColorScheme* ofxEditor::getColorScheme() {
 	return m_colorScheme;
 }
+
+// SETTINGS
 
 void ofxEditor::setLineWrapping(bool wrap) {
 	m_lineWrapping = wrap;
@@ -788,7 +854,14 @@ void ofxEditor::reset() {
 
 // PROTECTED
 
-void ofxEditor::drawCharBlock(int x, int y) {
+void ofxEditor::drawMatchingCharBlock(int x, int y) {
+	ofPushStyle();
+		ofSetColor(s_matchingCharsColor.r, s_matchingCharsColor.g, s_matchingCharsColor.b, s_matchingCharsColor.a * s_alpha);
+		ofRect(x, y-s_charHeight, s_charWidth, s_charHeight);
+	ofPopStyle();
+}
+
+void ofxEditor::drawSelectionCharBlock(int x, int y) {
 	ofPushStyle();
 		ofSetColor(s_selectionColor.r, s_selectionColor.g, s_selectionColor.b, s_selectionColor.a * s_alpha);
 		ofRect(x, y-s_charHeight, s_charWidth, s_charHeight);
@@ -894,6 +967,68 @@ unsigned int ofxEditor::lineEnd(int pos) {
 		end = m_text.size()-1;
 	}
 	return end;
+}
+
+void ofxEditor::parseMatchingChars() {
+
+	// parse the parentheses
+	int type = 0;
+	for(string::iterator i = s_openChars.begin(); i != s_openChars.end(); ++i) {
+		if(m_text[m_position] == *i) {
+			parseOpenChars(m_position, type);
+		}
+		type++;
+	}
+		
+	if(m_position > 0) {
+		type = 0;
+		for(string::iterator i = s_closeChars.begin(); i != s_closeChars.end(); ++i) {
+			if(m_text[m_position-1] == *i) {
+				parseCloseChars(m_position-1, type);
+			}
+			type++;
+		}
+	}
+}
+
+void ofxEditor::parseOpenChars(int pos, int type) {
+
+	// looking for a close, so search forward
+	int stack = 0, start_pos = pos;
+	pos++;
+	while(stack != -1 && pos < (int)m_text.size()) {
+		if(m_text[pos] == s_openChars[type]) {
+			stack++;
+		}
+		if(m_text[pos] == s_closeChars[type]) {
+			stack--;
+		}
+		pos++;
+	}
+	if(stack == -1) {
+		m_matchingCharsHighlight[0] = start_pos;
+		m_matchingCharsHighlight[1] = pos-1;
+	}
+}
+
+void ofxEditor::parseCloseChars(int pos, int type) {
+
+	// looking for a open, so search backward
+	int stack = 0, start_pos = pos;
+	pos--;
+	while(stack != -1 && pos >= 0) {
+		if(m_text[pos] == s_closeChars[type]) {
+			stack++;
+		}
+		if(m_text[pos] == s_openChars[type]) {
+			stack--;
+		}
+		pos--;
+	}
+	if(stack == -1) {
+		m_matchingCharsHighlight[0] = pos+1;
+		m_matchingCharsHighlight[1] = start_pos;
+	}	
 }
 
 // PRIVATE
