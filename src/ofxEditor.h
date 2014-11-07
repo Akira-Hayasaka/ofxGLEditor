@@ -51,6 +51,10 @@ class ofxEditor {
 		/// matching chars highlight color, default: blue w/ alpha
 		static void setMatchingCharsColor(ofColor color);
 		static ofColor& getMatchingCharsColor();
+	
+		/// line number color, default: gray
+		static void setLineNumberColor(ofColor color);
+		static ofColor& getLineNumberColor();
 		
 		/// set useSuper = true if you want to use the Super (Windows key, Mac CMD)
 		/// key as the modifier key, default: false for CTRL key
@@ -112,6 +116,12 @@ class ofxEditor {
 		/// get line wrapping value
 		bool getLineWrapping();
 	
+		/// enable/disable line numbers
+		void setLineNumbers(bool numbers=true);
+	
+		/// get line numbers value
+		bool getLineNumbers();
+	
 	/// \section Current Position & Info
 	
 		/// animate the cursor so it's easy to find
@@ -169,6 +179,7 @@ class ofxEditor {
 		static ofColor s_cursorColor;	 //< text pos cursor color
 		static ofColor s_selectionColor; //< char selection background color
 		static ofColor s_matchingCharsColor; //< matching chars background color
+		static ofColor s_lineNumberColor;    //< line number color
 	
 		static bool s_superAsModifier;   //< use the super key as modifier?
 		
@@ -205,6 +216,8 @@ class ofxEditor {
 		
 		ofxEditorColorScheme *m_colorScheme; //< optional syntax color scheme
 		bool m_lineWrapping; //< enable line wrapping in this editor?
+		bool m_lineNumbers;  //< enable line numbers?
+		unsigned int m_lineNumWidth; //< line number block width in chars 
 		
 		float m_time;         //< timestamp for calculating animations
 		float m_delta;        //< difference from last timestamp
@@ -261,6 +274,9 @@ class ofxEditor {
 		/// draw the cursor at pos
 		void drawCursor(int x, int y);
 	
+		/// draw current line number starting at a given pos, padded by digit width of last line number
+		void drawLineNumber(int &x, int &y, int &currentLine);
+	
 		/// replace tabs in buffer with spaces
 		void processTabs();
 	
@@ -290,6 +306,9 @@ class ofxEditor {
 	
 		/// look backward for an open char
 		void parseCloseChars(int pos, int type);
+	
+		/// get the number of lines at a buffer pos
+		unsigned int lineNumberForPos(unsigned int pos);
 		
 	private:
 	

@@ -16,7 +16,7 @@ void ofApp::setup(){
 	colorScheme.setSingleLineComment("--"); // lua style
 	colorScheme.setMultiLineComment("--[[", "]]"); // lua style
 	
-	editor.setText("-- a single line comment\n--[[\n\ta multi line comment\n]]\n\nfunction setup\n\tprint(\"hello world\")\n\tprint(\"123string456\")\nend\n\nfunction draw\n\tof.setColor(200.1)\n\tof.line(10, 10, 100, 100)\nend\n\n--mix of numbers & text\n5hj55hj44\n \n\n\n\n\n\n\n\n\n\n\n\n\n");
+	editor.setText("-- a single line comment\123456789012345678901234567890n\n--[[\n\ta multi line comment\n]]\n\nfunction setup\n\tprint(\"hello world\")\n\tprint(\"123string456\")\nend\n\nfunction draw\n\tof.setColor(200.1)\n\tof.line(10, 10, 100, 100)\nend\n\n--mix of numbers & text\n5hj55hj44\n \n\n\n\n\n\n\n\n\n\n\n\n\n");
 	ofLogNotice() << "num chars: " << editor.getNumCharacters() << " num lines: " << editor.getNumLines();
 	
 	ofBackground(0);
@@ -52,6 +52,9 @@ void ofApp::keyPressed(int key){
 				return;
 			case 'l':
 				editor.setLineWrapping(!editor.getLineWrapping());
+				return;
+			case 'n':
+				editor.setLineNumbers(!editor.getLineNumbers());
 				return;
 			case '1':
 				ofLogNotice() << "current line: " << editor.getCurrentLine() <<	" pos: " << editor.getCurrentLinePos();
