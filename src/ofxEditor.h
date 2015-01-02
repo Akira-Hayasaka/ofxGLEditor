@@ -1,8 +1,10 @@
 #pragma once
 
+#include "ofMain.h"
 #include "ofxEditorColorScheme.h"
+#include "ofxEditorSettings.h"
 
-/// basic full screen text editor with optional syntax highlighting,
+/// full screen text editor with optional syntax highlighting,
 /// based on the Fluxus GLEditor
 ///
 /// TODO: support UTF-8 characters
@@ -12,6 +14,7 @@ class ofxEditor {
 	public:
 	
 		ofxEditor();
+		ofxEditor(ofxEditorSettings &sharedSettings); //< share given settings object
 		virtual ~ofxEditor();
 		
 	/// \section Static Settings
@@ -21,56 +24,11 @@ class ofxEditor {
 		/// call this before drawing any editor
 		///
 		static bool loadFont(const string & font, int size);
-		
-		/// set the displayed tab width, default: 4
-		static void setTabWidth(unsigned int numSpaces);
-		static unsigned int getTabWidth();
-		
-		/// convert tabs to spaces? performed when setting or editing text and
-		/// *cannot* be undone
-		static void setConvertTabsToSpaces(bool convert=true);
-		static bool getConvertTabsToSpaces();
-		
-		/// set overall text alpha
-		static void setAlpha(float alpha);
-		static float getAlpha();
-		
-		/// text color color, default: white
-		/// overridden by color scheme if a scheme is set
-		static void setTextColor(ofColor color);
-		static ofColor& getTextColor();
-		
-		/// cursor color, default: yellow w/ alpha
-		static void setCursorColor(ofColor color);
-		static ofColor& getCursorColor();
-		
-		/// selection color, default: green w/ alpha
-		static void setSelectionColor(ofColor color);
-		static ofColor& getSelectionColor();
 	
-		/// matching chars highlight color, default: blue w/ alpha
-		static void setMatchingCharsColor(ofColor color);
-		static ofColor& getMatchingCharsColor();
-	
-		/// line number color, default: gray
-		static void setLineNumberColor(ofColor color);
-		static ofColor& getLineNumberColor();
-		
 		/// set useSuper = true if you want to use the Super (Windows key, Mac CMD)
 		/// key as the modifier key, default: false for CTRL key
 		static void setSuperAsModifier(bool useSuper);
 		static bool getSuperAsModifier();
-	
-		/// highlight matching open/close chars?, default: true
-		static void setHighlightMatchingChars(bool highlight);
-		static bool getHighlightMatchingChars();
-	
-		/// set the matching open/close chars to highlight,
-		/// default: "([<{" & ")]>}", strings should not be empty
-		/// note: matching chars are not highlighted inside comments
-		static void setMatchingChars(string openChars, string closeChars);
-		static string getOpenChars();
-		static string getCloseChars();
 	
 	/// \section Main
 		
@@ -96,6 +54,53 @@ class ofxEditor {
 		/// clear text buffer contents
 		void clearAllText();
 	
+	/// \section Settings
+		
+		/// set the displayed tab width, default: 4
+		void setTabWidth(unsigned int numSpaces);
+		unsigned int getTabWidth();
+		
+		/// convert tabs to spaces? performed when setting or editing text and
+		/// *cannot* be undone
+		void setConvertTabsToSpaces(bool convert=true);
+		bool getConvertTabsToSpaces();
+		
+		/// set overall text alpha
+		void setAlpha(float alpha);
+		float getAlpha();
+		
+		/// text color color, default: white
+		/// overridden by color scheme if a scheme is set
+		void setTextColor(ofColor color);
+		ofColor& getTextColor();
+		
+		/// cursor color, default: yellow w/ alpha
+		void setCursorColor(ofColor color);
+		ofColor& getCursorColor();
+		
+		/// selection color, default: green w/ alpha
+		void setSelectionColor(ofColor color);
+		ofColor& getSelectionColor();
+	
+		/// matching chars highlight color, default: blue w/ alpha
+		void setMatchingCharsColor(ofColor color);
+		ofColor& getMatchingCharsColor();
+	
+		/// line number color, default: gray
+		void setLineNumberColor(ofColor color);
+		ofColor& getLineNumberColor();
+	
+		/// highlight matching open/close chars?, default: true
+		void setHighlightMatchingChars(bool highlight);
+		bool getHighlightMatchingChars();
+	
+		/// set the matching open/close chars to highlight,
+		/// default: "([<{" & ")]>}", strings should not be empty
+		/// note: matching chars are not highlighted inside comments
+		void setMatchingChars(string openChars, string closeChars);
+		string getOpenChars();
+		string getCloseChars();
+	
 	/// \section Color Scheme
 	
 		/// set color scheme for this editor and highlight syntax
@@ -108,7 +113,7 @@ class ofxEditor {
 		/// get the current color scheme, returns NULL if not set
 		ofxEditorColorScheme* getColorScheme();
 	
-	/// \section Settings
+	/// \section Display Settings
 	
 		/// enable/disable line wrapping
 		void setLineWrapping(bool wrap=true);
@@ -170,26 +175,15 @@ class ofxEditor {
 		static int s_charWidth;          //< char block pixel width
 		static int s_charHeight;         //< char block pixel height
 		static int s_cursorWidth;		 //< cursor width, 1/3 char width
-		
-		static unsigned int s_tabWidth;  //< tab width in spaces
-		static bool s_convertTabs;       //< convert tabs to spaces?
-		
-		static float s_alpha;            //< overall text alpha
-		static ofColor s_textColor;		 //< general text color, overridden by color scheme
-		static ofColor s_cursorColor;	 //< text pos cursor color
-		static ofColor s_selectionColor; //< char selection background color
-		static ofColor s_matchingCharsColor; //< matching chars background color
-		static ofColor s_lineNumberColor;    //< line number color
 	
 		static bool s_superAsModifier;   //< use the super key as modifier?
-		
+	
 		static string s_copyBuffer;      //< shared copy/paste buffer
 	
-		static bool s_highlightMatchingChars; //< highlight matching open/close chars?
-		static string s_openChars;       //< open chars (parens, brackets, etc) for matching highlight
-		static string s_closeChars;      //< close chars (parens, bracket, etc) for matching highlight
-	
 	/// \section Member Variables
+
+		ofxEditorSettings *m_settings; //< editor settings object
+		bool m_sharedSettings; //< are the settings shared? if so, do not delete
 	
 		string m_text; //< text buffer
 		unsigned int m_numLines; //< number of lines in the text buffer
@@ -313,6 +307,10 @@ class ofxEditor {
 	private:
 	
 		/// text buffer changed, so update syntax text blocks and/or other info
+		///
+		/// TODO: replace this brute force method with a link list pointer based
+		/// approach that updates only those text blocks around the current
+		/// editor area
 		void textBufferUpdated();
 	
 		/// parses text into text blocks

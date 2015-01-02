@@ -1,6 +1,8 @@
 #pragma once
 
-#include "ofMain.h"
+#include "ofColor.h"
+#include "ofConstants.h"
+#include <map>
 
 /// syntax highlighter color scheme
 class ofxEditorColorScheme {

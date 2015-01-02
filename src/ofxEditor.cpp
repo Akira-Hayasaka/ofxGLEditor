@@ -15,21 +15,7 @@ int ofxEditor::s_charWidth = 1;
 int ofxEditor::s_charHeight = 1;
 int ofxEditor::s_cursorWidth = 1;
 
-unsigned int ofxEditor::s_tabWidth = 4;
-bool ofxEditor::s_convertTabs = false;
-
-float ofxEditor::s_alpha = 1.0f;
-ofColor ofxEditor::s_textColor = ofColor(255);
-ofColor ofxEditor::s_cursorColor = ofColor(255, 255, 0, 200);
-ofColor ofxEditor::s_selectionColor = ofColor(0, 255, 0, 127);
-ofColor ofxEditor::s_matchingCharsColor = ofColor(0, 127, 255, 127);
-ofColor ofxEditor::s_lineNumberColor = ofColor(127);
-
 string ofxEditor::s_copyBuffer;
-
-bool ofxEditor::s_highlightMatchingChars = true;
-string ofxEditor::s_openChars = "([<{";
-string ofxEditor::s_closeChars = ")]>}";
 
 // use CMD on OSX, CTRL for Windows & Linux by default
 #ifdef __APPLE__
@@ -40,13 +26,14 @@ string ofxEditor::s_closeChars = ")]>}";
 
 ofxEditor::ofxEditor() {
 	
+	// internal settings
+	m_settings = new ofxEditorSettings;
+	m_sharedSettings = false;
+	
 	m_position = 0;
 	m_desiredXPos = 0;
 	
 	m_selection = false;
-
-	unsigned int m_highlightStart;
-	unsigned int m_highlightEnd;
 	
 	m_leftTextPosition = 0;
 	m_topTextPosition = 0;
@@ -67,7 +54,41 @@ ofxEditor::ofxEditor() {
 	m_blowup = 0;
 }
 
-ofxEditor::~ofxEditor() {}
+ofxEditor::ofxEditor(ofxEditorSettings &sharedSettings) {
+	
+	// shared settings
+	m_settings = &sharedSettings;
+	m_sharedSettings = true;
+	
+	m_position = 0;
+	m_desiredXPos = 0;
+	
+	m_selection = false;
+	
+	m_leftTextPosition = 0;
+	m_topTextPosition = 0;
+	m_bottomTextPosition = 0;
+	m_displayedLineCount = 0;
+	
+	m_shiftState = false;
+	
+	m_colorScheme = NULL;
+	m_lineWrapping = false;
+	m_lineNumbers = false;
+	m_lineNumWidth = 0;
+	
+	m_time = 0;
+	m_delta = 0;
+	m_flash = 0;
+	m_blowupCursor = false;
+	m_blowup = 0;
+}
+
+ofxEditor::~ofxEditor() {
+	if(!m_sharedSettings) {
+		delete m_settings;
+	}
+}
 
 // STATIC SETTINGS
 
@@ -82,100 +103,12 @@ bool ofxEditor::loadFont(const string &font, int size) {
 	}
 }
 
-void ofxEditor::setTabWidth(unsigned int numSpaces) {
-	s_tabWidth = numSpaces < 1 ? 1 : numSpaces;
-}
-
-unsigned int ofxEditor::getTabWidth() {
-	return s_tabWidth;
-}
-
-void ofxEditor::setConvertTabsToSpaces(bool convert) {
-	s_convertTabs = convert;
-}
-
-bool ofxEditor::getConvertTabsToSpaces() {
-	return s_convertTabs;
-}
-
-void ofxEditor::setAlpha(float alpha) {
-	s_alpha = ofClamp(alpha, 0.0f, 1.0f);
-}
-
-float ofxEditor::getAlpha() {
-	return s_alpha;
-}
-
-void ofxEditor::setTextColor(ofColor color) {
-	s_textColor = color;
-}
-
-ofColor& ofxEditor::getTextColor() {
-	return s_textColor;
-}
-
-void ofxEditor::setCursorColor(ofColor color) {
-	s_cursorColor = color;
-}
-
-ofColor& ofxEditor::getCursorColor() {
-	return s_cursorColor;
-}
-
-void ofxEditor::setSelectionColor(ofColor color) {
-	s_selectionColor = color;
-}
-
-ofColor& ofxEditor::getSelectionColor() {
-	return s_selectionColor;
-}
-
-void ofxEditor::setMatchingCharsColor(ofColor color) {
-	s_matchingCharsColor = color;
-}
-
-ofColor& ofxEditor::getMatchingCharsColor() {
-	return s_matchingCharsColor;
-}
-
-void ofxEditor::setLineNumberColor(ofColor color) {
-	s_lineNumberColor = color;
-}
-
-ofColor& ofxEditor::getLineNumberColor() {
-	return s_lineNumberColor;
-}
-
 void ofxEditor::setSuperAsModifier(bool useSuper) {
 	s_superAsModifier = useSuper;
 }
 
 bool ofxEditor::getSuperAsModifier() {
 	return s_superAsModifier;
-}
-
-void ofxEditor::setHighlightMatchingChars(bool highlight) {
-	s_highlightMatchingChars = highlight;
-}
-
-bool ofxEditor::getHighlightMatchingChars() {
-	return s_highlightMatchingChars;
-}
-
-void ofxEditor::setMatchingChars(string openChars, string closeChars) {
-	if(openChars.length() == 0 || closeChars.length() == 0) {
-		ofLogWarning("ofxEditor") << "empty open or close char string";
-	}
-	s_openChars = openChars;
-	s_closeChars = closeChars;
-}
-
-string ofxEditor::getOpenChars() {
-	return s_openChars;
-}
-
-string ofxEditor::getCloseChars() {
-	return s_closeChars;
 }
 
 // MAIN
@@ -194,7 +127,7 @@ void ofxEditor::draw() {
 	
 		m_matchingCharsHighlight[0] = -1;
 		m_matchingCharsHighlight[1] = -1;
-		if(s_highlightMatchingChars) {
+		if(m_settings->highlightMatchingChars) {
 			parseMatchingChars();
 		}
 	
@@ -243,11 +176,11 @@ void ofxEditor::draw() {
 					case WORD: {
 						if(comment) {
 							ofColor &c = m_colorScheme->getCommentColor();
-							ofSetColor(c.r, c.g, c.b, c.a * s_alpha);
+							ofSetColor(c.r, c.g, c.b, c.a * m_settings->alpha);
 						}
 						else {
 							ofColor &c = m_colorScheme->getWordColor(tb.text);
-							ofSetColor(c.r, c.g, c.b, c.a * s_alpha);
+							ofSetColor(c.r, c.g, c.b, c.a * m_settings->alpha);
 						}
 						break;
 					}
@@ -255,11 +188,11 @@ void ofxEditor::draw() {
 					case STRING: {
 						if(comment) {
 							ofColor &c = m_colorScheme->getCommentColor();
-							ofSetColor(c.r, c.g, c.b, c.a * s_alpha);
+							ofSetColor(c.r, c.g, c.b, c.a * m_settings->alpha);
 						}
 						else {
 							ofColor &c = m_colorScheme->getStringColor();
-							ofSetColor(c.r, c.g, c.b, c.a * s_alpha);
+							ofSetColor(c.r, c.g, c.b, c.a * m_settings->alpha);
 						}
 						break;
 					}
@@ -267,11 +200,11 @@ void ofxEditor::draw() {
 					case NUMBER: {
 						if(comment) {
 							ofColor &c = m_colorScheme->getCommentColor();
-							ofSetColor(c.r, c.g, c.b, c.a * s_alpha);
+							ofSetColor(c.r, c.g, c.b, c.a * m_settings->alpha);
 						}
 						else {
 							ofColor &c = m_colorScheme->getNumberColor();
-							ofSetColor(c.r, c.g, c.b, c.a * s_alpha);
+							ofSetColor(c.r, c.g, c.b, c.a * m_settings->alpha);
 						}
 						break;
 					}
@@ -309,7 +242,7 @@ void ofxEditor::draw() {
 					// draw selection
 					if(m_selection && textPos >= m_highlightStart && textPos < m_highlightEnd) {
 						if(tb.type == TAB) {
-							for(int i = 0; i < s_tabWidth; ++i) {
+							for(int i = 0; i < m_settings->tabWidth; ++i) {
 								drawSelectionCharBlock(x+s_charWidth*i, y);
 							}
 						}
@@ -337,8 +270,8 @@ void ofxEditor::draw() {
 							}
 							break;
 						case TAB:
-							x += s_charWidth * s_tabWidth;
-							xcount += s_tabWidth;
+							x += s_charWidth * m_settings->tabWidth;
+							xcount += m_settings->tabWidth;
 							textPos++;
 							break;
 						default:
@@ -413,19 +346,21 @@ void ofxEditor::draw() {
 					
 					if(m_selection && i >= m_highlightStart && i < m_highlightEnd) {
 						int tabX = x+s_charWidth;
-						for(int i = 0; i < s_tabWidth-1; ++i) {
+						for(int i = 0; i < m_settings->tabWidth-1; ++i) {
 							drawSelectionCharBlock(tabX, y);
 							tabX += s_charWidth;
 						}
 					}
 					
-					x += s_charWidth * s_tabWidth;
-					xcount += s_tabWidth;
+					x += s_charWidth * m_settings->tabWidth;
+					xcount += m_settings->tabWidth;
 					textPos++;
 				}
 				// everything else
 				else {
-					ofSetColor(s_textColor.r, s_textColor.g, s_textColor.b, s_textColor.a * s_alpha);
+					ofSetColor(
+						m_settings->textColor.r, m_settings->textColor.g,
+						m_settings->textColor.b, m_settings->textColor.a * m_settings->alpha);
 					s_font->drawCharacter(m_text[i], x, y);
 					x += s_charWidth;
 					xcount++;
@@ -694,13 +629,13 @@ void ofxEditor::keyPressed(int key) {
 				break;
 				
 			case OF_KEY_TAB:
-				if(s_convertTabs) {
+				if(m_settings->convertTabs) {
 					m_text.insert(m_position, "\t");
 					m_position++;
 				}
 				else {
-					m_text.insert(m_position, string(s_tabWidth, ' '));
-					m_position += s_tabWidth;
+					m_text.insert(m_position, string(m_settings->tabWidth, ' '));
+					m_position += m_settings->tabWidth;
 				}
 				textBufferUpdated();
 				break;
@@ -786,7 +721,7 @@ void ofxEditor::setText(const string& text) {
 		m_text = text;
 	}
 	
-	if(s_convertTabs) {
+	if(m_settings->convertTabs) {
 		processTabs();
 	}
 	textBufferUpdated();
@@ -802,6 +737,96 @@ void ofxEditor::clearAllText() {
 	setCurrentLine(0);
 	m_shiftState = false;
 	m_selection = false;
+}
+
+// SETTINGS
+
+void ofxEditor::setTabWidth(unsigned int numSpaces) {
+	m_settings->tabWidth = numSpaces < 1 ? 1 : numSpaces;
+}
+
+unsigned int ofxEditor::getTabWidth() {
+	return m_settings->tabWidth;
+}
+
+void ofxEditor::setConvertTabsToSpaces(bool convert) {
+	m_settings->convertTabs = convert;
+}
+
+bool ofxEditor::getConvertTabsToSpaces() {
+	return m_settings->convertTabs;
+}
+
+void ofxEditor::setAlpha(float alpha) {
+	m_settings->alpha = ofClamp(alpha, 0.0f, 1.0f);
+}
+
+float ofxEditor::getAlpha() {
+	return m_settings->alpha;
+}
+
+void ofxEditor::setTextColor(ofColor color) {
+	m_settings->textColor = color;
+}
+
+ofColor& ofxEditor::getTextColor() {
+	return m_settings->textColor;
+}
+
+void ofxEditor::setCursorColor(ofColor color) {
+	m_settings->cursorColor = color;
+}
+
+ofColor& ofxEditor::getCursorColor() {
+	return m_settings->cursorColor;
+}
+
+void ofxEditor::setSelectionColor(ofColor color) {
+	m_settings->selectionColor = color;
+}
+
+ofColor& ofxEditor::getSelectionColor() {
+	return m_settings->selectionColor;
+}
+
+void ofxEditor::setMatchingCharsColor(ofColor color) {
+	m_settings->matchingCharsColor = color;
+}
+
+ofColor& ofxEditor::getMatchingCharsColor() {
+	return m_settings->matchingCharsColor;
+}
+
+void ofxEditor::setLineNumberColor(ofColor color) {
+	m_settings->lineNumberColor = color;
+}
+
+ofColor& ofxEditor::getLineNumberColor() {
+	return m_settings->lineNumberColor;
+}
+
+void ofxEditor::setHighlightMatchingChars(bool highlight) {
+	m_settings->highlightMatchingChars = highlight;
+}
+
+bool ofxEditor::getHighlightMatchingChars() {
+	return m_settings->highlightMatchingChars;
+}
+
+void ofxEditor::setMatchingChars(string openChars, string closeChars) {
+	if(openChars.length() == 0 || closeChars.length() == 0) {
+		ofLogWarning("ofxEditor") << "empty open or close char string";
+	}
+	m_settings->openChars = openChars;
+	m_settings->closeChars = closeChars;
+}
+
+string ofxEditor::getOpenChars() {
+	return m_settings->openChars;
+}
+
+string ofxEditor::getCloseChars() {
+	return m_settings->closeChars;
 }
 
 // COLOR SCHEME
@@ -947,14 +972,18 @@ void ofxEditor::reset() {
 
 void ofxEditor::drawMatchingCharBlock(int x, int y) {
 	ofPushStyle();
-		ofSetColor(s_matchingCharsColor.r, s_matchingCharsColor.g, s_matchingCharsColor.b, s_matchingCharsColor.a * s_alpha);
+		ofSetColor(
+			m_settings->matchingCharsColor.r, m_settings->matchingCharsColor.g,
+			m_settings->matchingCharsColor.b, m_settings->matchingCharsColor.a * m_settings->alpha);
 		ofRect(x, y-s_charHeight, s_charWidth, s_charHeight);
 	ofPopStyle();
 }
 
 void ofxEditor::drawSelectionCharBlock(int x, int y) {
 	ofPushStyle();
-		ofSetColor(s_selectionColor.r, s_selectionColor.g, s_selectionColor.b, s_selectionColor.a * s_alpha);
+		ofSetColor(
+			m_settings->selectionColor.r, m_settings->selectionColor.g,
+			m_settings->selectionColor.b, m_settings->selectionColor.a * m_settings->alpha);
 		ofRect(x, y-s_charHeight, s_charWidth, s_charHeight);
 	ofPopStyle();
 }
@@ -973,7 +1002,9 @@ void ofxEditor::drawCursor(int x, int y) {
 			float maxCH = (BLOWUP_FLASHES - m_blowup) / BLOWUP_FLASHES * (CURSOR_MAX_HEIGHT * s_charHeight) + s_charHeight;
 			ofPushStyle();
 				ofSetRectMode(OF_RECTMODE_CENTER);
-				ofSetColor(s_cursorColor.r, s_cursorColor.g, s_cursorColor.b, s_cursorColor.a * s_alpha * m_blowup/BLOWUP_FLASHES);
+				ofSetColor(
+					m_settings->cursorColor.r, m_settings->cursorColor.g,
+					m_settings->cursorColor.b, m_settings->cursorColor.a * m_settings->alpha * m_blowup/BLOWUP_FLASHES);
 				ofRect(MAX(x+maxCW/2, x), MAX(y-s_charHeight+maxCH/2, y-s_charHeight), MAX(maxCW, s_cursorWidth), MAX(maxCH, s_charHeight));
 			ofPopStyle();
 		}
@@ -985,7 +1016,9 @@ void ofxEditor::drawCursor(int x, int y) {
 		}
 		if (m_flash > HALF_FLASH_RATE) {
 			ofPushStyle();
-				ofSetColor(s_cursorColor.r, s_cursorColor.g, s_cursorColor.b, s_cursorColor.a * s_alpha);
+				ofSetColor(
+					m_settings->cursorColor.r, m_settings->cursorColor.g,
+					m_settings->cursorColor.b, m_settings->cursorColor.a * m_settings->alpha);
 				ofRect(x, y-s_charHeight, s_cursorWidth, s_charHeight);
 			ofPopStyle();
 		}
@@ -994,7 +1027,9 @@ void ofxEditor::drawCursor(int x, int y) {
 
 void ofxEditor::drawLineNumber(int &x, int &y, int &currentLine) {
 	ofPushStyle();
-		ofSetColor(s_lineNumberColor.r, s_lineNumberColor.g, s_lineNumberColor.b, s_lineNumberColor.a * s_alpha);
+		ofSetColor(
+			m_settings->lineNumberColor.r, m_settings->lineNumberColor.g,
+			m_settings->lineNumberColor.b, m_settings->lineNumberColor.a * m_settings->alpha);
 		currentLine++;
 		string currentLineString = ofToString(currentLine);
 		x += s_charWidth*(m_lineNumWidth-currentLineString.length()-1); // 1 for the space
@@ -1010,7 +1045,7 @@ void ofxEditor::processTabs() {
 	size_t pos = m_text.find("\t", 0);
 	while(pos != string::npos) {
 		m_text.erase(pos, 1);
-		m_text.insert(pos, string(s_tabWidth, ' '));
+		m_text.insert(pos, string(m_settings->tabWidth, ' '));
 		pos = m_text.find("\t", pos);
 	}
 }
@@ -1078,7 +1113,7 @@ void ofxEditor::parseMatchingChars() {
 
 	// parse the parentheses
 	int type = 0;
-	for(string::iterator i = s_openChars.begin(); i != s_openChars.end(); ++i) {
+	for(string::iterator i = m_settings->openChars.begin(); i != m_settings->openChars.end(); ++i) {
 		if(m_text[m_position] == *i) {
 			parseOpenChars(m_position, type);
 		}
@@ -1087,7 +1122,7 @@ void ofxEditor::parseMatchingChars() {
 		
 	if(m_position > 0) {
 		type = 0;
-		for(string::iterator i = s_closeChars.begin(); i != s_closeChars.end(); ++i) {
+		for(string::iterator i = m_settings->closeChars.begin(); i != m_settings->closeChars.end(); ++i) {
 			if(m_text[m_position-1] == *i) {
 				parseCloseChars(m_position-1, type);
 			}
@@ -1102,10 +1137,10 @@ void ofxEditor::parseOpenChars(int pos, int type) {
 	int stack = 0, start_pos = pos;
 	pos++;
 	while(stack != -1 && pos < (int)m_text.size()) {
-		if(m_text[pos] == s_openChars[type]) {
+		if(m_text[pos] == m_settings->openChars[type]) {
 			stack++;
 		}
-		if(m_text[pos] == s_closeChars[type]) {
+		if(m_text[pos] == m_settings->closeChars[type]) {
 			stack--;
 		}
 		pos++;
@@ -1122,10 +1157,10 @@ void ofxEditor::parseCloseChars(int pos, int type) {
 	int stack = 0, start_pos = pos;
 	pos--;
 	while(stack != -1 && pos >= 0) {
-		if(m_text[pos] == s_closeChars[type]) {
+		if(m_text[pos] == m_settings->closeChars[type]) {
 			stack++;
 		}
-		if(m_text[pos] == s_openChars[type]) {
+		if(m_text[pos] == m_settings->openChars[type]) {
 			stack--;
 		}
 		pos--;
@@ -1179,6 +1214,7 @@ void ofxEditor::textBufferUpdated() {
 	}
 }
 
+// simple syntax parser
 void ofxEditor::parseTextBlocks() {
 	
 	clearAllTextBlocks();
