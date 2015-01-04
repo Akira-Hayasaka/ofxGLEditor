@@ -14,7 +14,7 @@ class ofxEditor {
 	public:
 	
 		ofxEditor();
-		ofxEditor(ofxEditorSettings &sharedSettings); //< share given settings object
+		ofxEditor(ofxEditorSettings &sharedSettings); //< share settings object
 		virtual ~ofxEditor();
 		
 	/// \section Static Settings
@@ -26,80 +26,50 @@ class ofxEditor {
 		static bool loadFont(const string & font, int size);
 	
 		/// set useSuper = true if you want to use the Super (Windows key, Mac CMD)
-		/// key as the modifier key, default: false for CTRL key
+		/// key as the modifier key, otherwise false uses CTRL key
+		/// default: true on Mac & false on all other platforms
 		static void setSuperAsModifier(bool useSuper);
 		static bool getSuperAsModifier();
 	
 	/// \section Main
 		
 		/// draw the editor, pushes view and applies viewport
-		void draw();
+		virtual void draw();
 	
 		/// draw the text field character grid
-		void drawGrid();
+		virtual void drawGrid();
 		
 		/// required for interactive editing, etc
-		void keyPressed(int key);
+		virtual void keyPressed(int key);
 		
 		/// set the view port size,
 		/// size of text field calculated based on font size
-		void setSize(int width, int height);
+		virtual void resize();
+		virtual void resize(int width, int height);
 	
-		/// get text buffer contents or selection
-		string getText();
+		/// get text buffer contents or current selection
+		virtual string getText();
 	
 		/// set text buffer contents
-		void setText(const string& text);
+		virtual void setText(const string& text);
+	
+		// insert text at the current buffer position
+		virtual void insertText(const string& text);
 	
 		/// clear text buffer contents
-		void clearAllText();
+		virtual void clearText();
 	
 	/// \section Settings
-		
-		/// set the displayed tab width, default: 4
-		void setTabWidth(unsigned int numSpaces);
-		unsigned int getTabWidth();
-		
-		/// convert tabs to spaces? performed when setting or editing text and
-		/// *cannot* be undone
-		void setConvertTabsToSpaces(bool convert=true);
-		bool getConvertTabsToSpaces();
-		
-		/// set overall text alpha
-		void setAlpha(float alpha);
-		float getAlpha();
-		
-		/// text color color, default: white
-		/// overridden by color scheme if a scheme is set
-		void setTextColor(ofColor color);
-		ofColor& getTextColor();
-		
-		/// cursor color, default: yellow w/ alpha
-		void setCursorColor(ofColor color);
-		ofColor& getCursorColor();
-		
-		/// selection color, default: green w/ alpha
-		void setSelectionColor(ofColor color);
-		ofColor& getSelectionColor();
-	
-		/// matching chars highlight color, default: blue w/ alpha
-		void setMatchingCharsColor(ofColor color);
-		ofColor& getMatchingCharsColor();
-	
-		/// line number color, default: gray
-		void setLineNumberColor(ofColor color);
-		ofColor& getLineNumberColor();
-	
-		/// highlight matching open/close chars?, default: true
-		void setHighlightMatchingChars(bool highlight);
-		bool getHighlightMatchingChars();
-	
-		/// set the matching open/close chars to highlight,
-		/// default: "([<{" & ")]>}", strings should not be empty
-		/// note: matching chars are not highlighted inside comments
-		void setMatchingChars(string openChars, string closeChars);
-		string getOpenChars();
-		string getCloseChars();
+
+		/// access to the internal settings object
+		///
+		/// example usage:
+		///
+		///   editor.getSettings().alpha = 0.5;
+		///   editor.getSettings().tabWidth = 8;
+		///   ... etc
+		///
+		ofxEditorSettings& getSettings();
 	
 	/// \section Color Scheme
 	
@@ -153,11 +123,26 @@ class ofxEditor {
 		/// get the current line character position of the cursor
 		unsigned int getCurrentLinePos();
 	
+		/// get length of the current line cursor is on
+		unsigned int getCurrentLineLen();
+	
 		/// get the cursor position by line and line character
 		void setCurrentLinePos(unsigned int line, unsigned int character);
 	
 		/// reset position & selection
 		void reset();
+	
+	/// \section Drawing Utils
+	
+		/// draw a string using the current editor font
+		void drawString(const string& s, float x, float y);
+		void drawString(const string& s, ofPoint& p);
+	
+		/// get the fixed width of a char using the current editor font
+		int getCharWidth();
+	
+		/// get the fixed height of a char using the current editor font
+		int getCharHeight();
 	
 	protected:
 	
@@ -178,7 +163,8 @@ class ofxEditor {
 	
 		static bool s_superAsModifier;   //< use the super key as modifier?
 	
-		static string s_copyBuffer;      //< shared copy/paste buffer
+		/// shared copy/paste buffer if system clipboard isn't available
+		static string s_copyBuffer;
 	
 	/// \section Member Variables
 
@@ -256,7 +242,7 @@ class ofxEditor {
 				}
 		};
 		list<TextBlock> m_textBlocks; //< syntax parser text block linked list
-		
+	
 	/// \section Helper Functions
 	
 		// draw a matching char hilight char block rectanlge at pos
@@ -303,6 +289,14 @@ class ofxEditor {
 	
 		/// get the number of lines at a buffer pos
 		unsigned int lineNumberForPos(unsigned int pos);
+	
+		/// copy selected text to the system clipboard or copy buffer
+		/// note: clipboard only supported when using a GLFW Window
+		void copySelection();
+	
+		/// paste text from the system clipboard or copy buffer
+		/// note: clipboard only supported when using a GLFW Window
+		void pasteSelection();
 		
 	private:
 	
@@ -317,5 +311,5 @@ class ofxEditor {
 		void parseTextBlocks();
 		
 		/// clears current text block list
-		void clearAllTextBlocks();
+		void clearTextBlocks();
 };

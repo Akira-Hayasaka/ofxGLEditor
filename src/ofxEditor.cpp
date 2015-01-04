@@ -1,5 +1,10 @@
 #include "ofxEditor.h"
 
+#if !defined(TARGET_NODISPLAY) && !defined(TARGET_OF_IOS) && \
+		!defined(TARGET_ANDROID) && !defined(TARGET_RASPBERRY_PI)
+	#include "ofAppGLFWWindow.h"
+#endif
+
 #define FLASH_RATE 1
 #define HALF_FLASH_RATE (FLASH_RATE*0.5)
 
@@ -24,6 +29,7 @@ string ofxEditor::s_copyBuffer;
 	bool ofxEditor::s_superAsModifier = false;
 #endif
 
+//--------------------------------------------------------------
 ofxEditor::ofxEditor() {
 	
 	// internal settings
@@ -54,6 +60,7 @@ ofxEditor::ofxEditor() {
 	m_blowup = 0;
 }
 
+//--------------------------------------------------------------
 ofxEditor::ofxEditor(ofxEditorSettings &sharedSettings) {
 	
 	// shared settings
@@ -84,6 +91,7 @@ ofxEditor::ofxEditor(ofxEditorSettings &sharedSettings) {
 	m_blowup = 0;
 }
 
+//--------------------------------------------------------------
 ofxEditor::~ofxEditor() {
 	if(!m_sharedSettings) {
 		delete m_settings;
@@ -92,7 +100,16 @@ ofxEditor::~ofxEditor() {
 
 // STATIC SETTINGS
 
+//--------------------------------------------------------------
 bool ofxEditor::loadFont(const string &font, int size) {
+	
+	string path = ofToDataPath(font);
+	if(!ofFile::doesFileExist(path)){
+		ofLogFatalError("ofxEditor") << "couldn't find font \"" << font << "\"";
+			return false;
+	}
+	ofLogVerbose("ofxEditor") << "loading font \"" << ofFilePath::getFileName(path) << "\"";
+	
 	if(s_font == NULL) {
 		s_font = ofPtr<ofxEditor::Font>(new ofxEditor::Font());
 	}
@@ -103,21 +120,24 @@ bool ofxEditor::loadFont(const string &font, int size) {
 	}
 }
 
+//--------------------------------------------------------------
 void ofxEditor::setSuperAsModifier(bool useSuper) {
 	s_superAsModifier = useSuper;
 }
 
+//--------------------------------------------------------------
 bool ofxEditor::getSuperAsModifier() {
 	return s_superAsModifier;
 }
 
 // MAIN
 
+//--------------------------------------------------------------
 void ofxEditor::draw() {
 
 	// default size if not set
 	if(m_viewport.width == 0 || m_viewport.height == 0) {
-		setSize(ofGetWidth(), ofGetHeight());
+		resize();
 	}
 
 	ofPushStyle();
@@ -151,7 +171,8 @@ void ofxEditor::draw() {
 			}
 			
 			bool comment = false;
-			for(list<TextBlock>::iterator iter = m_textBlocks.begin(); iter != m_textBlocks.end() && m_displayedLineCount < m_visibleLines; iter++) {
+			for(list<TextBlock>::iterator iter = m_textBlocks.begin();
+			    iter != m_textBlocks.end() && m_displayedLineCount < m_visibleLines; iter++) {
 			
 				TextBlock &tb = (*iter);
 				
@@ -358,9 +379,8 @@ void ofxEditor::draw() {
 				}
 				// everything else
 				else {
-					ofSetColor(
-						m_settings->textColor.r, m_settings->textColor.g,
-						m_settings->textColor.b, m_settings->textColor.a * m_settings->alpha);
+					ofSetColor(m_settings->textColor.r, m_settings->textColor.g,
+						       m_settings->textColor.b, m_settings->textColor.a * m_settings->alpha);
 					s_font->drawCharacter(m_text[i], x, y);
 					x += s_charWidth;
 					xcount++;
@@ -398,6 +418,7 @@ void ofxEditor::draw() {
 	}
 }
 
+//--------------------------------------------------------------
 void ofxEditor::drawGrid() {
 	ofPushStyle();
 	ofPushView();
@@ -419,6 +440,7 @@ void ofxEditor::drawGrid() {
 	ofPopStyle();
 }
 
+//--------------------------------------------------------------
 void ofxEditor::keyPressed(int key) {
 
 	// filter out modifier key events, except SHIFT
@@ -444,26 +466,20 @@ void ofxEditor::keyPressed(int key) {
 				
 			case 'x': case 24: // cut
 				if(m_selection) {
-					s_copyBuffer = m_text.substr(m_highlightStart, m_highlightEnd-m_highlightStart);
+					copySelection();
 					m_text.erase(m_highlightStart, m_highlightEnd-m_highlightStart);
 					if(m_position >= m_highlightEnd) {
 						m_position -= m_highlightEnd-m_highlightStart;
-					}	
-					m_selection = false;
+					}
 				}
 				break;
 			
 			case 'c': case 3: // copy
-				if(m_selection) {
-					s_copyBuffer = m_text.substr(m_highlightStart, m_highlightEnd-m_highlightStart);
-				}
+				copySelection();
 				break;
 			
 			case 'v': case 22: // paste
-				m_text.insert(m_position, s_copyBuffer);
-				m_selection = false;
-				m_position += s_copyBuffer.size();
-				textBufferUpdated();
+				pasteSelection();
 				break;
 			
 			case 'b' : // show cursor location
@@ -603,7 +619,7 @@ void ofxEditor::keyPressed(int key) {
 					m_selection = false;
 					m_highlightStart = 0;
 					m_highlightEnd = 0;
-					clearAllText();
+					clearText();
 				}
 				else {
 					m_text.erase(m_position, 1);
@@ -643,6 +659,11 @@ void ofxEditor::keyPressed(int key) {
 			case OF_KEY_RETURN:
 				key = '\n'; // fallthrough (replacement of newline)
 				m_numLines++;
+				
+			case OF_KEY_ESC:
+				m_selection = false;
+				m_position = m_highlightStart;
+				break;
 				
 			default:
 				
@@ -691,7 +712,15 @@ void ofxEditor::keyPressed(int key) {
 	}
 }
 
-void ofxEditor::setSize(int width, int height) {
+//--------------------------------------------------------------
+void ofxEditor::resize() {
+	int w = (ofGetWindowMode() == OF_WINDOW)?ofGetViewportWidth():ofGetScreenWidth();
+	int h = (ofGetWindowMode() == OF_WINDOW)?ofGetViewportHeight():ofGetScreenHeight();
+	resize(w, h);
+}
+
+//--------------------------------------------------------------
+void ofxEditor::resize(int width, int height) {
 	m_viewport.width = width;
 	m_viewport.height = height;
 	
@@ -702,6 +731,7 @@ void ofxEditor::setSize(int width, int height) {
 	ofLogVerbose("ofxEditor") << "text size: " << m_visibleChars << " " << m_visibleLines;
 }
 
+//--------------------------------------------------------------
 string ofxEditor::getText() {
 	if(m_selection) {
 		return m_text.substr(m_highlightStart, m_highlightEnd-m_highlightStart);
@@ -709,6 +739,7 @@ string ofxEditor::getText() {
 	return m_text;
 }
 
+//--------------------------------------------------------------
 void ofxEditor::setText(const string& text) {
 	
 	if(m_text != ""){
@@ -727,10 +758,22 @@ void ofxEditor::setText(const string& text) {
 	textBufferUpdated();
 }
 
-void ofxEditor::clearAllText() {
+//--------------------------------------------------------------
+void ofxEditor::insertText(const string& text) {
+	m_text.insert(m_position, text);
+	m_selection = false;
+	m_position += text.size();
+	if(m_settings->convertTabs) {
+		processTabs();
+	}
+	textBufferUpdated();
+}
+
+//--------------------------------------------------------------
+void ofxEditor::clearText() {
 	m_text = "";
 	if(m_colorScheme) {
-		clearAllTextBlocks();
+		clearTextBlocks();
 	}
 	m_position = 0;
 	m_numLines = 0;
@@ -741,101 +784,19 @@ void ofxEditor::clearAllText() {
 
 // SETTINGS
 
-void ofxEditor::setTabWidth(unsigned int numSpaces) {
-	m_settings->tabWidth = numSpaces < 1 ? 1 : numSpaces;
-}
-
-unsigned int ofxEditor::getTabWidth() {
-	return m_settings->tabWidth;
-}
-
-void ofxEditor::setConvertTabsToSpaces(bool convert) {
-	m_settings->convertTabs = convert;
-}
-
-bool ofxEditor::getConvertTabsToSpaces() {
-	return m_settings->convertTabs;
-}
-
-void ofxEditor::setAlpha(float alpha) {
-	m_settings->alpha = ofClamp(alpha, 0.0f, 1.0f);
-}
-
-float ofxEditor::getAlpha() {
-	return m_settings->alpha;
-}
-
-void ofxEditor::setTextColor(ofColor color) {
-	m_settings->textColor = color;
-}
-
-ofColor& ofxEditor::getTextColor() {
-	return m_settings->textColor;
-}
-
-void ofxEditor::setCursorColor(ofColor color) {
-	m_settings->cursorColor = color;
-}
-
-ofColor& ofxEditor::getCursorColor() {
-	return m_settings->cursorColor;
-}
-
-void ofxEditor::setSelectionColor(ofColor color) {
-	m_settings->selectionColor = color;
-}
-
-ofColor& ofxEditor::getSelectionColor() {
-	return m_settings->selectionColor;
-}
-
-void ofxEditor::setMatchingCharsColor(ofColor color) {
-	m_settings->matchingCharsColor = color;
-}
-
-ofColor& ofxEditor::getMatchingCharsColor() {
-	return m_settings->matchingCharsColor;
-}
-
-void ofxEditor::setLineNumberColor(ofColor color) {
-	m_settings->lineNumberColor = color;
-}
-
-ofColor& ofxEditor::getLineNumberColor() {
-	return m_settings->lineNumberColor;
-}
-
-void ofxEditor::setHighlightMatchingChars(bool highlight) {
-	m_settings->highlightMatchingChars = highlight;
-}
-
-bool ofxEditor::getHighlightMatchingChars() {
-	return m_settings->highlightMatchingChars;
-}
-
-void ofxEditor::setMatchingChars(string openChars, string closeChars) {
-	if(openChars.length() == 0 || closeChars.length() == 0) {
-		ofLogWarning("ofxEditor") << "empty open or close char string";
-	}
-	m_settings->openChars = openChars;
-	m_settings->closeChars = closeChars;
-}
-
-string ofxEditor::getOpenChars() {
-	return m_settings->openChars;
-}
-
-string ofxEditor::getCloseChars() {
-	return m_settings->closeChars;
+//--------------------------------------------------------------
+ofxEditorSettings& ofxEditor::getSettings() {
+	return *m_settings;
 }
 
 // COLOR SCHEME
 
+//--------------------------------------------------------------
 void ofxEditor::setColorScheme(ofxEditorColorScheme *colorScheme) {
 	
 	// clear to save memory
 	if(colorScheme == NULL) {
-		clearAllTextBlocks();
+		clearTextBlocks();
 		m_colorScheme = NULL;
 		return;
 	}
@@ -849,17 +810,20 @@ void ofxEditor::setColorScheme(ofxEditorColorScheme *colorScheme) {
 	}
 }
 
+//--------------------------------------------------------------
 void ofxEditor::clearColorScheme() {
 	m_colorScheme = NULL;
-	clearAllTextBlocks();
+	clearTextBlocks();
 }
 
+//--------------------------------------------------------------
 ofxEditorColorScheme* ofxEditor::getColorScheme() {
 	return m_colorScheme;
 }
 
-// SETTINGS
+// DISPLAY SETTINGS
 
+//--------------------------------------------------------------
 void ofxEditor::setLineWrapping(bool wrap) {
 	m_lineWrapping = wrap;
 	if(m_lineWrapping) { // reset x viewport offset
@@ -879,10 +843,12 @@ void ofxEditor::setLineWrapping(bool wrap) {
 	}
 }
 
+//--------------------------------------------------------------
 bool ofxEditor::getLineWrapping() {
 	return m_lineWrapping;
 }
 
+//--------------------------------------------------------------
 void ofxEditor::setLineNumbers(bool numbers) {
 	m_lineNumbers = numbers;
 	if(m_lineNumbers) {
@@ -895,29 +861,35 @@ void ofxEditor::setLineNumbers(bool numbers) {
 	}
 }
 
+//--------------------------------------------------------------
 bool ofxEditor::getLineNumbers() {
 	return m_lineNumbers;
 }
 
 // CURSOR POSITION & INFO
 
+//--------------------------------------------------------------
 void ofxEditor::blowupCursor() {
 	m_blowupCursor = true;
 	m_blowup = 0;
 }
 
+//--------------------------------------------------------------
 unsigned int ofxEditor::getNumLines() {
 	return m_numLines;
 }
 
+//--------------------------------------------------------------
 unsigned int ofxEditor::getNumCharacters() {
 	return m_text.length();
 }
 
+//--------------------------------------------------------------
 unsigned int ofxEditor::getCurrentPos() {
 	return m_position;
 }
 
+//--------------------------------------------------------------
 void ofxEditor::setCurrentPos(unsigned int pos) {
 	if(pos >= m_text.length()) {
 		ofLogWarning("ofxEditor") << "ignoring invalid position " << pos;
@@ -925,11 +897,13 @@ void ofxEditor::setCurrentPos(unsigned int pos) {
 	}
 	m_position = pos;
 }
-	
+
+//--------------------------------------------------------------
 unsigned int ofxEditor::getCurrentLine() {
 	return lineNumberForPos(m_position);
 }
 
+//--------------------------------------------------------------
 void ofxEditor::setCurrentLine(unsigned int line) {
 	m_position = 0;
 	int count = 0;
@@ -950,15 +924,23 @@ void ofxEditor::setCurrentLine(unsigned int line) {
 	m_position = lineStart(m_position);
 }
 
+//--------------------------------------------------------------
 unsigned int ofxEditor::getCurrentLinePos() {
 	return m_position - lineStart(m_position);
 }
 
+//--------------------------------------------------------------
+unsigned int ofxEditor::getCurrentLineLen() {
+	return offsetToCurrentLineStart();
+}
+
+//--------------------------------------------------------------
 void ofxEditor::setCurrentLinePos(unsigned int line, unsigned int character) {
 	setCurrentLine(line);
 	m_position += character;
 }
 
+//--------------------------------------------------------------
 void ofxEditor::reset() {
 	m_blowupCursor = false;
 	m_blowup = 0.0f;
@@ -968,8 +950,44 @@ void ofxEditor::reset() {
 	m_selection = false;
 }
 
+// DRAWING UTILS
+
+//--------------------------------------------------------------
+void ofxEditor::drawString(const string& s, float x, float y) {
+	int xPos = x, yPos = y+s_charHeight;
+	for(int i = 0; i < s.size(); ++i) {
+		if(s[i] == '\n') {
+			xPos = x;
+			yPos += s_charHeight;
+		}
+		else if(s[i] == '\t') {
+			xPos += s_charWidth*m_settings->tabWidth;
+		}
+		else {
+			s_font->drawCharacter(s[i], xPos, yPos);
+			xPos += s_charWidth;
+		}
+	}
+}
+
+//--------------------------------------------------------------
+void ofxEditor::drawString(const string& s, ofPoint& p) {
+	return drawString(s, p.x, p.y);
+}
+
+//--------------------------------------------------------------
+int ofxEditor::getCharWidth() {
+	return s_charWidth;
+}
+
+//--------------------------------------------------------------
+int ofxEditor::getCharHeight() {
+	return s_charHeight;
+}
+
 // PROTECTED
 
+//--------------------------------------------------------------
 void ofxEditor::drawMatchingCharBlock(int x, int y) {
 	ofPushStyle();
 		ofSetColor(
@@ -979,6 +997,7 @@ void ofxEditor::drawMatchingCharBlock(int x, int y) {
 	ofPopStyle();
 }
 
+//--------------------------------------------------------------
 void ofxEditor::drawSelectionCharBlock(int x, int y) {
 	ofPushStyle();
 		ofSetColor(
@@ -988,6 +1007,7 @@ void ofxEditor::drawSelectionCharBlock(int x, int y) {
 	ofPopStyle();
 }
 
+//--------------------------------------------------------------
 void ofxEditor::drawCursor(int x, int y) {
 	
 	if(m_blowupCursor) {
@@ -1002,9 +1022,8 @@ void ofxEditor::drawCursor(int x, int y) {
 			float maxCH = (BLOWUP_FLASHES - m_blowup) / BLOWUP_FLASHES * (CURSOR_MAX_HEIGHT * s_charHeight) + s_charHeight;
 			ofPushStyle();
 				ofSetRectMode(OF_RECTMODE_CENTER);
-				ofSetColor(
-					m_settings->cursorColor.r, m_settings->cursorColor.g,
-					m_settings->cursorColor.b, m_settings->cursorColor.a * m_settings->alpha * m_blowup/BLOWUP_FLASHES);
+				ofSetColor(m_settings->cursorColor.r, m_settings->cursorColor.g,
+					       m_settings->cursorColor.b, m_settings->cursorColor.a * m_settings->alpha * m_blowup/BLOWUP_FLASHES);
 				ofRect(MAX(x+maxCW/2, x), MAX(y-s_charHeight+maxCH/2, y-s_charHeight), MAX(maxCW, s_cursorWidth), MAX(maxCH, s_charHeight));
 			ofPopStyle();
 		}
@@ -1016,20 +1035,19 @@ void ofxEditor::drawCursor(int x, int y) {
 		}
 		if (m_flash > HALF_FLASH_RATE) {
 			ofPushStyle();
-				ofSetColor(
-					m_settings->cursorColor.r, m_settings->cursorColor.g,
-					m_settings->cursorColor.b, m_settings->cursorColor.a * m_settings->alpha);
+				ofSetColor(m_settings->cursorColor.r, m_settings->cursorColor.g,
+					       m_settings->cursorColor.b, m_settings->cursorColor.a * m_settings->alpha);
 				ofRect(x, y-s_charHeight, s_cursorWidth, s_charHeight);
 			ofPopStyle();
 		}
 	}
 }
 
+//--------------------------------------------------------------
 void ofxEditor::drawLineNumber(int &x, int &y, int &currentLine) {
 	ofPushStyle();
-		ofSetColor(
-			m_settings->lineNumberColor.r, m_settings->lineNumberColor.g,
-			m_settings->lineNumberColor.b, m_settings->lineNumberColor.a * m_settings->alpha);
+		ofSetColor(m_settings->lineNumberColor.r, m_settings->lineNumberColor.g,
+			       m_settings->lineNumberColor.b, m_settings->lineNumberColor.a * m_settings->alpha);
 		currentLine++;
 		string currentLineString = ofToString(currentLine);
 		x += s_charWidth*(m_lineNumWidth-currentLineString.length()-1); // 1 for the space
@@ -1041,6 +1059,7 @@ void ofxEditor::drawLineNumber(int &x, int &y, int &currentLine) {
 	ofPopStyle();
 }
 
+//--------------------------------------------------------------
 void ofxEditor::processTabs() {
 	size_t pos = m_text.find("\t", 0);
 	while(pos != string::npos) {
@@ -1050,10 +1069,12 @@ void ofxEditor::processTabs() {
 	}
 }
 
+//--------------------------------------------------------------
 int ofxEditor::offsetToCurrentLineStart() {
 	return m_position - lineStart(m_position);
 }
 
+//--------------------------------------------------------------
 int ofxEditor::nextLineLength(int pos) {
 	size_t nextLineStart = m_text.find("\n", pos);
 	if(nextLineStart != string::npos) {
@@ -1062,6 +1083,7 @@ int ofxEditor::nextLineLength(int pos) {
 	return 0;
 }
 
+//--------------------------------------------------------------
 int ofxEditor::previousLineLength(int pos) {
 	size_t prevLineEnd = string::npos;
 	if(pos > 0) {
@@ -1073,11 +1095,13 @@ int ofxEditor::previousLineLength(int pos) {
 	return 0;
 }
 
+//--------------------------------------------------------------
 int ofxEditor::lineLength(int pos) {
 	int len = lineEnd(pos) - lineStart(pos);
 	return len > 0 ? len : 0; // clip line length to zero
 }
 
+//--------------------------------------------------------------
 unsigned int ofxEditor::lineStart(int pos) {
 	size_t start = string::npos;
 	if(pos > 0) {
@@ -1098,6 +1122,7 @@ unsigned int ofxEditor::lineStart(int pos) {
 	return start;
 }
 
+//--------------------------------------------------------------
 unsigned int ofxEditor::lineEnd(int pos) {
 	if(m_text.empty()) {
 		return 0;
@@ -1109,6 +1134,7 @@ unsigned int ofxEditor::lineEnd(int pos) {
 	return end;
 }
 
+//--------------------------------------------------------------
 void ofxEditor::parseMatchingChars() {
 
 	// parse the parentheses
@@ -1131,6 +1157,7 @@ void ofxEditor::parseMatchingChars() {
 	}
 }
 
+//--------------------------------------------------------------
 void ofxEditor::parseOpenChars(int pos, int type) {
 
 	// looking for a close, so search forward
@@ -1151,6 +1178,7 @@ void ofxEditor::parseOpenChars(int pos, int type) {
 	}
 }
 
+//--------------------------------------------------------------
 void ofxEditor::parseCloseChars(int pos, int type) {
 
 	// looking for a open, so search backward
@@ -1171,6 +1199,7 @@ void ofxEditor::parseCloseChars(int pos, int type) {
 	}	
 }
 
+//--------------------------------------------------------------
 unsigned int ofxEditor::lineNumberForPos(unsigned int pos) {
 	int ret = 0;
 	for(unsigned int i = 0; i < pos; i++) {
@@ -1181,8 +1210,45 @@ unsigned int ofxEditor::lineNumberForPos(unsigned int pos) {
 	return ret;
 }
 
+//--------------------------------------------------------------
+void ofxEditor::copySelection() {
+	
+	if(!m_selection) {
+		return;
+	}
+
+	// use clipboard if available, otherwise use internal copybuffer
+	#if !defined(TARGET_NODISPLAY) && !defined(TARGET_OF_IOS) && \
+		!defined(TARGET_ANDROID) && !defined(TARGET_RASPBERRY_PI)
+		ofAppGLFWWindow *window = (ofAppGLFWWindow *) ofGetWindowPtr();
+		glfwSetClipboardString(window->getGLFWWindow(), getText().c_str());
+	#else
+		s_copyBuffer = m_text.substr(m_highlightStart, m_highlightEnd-m_highlightStart);
+	#endif
+	
+	m_selection = false;
+}
+
+//--------------------------------------------------------------
+void ofxEditor::pasteSelection() {
+
+	// use clipboard if available, otherwise use internal copybuffer
+	#if !defined(TARGET_NODISPLAY) && !defined(TARGET_OF_IOS) && \
+		!defined(TARGET_ANDROID) && !defined(TARGET_RASPBERRY_PI)
+		ofAppGLFWWindow *window = (ofAppGLFWWindow *) ofGetWindowPtr();
+		const char * text = glfwGetClipboardString(window->getGLFWWindow());
+		if(!text) {
+		 ofLogError("ofxEditor") << "pasting from clipboard failed";
+		}
+		insertText((string) text);
+	#else
+		insertText(s_copyBuffer);
+	#endif
+}
+
 // PRIVATE
 
+//--------------------------------------------------------------
 void ofxEditor::textBufferUpdated() {
 	
 	if(m_colorScheme) {
@@ -1214,10 +1280,11 @@ void ofxEditor::textBufferUpdated() {
 	}
 }
 
+//--------------------------------------------------------------
 // simple syntax parser
 void ofxEditor::parseTextBlocks() {
 	
-	clearAllTextBlocks();
+	clearTextBlocks();
 	m_numLines = 0;
 	
 	bool singleComment = false;
@@ -1412,6 +1479,7 @@ void ofxEditor::parseTextBlocks() {
 	}
 }
 
-void ofxEditor::clearAllTextBlocks() {
+//--------------------------------------------------------------
+void ofxEditor::clearTextBlocks() {
 	m_textBlocks.clear();
 }
