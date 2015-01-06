@@ -1,5 +1,28 @@
+/*
+ * Copyright (C) 2015 Dan Wilcox <danomatika@gmail.com>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * See https://github.com/danomatika/ofxEditor for more info.
+ *
+ * Based on a rewrite of the Fluxus GLEditor,
+ * http://www.pawfal.org/fluxus Copyright (C) Dave Griffiths
+ */
 #include "ofxEditor.h"
 
+// needed for clipboard support
 #if !defined(TARGET_NODISPLAY) && !defined(TARGET_OF_IOS) && \
 		!defined(TARGET_ANDROID) && !defined(TARGET_RASPBERRY_PI)
 	#include "ofAppGLFWWindow.h"
@@ -118,6 +141,26 @@ bool ofxEditor::loadFont(const string &font, int size) {
 		s_charHeight = s_font->getLineHeight();
 		s_cursorWidth = floor(s_charWidth*0.3);
 	}
+}
+
+//--------------------------------------------------------------
+bool ofxEditor::isFontLoaded() {
+	return s_font.get();
+}
+
+//--------------------------------------------------------------
+ofTrueTypeFont* ofxEditor::getFont() {
+	return s_font.get();
+}
+
+//--------------------------------------------------------------
+int ofxEditor::getCharWidth() {
+	return s_charWidth;
+}
+
+//--------------------------------------------------------------
+int ofxEditor::getCharHeight() {
+	return s_charHeight;
 }
 
 //--------------------------------------------------------------
@@ -410,12 +453,7 @@ void ofxEditor::draw() {
 	ofPopView();
 	ofPopStyle();
 	
-	// update animation timestamps
-	m_delta = ofGetElapsedTimef() - m_time;
-	m_time = ofGetElapsedTimef();
-	if (m_delta > 100.0f) {
-		m_delta = 0.000001f;
-	}
+	updateTimestamps();
 }
 
 //--------------------------------------------------------------
@@ -656,14 +694,14 @@ void ofxEditor::keyPressed(int key) {
 				textBufferUpdated();
 				break;
 				
-			case OF_KEY_RETURN:
-				key = '\n'; // fallthrough (replacement of newline)
-				m_numLines++;
-				
 			case OF_KEY_ESC:
 				m_selection = false;
 				m_position = m_highlightStart;
 				break;
+				
+			case OF_KEY_RETURN:
+				key = '\n'; // fallthrough (replacement of newline)
+				m_numLines++;
 				
 			default:
 				
@@ -975,16 +1013,6 @@ void ofxEditor::drawString(const string& s, ofPoint& p) {
 	return drawString(s, p.x, p.y);
 }
 
-//--------------------------------------------------------------
-int ofxEditor::getCharWidth() {
-	return s_charWidth;
-}
-
-//--------------------------------------------------------------
-int ofxEditor::getCharHeight() {
-	return s_charHeight;
-}
-
 // PROTECTED
 
 //--------------------------------------------------------------
@@ -1244,6 +1272,15 @@ void ofxEditor::pasteSelection() {
 	#else
 		insertText(s_copyBuffer);
 	#endif
+}
+
+//--------------------------------------------------------------
+void ofxEditor::updateTimestamps() {
+	m_delta = ofGetElapsedTimef() - m_time;
+	m_time = ofGetElapsedTimef();
+	if (m_delta > 100.0f) {
+		m_delta = 0.000001f;
+	}
 }
 
 // PRIVATE

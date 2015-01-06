@@ -1,0 +1,17 @@
+hello {
+    
+    I am some text ...
+    
+    I could be a program
+    
+    or a story
+    
+    or even ascii art:
+
+     OOO  FFFF
+    O   O F
+    O   O FFF
+    O   O F
+     OOO  F
+
+}

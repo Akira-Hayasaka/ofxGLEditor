@@ -1,3 +1,25 @@
+/*
+ * Copyright (C) 2015 Dan Wilcox <danomatika@gmail.com>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * See https://github.com/danomatika/ofxEditor for more info.
+ *
+ * Based on a rewrite of the Fluxus GLEditor,
+ * http://www.pawfal.org/fluxus Copyright (C) Dave Griffiths
+ */
 #pragma once
 
 #include "ofMain.h"
@@ -7,7 +29,7 @@
 /// full screen text editor with optional syntax highlighting,
 /// based on the Fluxus GLEditor
 ///
-/// TODO: support UTF-8 characters
+/// TODO: support wide UTF characters with the new ofFont
 ///
 class ofxEditor {
 
@@ -23,7 +45,19 @@ class ofxEditor {
 		///
 		/// call this before drawing any editor
 		///
-		static bool loadFont(const string & font, int size);
+		static bool loadFont(const string &font, int size);
+	
+		/// is a font currently loaded?
+		static bool isFontLoaded();
+		
+		/// get the currently loaded editor font
+		static ofTrueTypeFont* getFont();
+	
+		/// get the fixed width of a char using editor font
+		static int getCharWidth();
+	
+		/// get the fixed height of a char using editor font
+		static int getCharHeight();
 	
 		/// set useSuper = true if you want to use the Super (Windows key, Mac CMD)
 		/// key as the modifier key, otherwise false uses CTRL key
@@ -36,10 +70,13 @@ class ofxEditor {
 		/// draw the editor, pushes view and applies viewport
 		virtual void draw();
 	
-		/// draw the text field character grid
-		virtual void drawGrid();
+		/// draw the text field character grid, mainly for debugging
+		void drawGrid();
 		
 		/// required for interactive editing, etc
+		///
+		/// Note: ESC clears the current selection, but you'll need to set
+		///       ofSetEscapeQuitsApp(false) to use it
 		virtual void keyPressed(int key);
 		
 		/// set the view port size,
@@ -137,12 +174,6 @@ class ofxEditor {
 		/// draw a string using the current editor font
 		void drawString(const string& s, float x, float y);
 		void drawString(const string& s, ofPoint& p);
-	
-		/// get the fixed width of a char using the current editor font
-		int getCharWidth();
-	
-		/// get the fixed height of a char using the current editor font
-		int getCharHeight();
 	
 	protected:
 	
@@ -297,6 +328,10 @@ class ofxEditor {
 		/// paste text from the system clipboard or copy buffer
 		/// note: clipboard only supported when using a GLFW Window
 		void pasteSelection();
+	
+		/// update the animation timestamps
+		/// make sure to call this of you implement your own draw() function
+		void updateTimestamps();
 		
 	private:
 	
