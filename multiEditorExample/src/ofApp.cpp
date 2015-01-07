@@ -90,18 +90,18 @@ void ofApp::keyPressed(int key) {
 	// note: when using CTRL as the modifier key, CTRL + key might be an ascii
 	// control char so check for both the char 'f' and 6, the ascii value for
 	// CTRL + f, see also: http://ascii-table.com/control-chars.php
-	switch(key) {
-		case 'f': case 6:
-			if(editor.isModifierPressed()) {
+	if(editor.isModifierPressed()) {
+		switch(key) {
+			case 'f': case 6:
 				ofToggleFullscreen();
-			}
-			return;
-		case 'l': case 12:
-			editor.setLineWrapping(!editor.getLineWrapping());
-			return;
-		case 'n': case 14:
-			editor.setLineNumbers(!editor.getLineNumbers());
-			return;
+				return;
+			case 'l': case 12:
+				editor.setLineWrapping(!editor.getLineWrapping());
+				return;
+			case 'n': case 14:
+				editor.setLineNumbers(!editor.getLineNumbers());
+				return;
+		}
 	}
 	
 	// see ofxMultiEditor.h for key commands
