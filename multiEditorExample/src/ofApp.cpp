@@ -92,7 +92,13 @@ void ofApp::keyPressed(int key) {
 			if(editor.isModifierPressed()) {
 				ofToggleFullscreen();
 			}
-		return;
+			return;
+		case 'l': case 12:
+			editor.setLineWrapping(!editor.getLineWrapping());
+			return;
+		case 'n': case 14:
+			editor.setLineNumbers(!editor.getLineNumbers());
+			return;
 	}
 	
 	// see ofxMultiEditor.h for key commands

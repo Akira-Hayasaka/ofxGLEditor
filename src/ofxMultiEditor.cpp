@@ -230,8 +230,8 @@ void ofxMultiEditor::keyPressed(int key) {
 
 //--------------------------------------------------------------
 void ofxMultiEditor::resize() {
-	int w = (ofGetWindowMode() == OF_WINDOW)?ofGetViewportWidth():ofGetScreenWidth();
-	int h = (ofGetWindowMode() == OF_WINDOW)?ofGetViewportHeight():ofGetScreenHeight();
+	int w = (ofGetWindowMode() == OF_WINDOW) ? ofGetViewportWidth() : ofGetScreenWidth();
+	int h = (ofGetWindowMode() == OF_WINDOW) ? ofGetViewportHeight() : ofGetScreenHeight();
 	resize(w, h);
 }
 
