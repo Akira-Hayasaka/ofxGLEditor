@@ -16,7 +16,7 @@
 
 meta:
 	ADDON_NAME = ofxEditor
-	ADDON_DESCRIPTION = a rewrite of ofxGLEditor which provides a simple text editor with syntax highlighting, a file browser, and a Read-Eval-Print-Loop console
+	ADDON_DESCRIPTION = a simple text editor with syntax highlighting, a file browser, and a Read-Eval-Print-Loop console
 	ADDON_AUTHOR = Dan Wilcox
 	ADDON_TAGS = "text" "text editor" "syntax highlighting" "file browser" "console" "REPL"
 	ADDON_URL = http://github.com/danomatika/ofxEditor
