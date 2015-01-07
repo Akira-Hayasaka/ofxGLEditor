@@ -1,4 +1,4 @@
-ofxGLEditor
+ofxEditor
 ===================================
 
 ![image](https://github.com/danomatika/ofxEditor/raw/master/doc/editor.png)
@@ -10,10 +10,7 @@ GNU Public License v2.
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "LICENSE.txt," in this distribution.
 
-This is essentially a rewrite of [ofxGLEditor](https://github.com/Akira-Hayasaka/ofxGLEditor) by Akira Hayasaka & Dan Wilcox.
-
-Main functionality originally from [Fluxus](http://www.pawfal.org/fluxus)
-Copyright © 2005 Dave Griffiths
+This is a rewrite of the GLEditor from [Fluxus](http://www.pawfal.org/fluxus) (Copyright © 2005 Dave Griffiths) and the [ofxGLEditor](https://github.com/Akira-Hayasaka/ofxGLEditor) wrapper addon for OpenFrameworks by Akira Hayasaka & Dan Wilcox for better looks and new functionality.
 
 PrintChar21 font from Kreative Software
 
@@ -23,12 +20,15 @@ Description
 -----------
 
 ![image](https://github.com/danomatika/ofxEditor/raw/master/doc/syntax_highlighting.png)
+<small>Sample Lua yntax highlighting</small>
 
-ofxEditor provides a rewrite of the [Fluxus live coding environment](http://www.pawfal.org/fluxus)'s OpenGL-based text editor for OpenFrameworks including simple syntax highlighting, a file browser, and a Read-Eval-Print-Loop console. The ofxMultiEditor provides all of the above including 9 editor buffers, so it should be easy to use this as a basis for live coding, scripting, parameter tweaking, etc
+ofxEditor provides a rewrite of the [Fluxus live coding environment](http://www.pawfal.org/fluxus)'s OpenGL-based text editor for OpenFrameworks including simple syntax highlighting, a file browser, and a Read-Eval-Print Loop console. The ofxMultiEditor provides all of the above including 9 editor buffers, so it should be easy to use this as a basis for live coding, scripting, parameter tweaking, etc
 
 ![image](https://github.com/danomatika/ofxEditor/raw/master/doc/file_dialog.png)
+<small>Open file dialog</small>
 
 ![image](https://github.com/danomatika/ofxEditor/raw/master/doc/repl_console.png)
+<small>Read-Eval-Print Loop console</small>
 
 Build Requirements
 ------------------
