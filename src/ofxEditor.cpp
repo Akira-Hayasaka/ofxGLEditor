@@ -296,6 +296,7 @@ void ofxEditor::draw() {
 						if(m_lineNumbers) { // pad for line numbers
 							x += m_lineNumWidth * s_charWidth;
 						}
+						m_displayedLineCount++;
 					}
 					
 					// draw matching chars highlight
@@ -361,15 +362,14 @@ void ofxEditor::draw() {
 			for(int i = m_topTextPosition; i < m_text.length() && m_displayedLineCount < m_visibleLines; ++i) {
 			
 				// line wrap
-				if(m_lineWrapping) {
-					if(xcount >= m_visibleChars) {
-						x = 0;
-						y += s_charHeight;
-						xcount = 0;
-						if(m_lineNumbers) { // pad for line numbers
-							x += m_lineNumWidth * s_charWidth;
-						}
+				if(m_lineWrapping && xcount >= m_visibleChars) {
+					x = 0;
+					y += s_charHeight;
+					xcount = 0;
+					if(m_lineNumbers) { // pad for line numbers
+						x += m_lineNumWidth * s_charWidth;
 					}
+					m_displayedLineCount++;
 				}
 				
 				// draw matching chars highlight
@@ -432,7 +432,7 @@ void ofxEditor::draw() {
 			}
 		}
 		
-		if(m_displayedLineCount >= m_visibleLines-1) {
+		if(m_displayedLineCount >= m_visibleLines) {
 			m_bottomTextPosition = textPos;
 		}
 		else {
@@ -440,7 +440,7 @@ void ofxEditor::draw() {
 		}
 		
 		// draw cursor if we have no text, or if we're at the end of the buffer
-		if(!drawnCursor){
+		if(!drawnCursor) {
 			if(xcount > m_visibleChars) {
 				m_leftTextPosition = xcount-m_visibleChars;
 			}

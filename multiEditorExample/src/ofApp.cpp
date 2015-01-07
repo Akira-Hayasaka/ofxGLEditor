@@ -38,6 +38,9 @@ void ofApp::setup() {
 	// setup editor with event listener
 	editor.setup(this);
 	
+	// make some room for the bottom editor info text
+	editor.resize(ofGetWidth(), ofGetHeight()-ofxEditor::getCharHeight());
+	
 	// open & load a file into the current editor (1)
 	editor.openFile("hello.txt");
 	ofLogNotice() << "number of lines: " << editor.getNumLines();
@@ -73,7 +76,7 @@ void ofApp::draw() {
 		                  0, bottom);
 		
 		// draw the current line & line pos
-		editor.drawString(ofToString(editor.getCurrentLine())+","+
+		editor.drawString(ofToString(editor.getCurrentLine()+1)+","+
 		                  ofToString(editor.getCurrentLinePos()),
 		                  right, bottom);
 	}
@@ -121,7 +124,7 @@ void ofApp::openFileEvent(int &whichEditor) {
 
 //--------------------------------------------------------------
 void ofApp::saveFileEvent(int &whichEditor) {
-	// receievd an editor save via CTRL/Super + s or CTRL/Super + d
+	// received an editor save via CTRL/Super + s or CTRL/Super + d
 	
 	ofLogNotice() << "received save event for editor " << whichEditor
 		<< " with filename " << editor.getEditorFilename(whichEditor);
@@ -133,7 +136,7 @@ void ofApp::executeScriptEvent(int &whichEditor) {
 	
 	// get the text buffer with:
 	// string txt = editor.getText(whichEditor);
-	// note: returns only the seleceted area when holding Shift + arrow keys
+	// note: returns only the selected area when holding SHIFT + arrow keys
 	
 	// if you have some scripting language (e.g. ofxLua)
 	ofLogNotice() << "received execute script event for editor " << whichEditor;

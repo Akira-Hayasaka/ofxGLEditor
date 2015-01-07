@@ -164,9 +164,11 @@ class ofxEditor {
 		void setCurrentPos(unsigned int pos);
 	
 		/// get the line the cursor is on
+		/// note: starts at 0
 		unsigned int getCurrentLine();
 	
 		/// set the current line for the cursor
+		/// note: starts at 0
 		void setCurrentLine(unsigned int line);
 	
 		/// get the current line character position of the cursor
