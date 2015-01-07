@@ -89,7 +89,12 @@ void ofxRepl::keyPressed(int key) {
 	if(modifierPressed) {
 		switch(key) {
 			case 'c': case 3:
-				historyClear();
+				if(ofGetKeyPressed(OF_KEY_SHIFT)) {
+					clearHistory();
+				}
+				else {
+					clear();
+				}
 				return;
 		}
 	}
@@ -210,7 +215,7 @@ void ofxRepl::eval() {
 //--------------------------------------------------------------
 void ofxRepl::printPrompt() {
 	m_insertPos = m_text.length();
-	if(m_text[m_insertPos-1] != '\n') {
+	if(m_text.length() > 0 && m_text[m_insertPos-1] != '\n') {
 		m_text += '\n';
 		m_insertPos++;
 	}

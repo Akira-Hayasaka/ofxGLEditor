@@ -496,10 +496,15 @@ void ofxEditor::keyPressed(int key) {
 		// check control chars too if CTRL is modifier
 		switch(key) {
 				
-			case 'a': case 10: // select all
-				m_selection = true;
-				m_highlightStart = 0;
-				m_highlightEnd = m_text.size();
+			case 'a': case 10: // clear all text
+				if(ofGetKeyPressed(OF_KEY_SHIFT)) {
+					clearText();
+				}
+				else { // select all
+					m_selection = true;
+					m_highlightStart = 0;
+					m_highlightEnd = m_text.size();
+				}
 				break;
 				
 			case 'x': case 24: // cut

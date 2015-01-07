@@ -46,7 +46,14 @@ class ofxRepl : public ofxEditor {
 		/// set listener to receive eval events
 		void setListener(ofxReplListener *listener);
 		
-		/// required for interactive editing, etc
+		/// handles key events
+		///
+		/// MOD -> CTRL or Super (Windows Key, Mac CMD), set with
+		///        ofxEditor::setSuperAsModifier()
+		///
+		/// MOD + c: clear console
+		/// MOD + c + SHIFT: clear console history
+		///
 		void keyPressed(int key);
 		
 		/// add a string to the console

@@ -130,15 +130,6 @@ void ofxMultiEditor::keyPressed(int key) {
 				bHideEditor = !bHideEditor;
 				return;
 			
-			case 'a': case 1:
-				if(m_currentEditor == 0) {
-					clearRepl();
-				}
-				else {
-					clearText();
-				}
-				return;
-			
 			case 's': case 19:
 				if(m_currentEditor != 0) {
 					// show save as dialog on empty name

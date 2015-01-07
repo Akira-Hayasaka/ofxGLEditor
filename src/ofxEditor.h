@@ -75,8 +75,25 @@ class ofxEditor {
 		
 		/// required for interactive editing, etc
 		///
+	
+	
+	
+		/// handles editor key events
+		///
+		/// MOD -> CTRL or Super (Windows Key, Mac CMD), set with
+		///        ofxEditor::setSuperAsModifier()
+		///
+		/// MOD + b: blow up the cursor
+		/// MOD + a: select all text
+		/// MOD + a + SHIFT: clear all text
+		/// MOD + c: copy from system clipboard (GLFW only) or copy buffer
+		/// MOD + v: paste to system clipboard (GLFW only) or copy buffer
+		///
+		/// ARROWS + SHIFT: select text
+		///
 		/// Note: ESC clears the current selection, but you'll need to set
 		///       ofSetEscapeQuitsApp(false) to use it
+		///
 		virtual void keyPressed(int key);
 		
 		/// set the view port size,

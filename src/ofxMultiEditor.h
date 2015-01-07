@@ -79,11 +79,14 @@ class ofxMultiEditor {
 		/// MOD + r & MOD + 0: switch to REPL (console), if enabled
 		/// MOD + 1 to MOD + 9: switch to editor 1 - 9
 		///
+		/// ARROWS + SHIFT: select text
+		///
 		/// MOD + e: trigger an executeScript event
 		/// MOD + b: blow up the cursor
-		/// MOD + a: clear all text in current editor
-		/// MOD + c: copy from the system clipboard to current editor (GLFW only)
-		/// MOD + v: paste from current editor to the system clipboard (GLFW only)
+		/// MOD + a: select all text in the current editor
+		/// MOD + a + SHIFT: clear all text in the current editor
+		/// MOD + c: copy from system clipboard (GLFW only) or copy buffer
+		/// MOD + v: paste to system clipboard (GLFW only) or copy buffer
 		///
 		/// MOD + s: save file, shows save as dialog if no filename has been set
 		/// MOD + d: save as dialog, saves in current path (default: data path)

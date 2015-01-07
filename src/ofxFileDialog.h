@@ -32,10 +32,10 @@ class ofxFileDialog : public ofxEditor {
 		ofxFileDialog(ofxEditorSettings &sharedSettings); //< share settings object
 		virtual ~ofxFileDialog();
 
-		/// draw the editor, pushes view and applies viewport
+		/// draw the file dialog, pushes view and applies viewport
 		virtual void draw();
 	
-		/// required for interactive editing, etc
+		/// handles key events
 		virtual void keyPressed(int key);
 	
 		/// set the current path in the file browser, reads directory contents
