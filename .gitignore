@@ -1,0 +1,46 @@
+
+# xcode
+*.pbxuser
+*.perspectivev3
+*.mode*v3
+xcuserdata
+build
+*.app
+*.a
+.xccheckout
+
+# OSX
+*.DS_*
+
+# codeblocks
+*.depend
+*.layout
+example-input/obj
+example-output/obj
+*.cbTemp
+
+# Win
+*.exe
+*.dll
+*.sdf
+*.suo
+*.vcxproj.user
+
+# ignore example files for now
+editorExample/Makefile
+editorExample/Project.xcconfig
+editorExample/addons.make
+editorExample/bin/editorExampleDebug.app/
+editorExample/config.make
+editorExample/editorExample.xcodeproj/
+editorExample/openFrameworks-Info.plist
+multiEditorExample/Makefile
+multiEditorExample/Project.xcconfig
+multiEditorExample/addons.make
+multiEditorExample/bin/data/hello4.txt
+multiEditorExample/bin/data/test.txt
+multiEditorExample/bin/data/test2.txt
+multiEditorExample/bin/multiEditorExampleDebug.app/
+multiEditorExample/config.make
+multiEditorExample/multiEditorExample.xcodeproj/
+multiEditorExample/openFrameworks-Info.plist
