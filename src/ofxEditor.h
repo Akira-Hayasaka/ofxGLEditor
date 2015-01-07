@@ -72,12 +72,7 @@ class ofxEditor {
 	
 		/// draw the text field character grid, mainly for debugging
 		void drawGrid();
-		
-		/// required for interactive editing, etc
-		///
-	
-	
-	
+
 		/// handles editor key events
 		///
 		/// MOD -> CTRL or Super (Windows Key, Mac CMD), set with
