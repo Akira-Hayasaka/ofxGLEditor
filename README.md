@@ -19,16 +19,16 @@ See https://github.com/danomatika/ofxEditor for documentation
 Description
 -----------
 
+Sample Lua syntax highlighting:  
 ![image](https://github.com/danomatika/ofxEditor/raw/master/doc/syntax_highlighting.png)
-<p style="text-align: center;"><small>Sample Lua syntax highlighting</small></p>
 
 ofxEditor provides a rewrite of the [Fluxus live coding environment](http://www.pawfal.org/fluxus)'s OpenGL-based text editor for OpenFrameworks including simple syntax highlighting, a file browser, and a Read-Eval-Print Loop console. The ofxMultiEditor provides all of the above including 9 editor buffers, so it should be easy to use this as a basis for live coding, scripting, parameter tweaking, etc
 
+Open file dialog:  
 ![image](https://github.com/danomatika/ofxEditor/raw/master/doc/file_dialog.png)
-<p style="text-align: center;"><small>Open file dialog</small></p>
 
+Read-Eval-Print Loop console:  
 ![image](https://github.com/danomatika/ofxEditor/raw/master/doc/repl_console.png)
-<p style="text-align: center;"><small>Read-Eval-Print Loop console</small></p>
 
 Build Requirements
 ------------------
