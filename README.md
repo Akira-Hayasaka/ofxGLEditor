@@ -20,15 +20,15 @@ Description
 -----------
 
 ![image](https://github.com/danomatika/ofxEditor/raw/master/doc/syntax_highlighting.png)
-<small>Sample Lua yntax highlighting</small>
+<small style="text-align: center;">Sample Lua yntax highlighting</small>
 
 ofxEditor provides a rewrite of the [Fluxus live coding environment](http://www.pawfal.org/fluxus)'s OpenGL-based text editor for OpenFrameworks including simple syntax highlighting, a file browser, and a Read-Eval-Print Loop console. The ofxMultiEditor provides all of the above including 9 editor buffers, so it should be easy to use this as a basis for live coding, scripting, parameter tweaking, etc
 
 ![image](https://github.com/danomatika/ofxEditor/raw/master/doc/file_dialog.png)
-<small>Open file dialog</small>
+<small style="text-align: center;">Open file dialog</small>
 
 ![image](https://github.com/danomatika/ofxEditor/raw/master/doc/repl_console.png)
-<small>Read-Eval-Print Loop console</small>
+<small style="text-align: center;">Read-Eval-Print Loop console</small>
 
 Build Requirements
 ------------------
@@ -39,7 +39,7 @@ To use ofxEditor, first you need to download and install Open Frameworks. Develo
 
 On Mac OSX, you will need to install Xcode.
 
-On Linux, you can use the Makefile and/or Codeblocks project files (without the "_win" suffix).
+On Linux, you can use Makefiles and/or Codeblocks project files (without the "_win" suffix).
 
 On Win, you will need either Microsoft Visual Studio C++ or [Codeblocks+MiniGW](http://www.codeblocks.org/downloads/26) and the [Win Codeblocks OF package](http://www.openframeworks.cc/download). Use the Codeblocks projects files with the "_win" suffix.
 
@@ -64,4 +64,4 @@ Point the ProjectGenerator to `addons/ofxEditor`, change the project name to the
 
 ### Font
 
-You will need a monospaced font for best effect. PrintChar21.ttf is included with the example projects.
+You will need a monospaced font as variable width fonts are not currently supported. PrintChar21.ttf is included with the example projects.
