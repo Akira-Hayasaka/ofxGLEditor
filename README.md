@@ -7,11 +7,9 @@ Copyright © [Dan Wilcox](http://danomatika.com) & [Akira Hayasaka](http://www.a
 
 GNU Public License v2.
 
-For information on usage and redistribution, and for a DISCLAIMER OF ALL
-WARRANTIES, see the file, "LICENSE.txt," in this distribution.
+For information on usage and redistribution, and for a DISCLAIMER OF ALL WARRANTIES, see the file, "LICENSE.txt," in this distribution.
 
-This is a rewrite of the GLEditor from [Fluxus](http://www.pawfal.org/fluxus)
-Copyright © 2005 Dave Griffiths)
+This is a rewrite of the GLEditor from [Fluxus](http://www.pawfal.org/fluxus) Copyright © 2005 Dave Griffiths
 
 PrintChar21 font from Kreative Software
 
