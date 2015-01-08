@@ -15,15 +15,15 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * See https://github.com/danomatika/ofxEditor for more info.
+ * See https://github.com/Akira-Hayasaka/ofxGLEditor for more info.
  */
 #pragma once
 
 #include "ofMain.h"
-#include "ofxMultiEditor.h"
+#include "ofxEditor.h"
 
-// inherit ofxMultiEventListener to recieve open, save, excute, and eval events
-class ofApp : public ofBaseApp, public ofxMultiEditorListener {
+// synatx example using a single text editor instance
+class ofApp : public ofBaseApp {
 
 	public:
 		void setup();
@@ -31,12 +31,8 @@ class ofApp : public ofBaseApp, public ofxMultiEditorListener {
 
 		void keyPressed(int key);
 		void windowResized(int w, int h);
-	
-		/// ofxMultiEditor events
-		void saveFileEvent(int &whichEditor);
-		void openFileEvent(int &whichEditor);
-		void executeScriptEvent(int &whichEditor);
-		void evalReplEvent(string &text);
 		
-		ofxMultiEditor editor;
+		ofxEditor editor;
+		ofxEditorColorScheme colorScheme;
+		bool debug; //< show grid and fps?
 };

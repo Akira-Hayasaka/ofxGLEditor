@@ -15,16 +15,16 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * See https://github.com/danomatika/ofxEditor for more info.
+ * See https://github.com/Akira-Hayasaka/ofxGLEditor for more info.
  *
- * Based on a rewrite of the Fluxus GLEditor,
- * http://www.pawfal.org/fluxus Copyright (C) Dave Griffiths
+ * A rewrite of the Fluxus GLEditor http://www.pawfal.org/fluxus for OF
+ * Copyright (C) Dave Griffiths
  */
 #include "ofxEditor.h"
 
-// needed for clipboard support
+// GLFW needed for clipboard support
 #if !defined(TARGET_NODISPLAY) && !defined(TARGET_OF_IOS) && \
-		!defined(TARGET_ANDROID) && !defined(TARGET_RASPBERRY_PI)
+    !defined(TARGET_ANDROID) && !defined(TARGET_RASPBERRY_PI)
 	#include "ofAppGLFWWindow.h"
 #endif
 

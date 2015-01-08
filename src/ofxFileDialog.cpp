@@ -17,8 +17,8 @@
  *
  * See https://github.com/danomatika/ofxEditor for more info.
  *
- * Based on a rewrite of the Fluxus FileDialog in ofxGLEditor,
- * http://www.pawfal.org/fluxus Copyright (C) Dave Griffiths
+ * A rewrite of the Fluxus FileDialog http://www.pawfal.org/fluxus for OF
+ * Copyright (C) Dave Griffiths
  */
 #include "ofxFileDialog.h"
 

@@ -55,13 +55,13 @@ openframeworks/addons/ofxGLEditor
 Usage
 -----
 
-See the examples in `editorExample`, `multiEditorExample`, and the source headers in `ofxGLEditor/src`.
+See the examples in `editorExample`, `syntaxExample`, and the source headers in `ofxGLEditor/src`.
 
 ### Examples
 
 Project files for the examples are not included so you will need to generate the project files for your operating system and development environment using the OF ProjectGenerator which is included with the OpenFrameworks distribution.
 
-Point the ProjectGenerator to `addons/ofxGLEditor`, change the project name to the **exact** name of the example you want to generate (ie `editorExample`), and make sure to choose `ofxEditor` from the addons. Hitting "Generate Project" will populate that example with the project files you will need to build it.
+Point the ProjectGenerator to `addons/ofxGLEditor`, change the project name to the **exact** name of the example you want to generate (ie `editorExample`), and make sure to choose `ofxGLEditor` from the addons. Hitting "Generate Project" will populate that example with the project files you will need to build it.
 
 ### Font
 

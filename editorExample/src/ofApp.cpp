@@ -15,96 +15,139 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * See https://github.com/danomatika/ofxEditor for more info.
+ * See https://github.com/Akira-Hayasaka/ofxGLEditor for more info.
  */
 #include "ofApp.h"
 
 //--------------------------------------------------------------
 void ofApp::setup() {
 
-	ofSetVerticalSync(true);
+	ofBackground(0);
 	ofSetFrameRate(30);
 	
-	// handle ESC internally since we use it to exit selection
-	ofSetEscapeQuitsApp(false);
+	// let's see what's going on inside
+	ofSetLogLevel("ofxGLEditor", OF_LOG_VERBOSE);
+	
+	// setup the global editor font before you do anything!
+	ofxEditor::loadFont("fonts/PrintChar21.ttf", 24);
+	
+	// set a custom Repl banner & prompt (do this before setup())
+	ofxRepl::setReplBanner("Hello, welcome to ofxMultiEditor!");
+	ofxRepl::setReplPrompt("prompt> ");
 
-	ofxEditor::loadFont("fonts/PrintChar21.ttf", 30);
+	// setup editor with event listener
+	editor.setup(this);
 	
-	// sample lua syntax
-	colorScheme.setWordColor("function", ofColor::fuchsia);
-	colorScheme.setWordColor("end", ofColor::fuchsia);
-	colorScheme.setSingleLineComment("--"); // lua style
-	colorScheme.setMultiLineComment("--[[", "]]"); // lua style
+	// make some room for the bottom editor info text
+	editor.resize(ofGetWidth(), ofGetHeight()-ofxEditor::getCharHeight());
 	
-	// syntax highlighter colors
-	colorScheme.setStringColor(ofColor::yellow);
-	colorScheme.setNumberColor(ofColor::orangeRed);
-	colorScheme.setCommentColor(ofColor::gray);
+	// open & load a file into the current editor (1)
+	editor.openFile("hello.txt");
+	ofLogNotice() << "number of lines: " << editor.getNumLines();
 	
-	// open test file
-	ofFile testFile;
-	testFile.open("test.txt", ofFile::ReadOnly);
-	editor.setText(testFile.readToBuffer().getText());
-	ofLogNotice() << "num chars: " << editor.getNumCharacters() << " num lines: " << editor.getNumLines();
+	// change multi editor settings, see ofxEditorSettings.h for details
+	//editor.getSettings().textColor = ofColor::red; // main text color
+	//editor.getSettings().cursorColor = ofColor::blue; // current pos cursor
+	//editor.getSettings().alpha = 0.5; // main text, cursor, & highlight alpha
 	
-	ofBackground(0);
-	debug = false;
+	// other settings
+	//editor.setLineWrapping(true);
+	//editor.setLineNumbers(true);
+	
+	// move the cursor to a specific line
+	//editor.setCurrentLine(4);
+	//ofLogNotice() << "current line: " << editor.getCurrentLine();
 }
 
 //--------------------------------------------------------------
 void ofApp::draw() {
 	
 	editor.draw();
+
+	// draw current editor info using the same font as the editor
+	if(!editor.isHidden() && editor.getCurrentEditor() > 0) {
 	
-	if(debug) {
-		editor.drawGrid();
+		int bottom = ofGetHeight()-ofxEditor::getCharHeight();
+		int right = ofGetWidth()-ofxEditor::getCharWidth()*7; // should be enough room
+		ofSetColor(ofColor::gray);
 	
-		ofSetColor(255);
-		ofDrawBitmapString("fps: "+ofToString((int)ofGetFrameRate()), ofGetWidth()-70, ofGetHeight()-10);
+		// draw the current editor num
+		editor.drawString("Editor: "+ofToString(editor.getCurrentEditor()),
+		                  0, bottom);
+		
+		// draw the current line & line pos
+		editor.drawString(ofToString(editor.getCurrentLine()+1)+","+
+		                  ofToString(editor.getCurrentLinePos()),
+		                  right, bottom);
 	}
 }
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key) {
-
-	if(ofGetKeyPressed(OF_KEY_SUPER)) {
+	
+	// see ofxMultiEditor.h for key commands
+	editor.keyPressed(key);
+	
+	// can check modifiers from editor
+	//
+	// note: when using CTRL as the modifier key, CTRL + key might be an ascii
+	// control char so check for both the char 'f' and 6, the ascii value for
+	// CTRL + f, see also: http://ascii-table.com/control-chars.php
+	if(editor.isModifierPressed()) {
 		switch(key) {
-			case 's':
-				if(editor.getColorScheme()) {
-					editor.clearColorScheme();
-				}
-				else {
-					editor.setColorScheme(&colorScheme);
-				}
-				return;
-			case 'd':
-				debug = !debug;
-				return;
-			case 'f':
+			case 'f': case 6:
 				ofToggleFullscreen();
 				return;
-			case 'l':
+			case 'l': case 12:
 				editor.setLineWrapping(!editor.getLineWrapping());
 				return;
-			case 'n':
+			case 'n': case 14:
 				editor.setLineNumbers(!editor.getLineNumbers());
 				return;
-			case '1':
-				ofLogNotice() << "current line: " << editor.getCurrentLine() <<	" pos: " << editor.getCurrentLinePos();
-				editor.setCurrentLinePos(1, 5);
-				ofLogNotice() << "current line: " << editor.getCurrentLine() <<	" pos: " << editor.getCurrentLinePos();
-				break;
-			case '2':
-				ofLogNotice() << "current line: " << editor.getCurrentLine() <<	" pos: " << editor.getCurrentLinePos();
-				editor.setCurrentLinePos(5, 2);
-				ofLogNotice() << "current line: " << editor.getCurrentLine() <<	" pos: " << editor.getCurrentLinePos();
-				break;
 		}
 	}
-	editor.keyPressed(key);
 }
 
 //--------------------------------------------------------------
 void ofApp::windowResized(int w, int h) {
-	editor.resize(w, h);
+	// make some room for the bottom editor info text
+	editor.resize(w, h-ofxEditor::getCharHeight());
+}
+
+//--------------------------------------------------------------
+void ofApp::openFileEvent(int &whichEditor) {
+	// received an editor open via CTRL/Super + o
+	
+	ofLogNotice() << "received open event for editor " << whichEditor
+		<< " with filename " << editor.getEditorFilename(whichEditor);
+}
+
+//--------------------------------------------------------------
+void ofApp::saveFileEvent(int &whichEditor) {
+	// received an editor save via CTRL/Super + s or CTRL/Super + d
+	
+	ofLogNotice() << "received save event for editor " << whichEditor
+		<< " with filename " << editor.getEditorFilename(whichEditor);
+}
+
+//--------------------------------------------------------------
+void ofApp::executeScriptEvent(int &whichEditor) {
+	// received on editor CTRL/Super + e
+	
+	// get the text buffer with:
+	// string txt = editor.getText(whichEditor);
+	// note: returns only the selected area when holding SHIFT + arrow keys
+	
+	// if you have some scripting language (e.g. ofxLua)
+	ofLogNotice() << "received execute script event for editor " << whichEditor;
+}
+
+//--------------------------------------------------------------
+void ofApp::evalReplEvent(string &text) {
+	ofLogNotice() << "received eval repl event: " << text;
+	
+	// make sure there is a response since this triggers printing the
+	// next conosle prompt
+	editor.evalReplReturn("did something"); // print this, then prompt
+	//editor.evalReplReturn(); // empty response, just prints prompt
 }
