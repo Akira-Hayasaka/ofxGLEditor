@@ -22,7 +22,7 @@
 #include "ofMain.h"
 #include "ofxEditor.h"
 
-// synatx example using a single text editor instance
+// syntax example using a single text editor instance
 class ofApp : public ofBaseApp {
 
 	public:

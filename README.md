@@ -55,7 +55,7 @@ openframeworks/addons/ofxGLEditor
 Usage
 -----
 
-See the examples in `editorExample`, `syntaxExample`, and the source headers in `ofxGLEditor/src`.
+See the examples in `editorExample`, `editorSyntaxExample`, and the source headers in `ofxGLEditor/src`.
 
 ### Examples
 
