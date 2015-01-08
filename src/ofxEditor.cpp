@@ -714,7 +714,7 @@ void ofxEditor::keyPressed(int key) {
 				
 			default:
 				
-				// build a two UTF-8 byte character
+				// build a two byte UTF-8 character
 				// TODO: what happens if it's 3 or 4 bytes?
 				if(key > 0x80 && m_firstUTF8Byte == 0) {
 					m_firstUTF8Byte = key;

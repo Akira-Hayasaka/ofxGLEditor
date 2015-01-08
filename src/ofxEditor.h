@@ -30,6 +30,7 @@
 /// based on the Fluxus GLEditor
 ///
 /// uses wide chars internally so string conversion functions are provided
+/// TODO: 3 or 4 byte UTF-8 chars aren't handled in keyPressed
 ///
 class ofxEditor {
 
