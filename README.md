@@ -1,64 +1,68 @@
 ofxGLEditor
 ===================================
 
-![image](https://github.com/Akira-Hayasaka/ofxGLEditor/raw/master/doc/screenshot.png)
+![image](https://github.com/Akira-Hayasaka/ofxGLEditor/raw/master/doc/editor.png)
 
-Copyright © [Akira Hayasaka](http://www.ampontang.com/) & [Dan Wilcox](http://danomatika.com) 2011-2012
+Copyright © [Dan Wilcox](http://danomatika.com) & [Akira Hayasaka](http://www.ampontang.com) 2011-2015
 
 GNU Public License v2.
 
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "LICENSE.txt," in this distribution.
 
-Main functionality and sources from [Fluxus](http://www.pawfal.org/fluxus/)
-Copyright © 2005 Dave Griffiths
+This is a rewrite of the GLEditor from [Fluxus](http://www.pawfal.org/fluxus)
+Copyright © 2005 Dave Griffiths)
 
-Clipboard code from [here](http://forum.openframeworks.cc/index.php?topic=2296.0)
+PrintChar21 font from Kreative Software
 
-Droid Sans Mono Font by the Open Handset Alliance (Android)
-
-See https://github.com/Akira-Hayasaka/ofxGLEditor for documentation as well as the [OF forum post on ofxGLEditor](http://forum.openframeworks.cc/index.php/topic,10425.0.html)
+See https://github.com/Akira-Hayasaka/ofxGLEditor for documentation as well as the [OF forum post on ofxGLEditor](http://forum.openframeworks.cc/t/ofxgleditor/10425)
 
 Description
 -----------
 
-ofxGLEditor provides a version the [Fluxus live coding environment](http://www.pawfal.org/fluxus/)'s OpenGL-based text editor for OpenFrameworks. There are 9 editor buffers which are edited and accessed as std::strings, so it should be easy to use this as a basis for live coding, scripting, parameter tweaking, etc
+Sample Lua syntax highlighting:  
+![image](https://github.com/Akira-Hayasaka/ofxGLEditor/raw/master/doc/syntax_highlighting.png)
+
+ofxEditor provides a rewrite of the [Fluxus live coding environment](http://www.pawfal.org/fluxus)'s OpenGL-based text editor for OpenFrameworks including simple syntax highlighting, a file browser, and a Read-Eval-Print Loop console. The ofxMultiEditor provides all of the above including 9 editor buffers, so it should be easy to use this as a basis for live coding, scripting, parameter tweaking, etc
+
+Open file dialog:  
+![image](https://github.com/Akira-Hayasaka/ofxGLEditor/raw/master/doc/file_dialog.png)
+
+Read-Eval-Print Loop console:  
+![image](https://github.com/Akira-Hayasaka/ofxGLEditor/raw/master/doc/repl_console.png)
 
 Build Requirements
 ------------------
 
-To use ofxGLEditor, first you need to download and install Open Frameworks. Development is against the latest version of Open Frameworks on github. Checkout a tag if you need an earlier, stable version.
+To use ofxGLEditor, first you need to download and install OpenFrameworks. Development is against the latest version of OpenFrameworks on github. Checkout a tag if you need an earlier, stable version.
 
 [OF github repository](https://github.com/openframeworks/openFrameworks)
 
 On Mac OSX, you will need to install Xcode.
 
-On Linux, you can use the Makefile and/or Codeblocks project files (without the "_win" suffix).
+On Linux, you can use Makefiles and/or Codeblocks project files (without the "_win" suffix).
 
 On Win, you will need either Microsoft Visual Studio C++ or [Codeblocks+MiniGW](http://www.codeblocks.org/downloads/26) and the [Win Codeblocks OF package](http://www.openframeworks.cc/download). Use the Codeblocks projects files with the "_win" suffix.
 
 Installation
 ------------
 
-Place ofxGLEditor within a folder in the apps folder of the OF dir tree:
+Place ofxGLEditor within a folder in the addons folder of the OF dir tree:
 <pre>
 openframeworks/addons/ofxGLEditor
-</pre>
-
-#### Which version to use?
-
-If you are using a stable version (0062, 007, ...) of OpenFrameworks then you want to use a git tag of ofxGLEditor for that version. You can select the tag in the Github "Current Branch" menu or clone and check it out using git.
-
-For example, the following commands will clone ofxGLEditor and switch to the OF 007 tagged version:
-<pre>
-git://github.com/Akira-Hayasaka/ofxGLEditor.git
-cd ofxGLEditor
-git checkout 007
 </pre>
 
 Usage
 -----
 
-See the example in `EditorExample` and `src/ofxGLEditor.h`.
+See the examples in `editorExample`, `multiEditorExample`, and the source headers in `ofxGLEditor/src`.
 
-Note: You will need a monospaced font for best effect. DroidSansMono.ttf is included with the example application.
+### Examples
+
+Project files for the examples are not included so you will need to generate the project files for your operating system and development environment using the OF ProjectGenerator which is included with the OpenFrameworks distribution.
+
+Point the ProjectGenerator to `addons/ofxGLEditor`, change the project name to the **exact** name of the example you want to generate (ie `editorExample`), and make sure to choose `ofxEditor` from the addons. Hitting "Generate Project" will populate that example with the project files you will need to build it.
+
+### Font
+
+You will need a monospaced font as variable width fonts are not currently supported. PrintChar21.ttf is included with the example projects.
