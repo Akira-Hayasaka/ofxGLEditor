@@ -85,6 +85,9 @@ void ofApp::draw() {
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key) {
 	
+	// see ofxMultiEditor.h for key commands
+	editor.keyPressed(key);
+	
 	// can check modifiers from editor
 	//
 	// note: when using CTRL as the modifier key, CTRL + key might be an ascii
@@ -103,9 +106,6 @@ void ofApp::keyPressed(int key) {
 				return;
 		}
 	}
-	
-	// see ofxMultiEditor.h for key commands
-	editor.keyPressed(key);
 }
 
 //--------------------------------------------------------------
