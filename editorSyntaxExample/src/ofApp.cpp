@@ -34,8 +34,8 @@ void ofApp::setup() {
 	// sample lua syntax
 	colorScheme.setWordColor("function", ofColor::fuchsia);
 	colorScheme.setWordColor("end", ofColor::fuchsia);
-	colorScheme.setSingleLineComment("--"); // lua style
-	colorScheme.setMultiLineComment("--[[", "]]"); // lua style
+	colorScheme.setSingleLineComment("--");
+	colorScheme.setMultiLineComment("--[[", "]]");
 	
 	// syntax highlighter colors
 	colorScheme.setStringColor(ofColor::yellow);

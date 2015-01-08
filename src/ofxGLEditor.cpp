@@ -47,7 +47,7 @@ void ofxGLEditor::setup(ofxGLEditorListener *listener, bool enableRepl) {
 	// create editors
 	if(enableRepl) {
 		ofxRepl *repl = new ofxRepl(m_settings);
-		repl->setListener(listener);
+		repl->setup(listener);
 		m_editors.push_back(repl);
 	}
 	else {
@@ -161,17 +161,11 @@ void ofxGLEditor::keyPressed(int key) {
 				return;
 				
 			case '-':
-				m_settings.alpha -= 0.05;
-				if(m_settings.alpha < 0) {
-					m_settings.alpha = 0;
-				}
+				m_settings.setAlpha(m_settings.getAlpha()-0.05);
 				return;
 				
 			case '=':
-				m_settings.alpha += 0.05;
-				if(m_settings.alpha > 1) {
-					m_settings.alpha = 1;
-				}
+				m_settings.setAlpha(m_settings.getAlpha()+0.05);
 				return;
 				
 			case 'r': case '0': case 18: // Repl

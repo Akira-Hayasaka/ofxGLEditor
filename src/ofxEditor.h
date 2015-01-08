@@ -23,13 +23,13 @@
 #pragma once
 
 #include "ofMain.h"
-#include "ofxEditorColorScheme.h"
 #include "ofxEditorSettings.h"
+#include "ofxEditorColorScheme.h"
 
 /// full screen text editor with optional syntax highlighting,
 /// based on the Fluxus GLEditor
 ///
-/// TODO: support wide UTF characters with the new ofFont
+/// uses wide chars internally so string conversion functions are provided
 ///
 class ofxEditor {
 
@@ -96,13 +96,22 @@ class ofxEditor {
 		virtual void resize();
 		virtual void resize(int width, int height);
 	
+		/// get wide char text buffer contents or current selection
+		virtual wstring getWideText();
+	
 		/// get text buffer contents or current selection
 		virtual string getText();
 	
 		/// set text buffer contents
+		virtual void setText(const wstring& text);
+	
+		/// set text buffer contents
 		virtual void setText(const string& text);
 	
-		// insert text at the current buffer position
+		/// insert text at the current buffer position
+		virtual void insertText(const wstring& text);
+	
+		/// insert text at the current buffer position
 		virtual void insertText(const string& text);
 	
 		/// clear text buffer contents
@@ -114,8 +123,8 @@ class ofxEditor {
 		///
 		/// example usage:
 		///
-		///   editor.getSettings().alpha = 0.5;
-		///   editor.getSettings().tabWidth = 8;
+		///   editor.getSettings().getAlpha(0.5);
+		///   editor.getSettings().getTabWidth(8);
 		///   ... etc
 		///
 		ofxEditorSettings& getSettings();
@@ -185,9 +194,13 @@ class ofxEditor {
 	
 	/// \section Drawing Utils
 	
+		/// draw a wide char string using the current editor font
+		void drawString(wstring s, float x, float y);
+		void drawString(wstring s, ofPoint& p);
+	
 		/// draw a string using the current editor font
-		void drawString(const string& s, float x, float y);
-		void drawString(const string& s, ofPoint& p);
+		void drawString(string s, float x, float y);
+		void drawString(string s, ofPoint& p);
 	
 	protected:
 	
@@ -209,14 +222,14 @@ class ofxEditor {
 		static bool s_superAsModifier;   //< use the super key as modifier?
 	
 		/// shared copy/paste buffer if system clipboard isn't available
-		static string s_copyBuffer;
+		static wstring s_copyBuffer;
 	
 	/// \section Member Variables
 
 		ofxEditorSettings *m_settings; //< editor settings object
 		bool m_sharedSettings; //< are the settings shared? if so, do not delete
 	
-		string m_text; //< text buffer
+		wstring m_text; //< text buffer
 		unsigned int m_numLines; //< number of lines in the text buffer
 		
 		ofRectangle m_viewport;     //< viewport when drawing editor
@@ -238,6 +251,7 @@ class ofxEditor {
 		unsigned int m_displayedLineCount; //< current number of displayed lines (may be diff from m_visibleLines)
 	
 		bool m_shiftState; //< is shift pressed?
+		char m_firstUTF8Byte; //< used to handle multibyte chars
 		
 		ofxEditorColorScheme *m_colorScheme; //< optional syntax color scheme
 		bool m_lineWrapping; //< enable line wrapping in this editor?
@@ -270,7 +284,7 @@ class ofxEditor {
 			public:
 				
 				TextBlockType type; ///< block type
-				string text; ///< block text string
+				wstring text; ///< block text string
 				
 				TextBlock() {
 					clear();
@@ -283,7 +297,7 @@ class ofxEditor {
 				
 				void clear() {
 					type = UNKNOWN;
-					text = "";
+					text = L"";
 				}
 		};
 		list<TextBlock> m_textBlocks; //< syntax parser text block linked list

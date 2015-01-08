@@ -31,6 +31,8 @@ class ofxFileDialog : public ofxEditor {
 		ofxFileDialog();
 		ofxFileDialog(ofxEditorSettings &sharedSettings); //< share settings object
 		virtual ~ofxFileDialog();
+	
+	/// \section Main
 
 		/// draw the file dialog, pushes view and applies viewport
 		virtual void draw();
@@ -55,6 +57,14 @@ class ofxFileDialog : public ofxEditor {
 	
 		/// currently in save as mode?
 		bool getSaveAsMode();
+	
+	/// \section Static Utils
+	
+		/// set/get the save as info text, default: "Save as (esc to exit)"
+		static void setSaveAsText(const wstring &text);
+		static void setSaveAsText(const string &text);
+		static wstring& getWideSaveAsText();
+		static string getSaveAsText();
 
 	protected:
 
@@ -64,13 +74,13 @@ class ofxFileDialog : public ofxEditor {
 		void keyPressedOpen(int key);
 
 		unsigned int m_currentFile; //< index of the current file
-		vector<string> m_filenames; //< filenames & directories
+		vector<wstring> m_filenames; //< filenames & directories
 		set<int> m_directories;     //< which indexes are directories
-		string m_path;              //< current path
-		string m_selectedPath;      //< selected path on enter
+		wstring m_path;              //< current path
+		wstring m_selectedPath;      //< selected path on enter
 	
 		/// number of files to show above and below open file cursor
 		static const unsigned int s_fileDisplayRange;
-		static const string s_saveAsInfoText; //< save as greeting text
+		static wstring s_saveAsText; //< save as info text
 		bool m_saveAs; //< are we in save as mode?
 };

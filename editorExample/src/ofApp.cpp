@@ -32,7 +32,7 @@ void ofApp::setup() {
 	ofxEditor::loadFont("fonts/PrintChar21.ttf", 24);
 	
 	// set a custom Repl banner & prompt (do this before setup())
-	ofxRepl::setReplBanner("Hello, welcome to ofxMultiEditor!");
+	ofxRepl::setReplBanner("Hello, welcome to ofxGLEditor!");
 	ofxRepl::setReplPrompt("prompt> ");
 
 	// setup editor with event listener
@@ -46,9 +46,9 @@ void ofApp::setup() {
 	ofLogNotice() << "number of lines: " << editor.getNumLines();
 	
 	// change multi editor settings, see ofxEditorSettings.h for details
-	//editor.getSettings().textColor = ofColor::red; // main text color
-	//editor.getSettings().cursorColor = ofColor::blue; // current pos cursor
-	//editor.getSettings().alpha = 0.5; // main text, cursor, & highlight alpha
+	//editor.getSettings().setTextColor(ofColor::red); // main text color
+	//editor.getSettings().setCursorColor(ofColor::blue); // current pos cursor
+	//editor.getSettings().setAlpha(0.5); // main text, cursor, & highlight alpha
 	
 	// other settings
 	//editor.setLineWrapping(true);
@@ -85,7 +85,7 @@ void ofApp::draw() {
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key) {
 	
-	// see ofxMultiEditor.h for key commands
+	// see ofxGLEditor.h for key commands
 	editor.keyPressed(key);
 	
 	// can check modifiers from editor
@@ -143,7 +143,7 @@ void ofApp::executeScriptEvent(int &whichEditor) {
 }
 
 //--------------------------------------------------------------
-void ofApp::evalReplEvent(string &text) {
+void ofApp::evalReplEvent(const string &text) {
 	ofLogNotice() << "received eval repl event: " << text;
 	
 	// make sure there is a response since this triggers printing the

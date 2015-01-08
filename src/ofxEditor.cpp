@@ -22,6 +22,8 @@
  */
 #include "ofxEditor.h"
 
+#include "Unicode.h"
+
 // GLFW needed for clipboard support
 #if !defined(TARGET_NODISPLAY) && !defined(TARGET_OF_IOS) && \
     !defined(TARGET_ANDROID) && !defined(TARGET_RASPBERRY_PI)
@@ -43,7 +45,7 @@ int ofxEditor::s_charWidth = 1;
 int ofxEditor::s_charHeight = 1;
 int ofxEditor::s_cursorWidth = 1;
 
-string ofxEditor::s_copyBuffer;
+wstring ofxEditor::s_copyBuffer;
 
 // use CMD on OSX, CTRL for Windows & Linux by default
 #ifdef __APPLE__
@@ -70,6 +72,7 @@ ofxEditor::ofxEditor() {
 	m_displayedLineCount = 0;
 	
 	m_shiftState = false;
+	m_firstUTF8Byte = 0;
 	
 	m_colorScheme = NULL;
 	m_lineWrapping = false;
@@ -101,6 +104,7 @@ ofxEditor::ofxEditor(ofxEditorSettings &sharedSettings) {
 	m_displayedLineCount = 0;
 	
 	m_shiftState = false;
+	m_firstUTF8Byte = 0;
 	
 	m_colorScheme = NULL;
 	m_lineWrapping = false;
@@ -190,7 +194,7 @@ void ofxEditor::draw() {
 	
 		m_matchingCharsHighlight[0] = -1;
 		m_matchingCharsHighlight[1] = -1;
-		if(m_settings->highlightMatchingChars) {
+		if(m_settings->getHighlightMatchingChars()) {
 			parseMatchingChars();
 		}
 	
@@ -234,17 +238,17 @@ void ofxEditor::draw() {
 				switch(tb.type) {
 				
 					case UNKNOWN:
-						ofLogWarning("ofxEditor") << "trying to draw UNKNOWN text block, contents: " << tb.text;
+						ofLogWarning("ofxEditor") << "trying to draw UNKNOWN text block, contents: " << wstring_to_string(tb.text);
 						break;
 						
 					case WORD: {
 						if(comment) {
 							ofColor &c = m_colorScheme->getCommentColor();
-							ofSetColor(c.r, c.g, c.b, c.a * m_settings->alpha);
+							ofSetColor(c.r, c.g, c.b, c.a * m_settings->getAlpha());
 						}
 						else {
 							ofColor &c = m_colorScheme->getWordColor(tb.text);
-							ofSetColor(c.r, c.g, c.b, c.a * m_settings->alpha);
+							ofSetColor(c.r, c.g, c.b, c.a * m_settings->getAlpha());
 						}
 						break;
 					}
@@ -252,11 +256,11 @@ void ofxEditor::draw() {
 					case STRING: {
 						if(comment) {
 							ofColor &c = m_colorScheme->getCommentColor();
-							ofSetColor(c.r, c.g, c.b, c.a * m_settings->alpha);
+							ofSetColor(c.r, c.g, c.b, c.a * m_settings->getAlpha());
 						}
 						else {
 							ofColor &c = m_colorScheme->getStringColor();
-							ofSetColor(c.r, c.g, c.b, c.a * m_settings->alpha);
+							ofSetColor(c.r, c.g, c.b, c.a * m_settings->getAlpha());
 						}
 						break;
 					}
@@ -264,11 +268,11 @@ void ofxEditor::draw() {
 					case NUMBER: {
 						if(comment) {
 							ofColor &c = m_colorScheme->getCommentColor();
-							ofSetColor(c.r, c.g, c.b, c.a * m_settings->alpha);
+							ofSetColor(c.r, c.g, c.b, c.a * m_settings->getAlpha());
 						}
 						else {
 							ofColor &c = m_colorScheme->getNumberColor();
-							ofSetColor(c.r, c.g, c.b, c.a * m_settings->alpha);
+							ofSetColor(c.r, c.g, c.b, c.a * m_settings->getAlpha());
 						}
 						break;
 					}
@@ -307,7 +311,7 @@ void ofxEditor::draw() {
 					// draw selection
 					if(m_selection && textPos >= m_highlightStart && textPos < m_highlightEnd) {
 						if(tb.type == TAB) {
-							for(int i = 0; i < m_settings->tabWidth; ++i) {
+							for(int i = 0; i < m_settings->getTabWidth(); ++i) {
 								drawSelectionCharBlock(x+s_charWidth*i, y);
 							}
 						}
@@ -335,8 +339,8 @@ void ofxEditor::draw() {
 							}
 							break;
 						case TAB:
-							x += s_charWidth * m_settings->tabWidth;
-							xcount += m_settings->tabWidth;
+							x += s_charWidth * m_settings->getTabWidth();
+							xcount += m_settings->getTabWidth();
 							textPos++;
 							break;
 						default:
@@ -410,20 +414,20 @@ void ofxEditor::draw() {
 					
 					if(m_selection && i >= m_highlightStart && i < m_highlightEnd) {
 						int tabX = x+s_charWidth;
-						for(int i = 0; i < m_settings->tabWidth-1; ++i) {
+						for(int i = 0; i < m_settings->getTabWidth()-1; ++i) {
 							drawSelectionCharBlock(tabX, y);
 							tabX += s_charWidth;
 						}
 					}
 					
-					x += s_charWidth * m_settings->tabWidth;
-					xcount += m_settings->tabWidth;
+					x += s_charWidth * m_settings->getTabWidth();
+					xcount += m_settings->getTabWidth();
 					textPos++;
 				}
 				// everything else
 				else {
-					ofSetColor(m_settings->textColor.r, m_settings->textColor.g,
-						       m_settings->textColor.b, m_settings->textColor.a * m_settings->alpha);
+					ofSetColor(m_settings->getTextColor().r, m_settings->getTextColor().g,
+						       m_settings->getTextColor().b, m_settings->getTextColor().a * m_settings->getAlpha());
 					s_font->drawCharacter(m_text[i], x, y);
 					x += s_charWidth;
 					xcount++;
@@ -688,13 +692,13 @@ void ofxEditor::keyPressed(int key) {
 				break;
 				
 			case OF_KEY_TAB:
-				if(m_settings->convertTabs) {
-					m_text.insert(m_position, "\t");
+				if(m_settings->getConvertTabs()) {
+					m_text.insert(m_position, L"\t");
 					m_position++;
 				}
 				else {
-					m_text.insert(m_position, string(m_settings->tabWidth, ' '));
-					m_position += m_settings->tabWidth;
+					m_text.insert(m_position, wstring(m_settings->getTabWidth(), ' '));
+					m_position += m_settings->getTabWidth();
 				}
 				textBufferUpdated();
 				break;
@@ -710,8 +714,11 @@ void ofxEditor::keyPressed(int key) {
 				
 			default:
 				
-				if(key != '\n' && (key < ' ' || key > 0x80)) { // ignore UTF chars for now ...
-					break;
+				// build a two UTF-8 byte character
+				// TODO: what happens if it's 3 or 4 bytes?
+				if(key > 0x80 && m_firstUTF8Byte == 0) {
+					m_firstUTF8Byte = key;
+					return;
 				}
 				
 				if(m_selection) {
@@ -722,7 +729,32 @@ void ofxEditor::keyPressed(int key) {
 					m_selection = false;
 				}
 				
-				m_text.insert(m_position, (const char*)&key);
+				// ignore control chars
+				if(key != '\n' && key < ' ') {
+					break;
+				}
+				
+				// build wide char and insert
+				if(m_firstUTF8Byte > 0) {
+					string temp("  ");
+					temp[0] = m_firstUTF8Byte;
+					temp[1] = key;
+					m_text.insert(m_position, string_to_wstring(temp));
+					m_firstUTF8Byte = 0;
+				}
+				else {
+					if(key < 0x80) {
+						string temp(" ");
+						temp[0] = key;
+						m_text.insert(m_position, string_to_wstring(temp));
+					}
+					else {
+						wchar_t k[2];
+						memset(&k, 0, sizeof(wchar_t)*2);
+						k[0] = key;
+						m_text.insert(m_position, wstring(k));
+					}
+				}
 				m_position++;
 				
 				if(key == '\n' && m_position >= m_bottomTextPosition && m_displayedLineCount+1 >= m_visibleLines) {
@@ -775,7 +807,7 @@ void ofxEditor::resize(int width, int height) {
 }
 
 //--------------------------------------------------------------
-string ofxEditor::getText() {
+wstring ofxEditor::getWideText() {
 	if(m_selection) {
 		return m_text.substr(m_highlightStart, m_highlightEnd-m_highlightStart);
 	}
@@ -783,9 +815,17 @@ string ofxEditor::getText() {
 }
 
 //--------------------------------------------------------------
-void ofxEditor::setText(const string& text) {
+string ofxEditor::getText() {
+	if(m_selection) {
+		return wstring_to_string(m_text.substr(m_highlightStart, m_highlightEnd-m_highlightStart));
+	}
+	return wstring_to_string(m_text);
+}
+
+//--------------------------------------------------------------
+void ofxEditor::setText(const wstring& text) {
 	
-	if(m_text != ""){
+	if(m_text != L"") {
 		m_position = lineStart(m_position);
 		int line = getCurrentLine();
 		m_text = text;
@@ -795,7 +835,23 @@ void ofxEditor::setText(const string& text) {
 		m_text = text;
 	}
 	
-	if(m_settings->convertTabs) {
+	if(m_settings->getConvertTabs()) {
+		processTabs();
+	}
+	textBufferUpdated();
+}
+
+//--------------------------------------------------------------
+void ofxEditor::setText(const string& text) {
+	setText(string_to_wstring(text));
+}
+
+//--------------------------------------------------------------
+void ofxEditor::insertText(const wstring& text) {
+	m_text.insert(m_position, text);
+	m_selection = false;
+	m_position += text.size();
+	if(m_settings->getConvertTabs()) {
 		processTabs();
 	}
 	textBufferUpdated();
@@ -803,18 +859,12 @@ void ofxEditor::setText(const string& text) {
 
 //--------------------------------------------------------------
 void ofxEditor::insertText(const string& text) {
-	m_text.insert(m_position, text);
-	m_selection = false;
-	m_position += text.size();
-	if(m_settings->convertTabs) {
-		processTabs();
-	}
-	textBufferUpdated();
+	insertText(string_to_wstring(text));
 }
 
 //--------------------------------------------------------------
 void ofxEditor::clearText() {
-	m_text = "";
+	m_text = L"";
 	if(m_colorScheme) {
 		clearTextBlocks();
 	}
@@ -996,7 +1046,17 @@ void ofxEditor::reset() {
 // DRAWING UTILS
 
 //--------------------------------------------------------------
-void ofxEditor::drawString(const string& s, float x, float y) {
+void ofxEditor::drawString(string s, float x, float y) {
+	drawString(string_to_wstring(s), x, y);
+}
+
+//--------------------------------------------------------------
+void ofxEditor::drawString(string s, ofPoint& p) {
+	return drawString(string_to_wstring(s), p.x, p.y);
+}
+
+//--------------------------------------------------------------
+void ofxEditor::drawString(wstring s, float x, float y) {
 	int xPos = x, yPos = y+s_charHeight;
 	for(int i = 0; i < s.size(); ++i) {
 		if(s[i] == '\n') {
@@ -1004,7 +1064,7 @@ void ofxEditor::drawString(const string& s, float x, float y) {
 			yPos += s_charHeight;
 		}
 		else if(s[i] == '\t') {
-			xPos += s_charWidth*m_settings->tabWidth;
+			xPos += s_charWidth*m_settings->getTabWidth();
 		}
 		else {
 			s_font->drawCharacter(s[i], xPos, yPos);
@@ -1014,7 +1074,7 @@ void ofxEditor::drawString(const string& s, float x, float y) {
 }
 
 //--------------------------------------------------------------
-void ofxEditor::drawString(const string& s, ofPoint& p) {
+void ofxEditor::drawString(wstring s, ofPoint& p) {
 	return drawString(s, p.x, p.y);
 }
 
@@ -1024,8 +1084,8 @@ void ofxEditor::drawString(const string& s, ofPoint& p) {
 void ofxEditor::drawMatchingCharBlock(int x, int y) {
 	ofPushStyle();
 		ofSetColor(
-			m_settings->matchingCharsColor.r, m_settings->matchingCharsColor.g,
-			m_settings->matchingCharsColor.b, m_settings->matchingCharsColor.a * m_settings->alpha);
+			m_settings->getMatchingCharsColor().r, m_settings->getMatchingCharsColor().g,
+			m_settings->getMatchingCharsColor().b, m_settings->getMatchingCharsColor().a * m_settings->getAlpha());
 		ofRect(x, y-s_charHeight, s_charWidth, s_charHeight);
 	ofPopStyle();
 }
@@ -1034,8 +1094,8 @@ void ofxEditor::drawMatchingCharBlock(int x, int y) {
 void ofxEditor::drawSelectionCharBlock(int x, int y) {
 	ofPushStyle();
 		ofSetColor(
-			m_settings->selectionColor.r, m_settings->selectionColor.g,
-			m_settings->selectionColor.b, m_settings->selectionColor.a * m_settings->alpha);
+			m_settings->getSelectionColor().r, m_settings->getSelectionColor().g,
+			m_settings->getSelectionColor().b, m_settings->getSelectionColor().a * m_settings->getAlpha());
 		ofRect(x, y-s_charHeight, s_charWidth, s_charHeight);
 	ofPopStyle();
 }
@@ -1055,8 +1115,8 @@ void ofxEditor::drawCursor(int x, int y) {
 			float maxCH = (BLOWUP_FLASHES - m_blowup) / BLOWUP_FLASHES * (CURSOR_MAX_HEIGHT * s_charHeight) + s_charHeight;
 			ofPushStyle();
 				ofSetRectMode(OF_RECTMODE_CENTER);
-				ofSetColor(m_settings->cursorColor.r, m_settings->cursorColor.g,
-					       m_settings->cursorColor.b, m_settings->cursorColor.a * m_settings->alpha * m_blowup/BLOWUP_FLASHES);
+				ofSetColor(m_settings->getCursorColor().r, m_settings->getCursorColor().g,
+					       m_settings->getCursorColor().b, m_settings->getCursorColor().a * m_settings->getAlpha() * m_blowup/BLOWUP_FLASHES);
 				ofRect(MAX(x+maxCW/2, x), MAX(y-s_charHeight+maxCH/2, y-s_charHeight), MAX(maxCW, s_cursorWidth), MAX(maxCH, s_charHeight));
 			ofPopStyle();
 		}
@@ -1068,8 +1128,8 @@ void ofxEditor::drawCursor(int x, int y) {
 		}
 		if (m_flash > HALF_FLASH_RATE) {
 			ofPushStyle();
-				ofSetColor(m_settings->cursorColor.r, m_settings->cursorColor.g,
-					       m_settings->cursorColor.b, m_settings->cursorColor.a * m_settings->alpha);
+				ofSetColor(m_settings->getCursorColor().r, m_settings->getCursorColor().g,
+					       m_settings->getCursorColor().b, m_settings->getCursorColor().a * m_settings->getAlpha());
 				ofRect(x, y-s_charHeight, s_cursorWidth, s_charHeight);
 			ofPopStyle();
 		}
@@ -1079,8 +1139,8 @@ void ofxEditor::drawCursor(int x, int y) {
 //--------------------------------------------------------------
 void ofxEditor::drawLineNumber(int &x, int &y, int &currentLine) {
 	ofPushStyle();
-		ofSetColor(m_settings->lineNumberColor.r, m_settings->lineNumberColor.g,
-			       m_settings->lineNumberColor.b, m_settings->lineNumberColor.a * m_settings->alpha);
+		ofSetColor(m_settings->getLineNumberColor().r, m_settings->getLineNumberColor().g,
+			       m_settings->getLineNumberColor().b, m_settings->getLineNumberColor().a * m_settings->getAlpha());
 		currentLine++;
 		string currentLineString = ofToString(currentLine);
 		x += s_charWidth*(m_lineNumWidth-currentLineString.length()-1); // 1 for the space
@@ -1094,11 +1154,11 @@ void ofxEditor::drawLineNumber(int &x, int &y, int &currentLine) {
 
 //--------------------------------------------------------------
 void ofxEditor::processTabs() {
-	size_t pos = m_text.find("\t", 0);
+	size_t pos = m_text.find(L"\t", 0);
 	while(pos != string::npos) {
 		m_text.erase(pos, 1);
-		m_text.insert(pos, string(m_settings->tabWidth, ' '));
-		pos = m_text.find("\t", pos);
+		m_text.insert(pos, wstring(m_settings->getTabWidth(), ' '));
+		pos = m_text.find(L"\t", pos);
 	}
 }
 
@@ -1109,7 +1169,7 @@ int ofxEditor::offsetToCurrentLineStart() {
 
 //--------------------------------------------------------------
 int ofxEditor::nextLineLength(int pos) {
-	size_t nextLineStart = m_text.find("\n", pos);
+	size_t nextLineStart = m_text.find(L"\n", pos);
 	if(nextLineStart != string::npos) {
 		return lineLength(nextLineStart+1);
 	}
@@ -1120,7 +1180,7 @@ int ofxEditor::nextLineLength(int pos) {
 int ofxEditor::previousLineLength(int pos) {
 	size_t prevLineEnd = string::npos;
 	if(pos > 0) {
-		prevLineEnd = m_text.rfind("\n", pos-1);
+		prevLineEnd = m_text.rfind(L"\n", pos-1);
 	}
 	if(prevLineEnd != string::npos) {
 		return lineLength(prevLineEnd);
@@ -1140,10 +1200,10 @@ unsigned int ofxEditor::lineStart(int pos) {
 	if(pos > 0) {
 		// take one off if we're over a newline
 		if(m_text[pos] == '\n') {
-			start = m_text.rfind("\n", pos-1);
+			start = m_text.rfind(L"\n", pos-1);
 		}
 		else {
-			start = m_text.rfind("\n", pos);
+			start = m_text.rfind(L"\n", pos);
 		}
 	}
 	if(start != string::npos) {
@@ -1160,7 +1220,7 @@ unsigned int ofxEditor::lineEnd(int pos) {
 	if(m_text.empty()) {
 		return 0;
 	}
-	size_t end = m_text.find("\n", pos);
+	size_t end = m_text.find(L"\n", pos);
 	if(end == string::npos) {
 		end = m_text.size()-1;
 	}
@@ -1170,9 +1230,12 @@ unsigned int ofxEditor::lineEnd(int pos) {
 //--------------------------------------------------------------
 void ofxEditor::parseMatchingChars() {
 
+	wstring &openChars = m_settings->getWideOpenChars();
+	wstring &closeChars = m_settings->getWideCloseChars();
+
 	// parse the parentheses
 	int type = 0;
-	for(string::iterator i = m_settings->openChars.begin(); i != m_settings->openChars.end(); ++i) {
+	for(wstring::iterator i = openChars.begin(); i != openChars.end(); ++i) {
 		if(m_text[m_position] == *i) {
 			parseOpenChars(m_position, type);
 		}
@@ -1181,7 +1244,7 @@ void ofxEditor::parseMatchingChars() {
 		
 	if(m_position > 0) {
 		type = 0;
-		for(string::iterator i = m_settings->closeChars.begin(); i != m_settings->closeChars.end(); ++i) {
+		for(wstring::iterator i = closeChars.begin(); i != closeChars.end(); ++i) {
 			if(m_text[m_position-1] == *i) {
 				parseCloseChars(m_position-1, type);
 			}
@@ -1193,14 +1256,17 @@ void ofxEditor::parseMatchingChars() {
 //--------------------------------------------------------------
 void ofxEditor::parseOpenChars(int pos, int type) {
 
+	wstring &openChars = m_settings->getWideOpenChars();
+	wstring &closeChars = m_settings->getWideCloseChars();
+
 	// looking for a close, so search forward
 	int stack = 0, start_pos = pos;
 	pos++;
 	while(stack != -1 && pos < (int)m_text.size()) {
-		if(m_text[pos] == m_settings->openChars[type]) {
+		if(m_text[pos] == openChars[type]) {
 			stack++;
 		}
-		if(m_text[pos] == m_settings->closeChars[type]) {
+		if(m_text[pos] == closeChars[type]) {
 			stack--;
 		}
 		pos++;
@@ -1214,14 +1280,17 @@ void ofxEditor::parseOpenChars(int pos, int type) {
 //--------------------------------------------------------------
 void ofxEditor::parseCloseChars(int pos, int type) {
 
+	wstring &openChars = m_settings->getWideOpenChars();
+	wstring &closeChars = m_settings->getWideCloseChars();
+
 	// looking for a open, so search backward
 	int stack = 0, start_pos = pos;
 	pos--;
 	while(stack != -1 && pos >= 0) {
-		if(m_text[pos] == m_settings->closeChars[type]) {
+		if(m_text[pos] == closeChars[type]) {
 			stack++;
 		}
-		if(m_text[pos] == m_settings->openChars[type]) {
+		if(m_text[pos] == openChars[type]) {
 			stack--;
 		}
 		pos--;
@@ -1331,9 +1400,9 @@ void ofxEditor::parseTextBlocks() {
 	
 	bool singleComment = false;
 	bool multiComment = false;
-	string singleLineComment = m_colorScheme->getSingleLineComment();
-	string multiLineCommentBegin = m_colorScheme->getMultiLineCommentBegin();
-	string multiLineCommentEnd = m_colorScheme->getMultiLineCommentEnd();
+	wstring &singleLineComment = m_colorScheme->getWideSingleLineComment();
+	wstring &multiLineCommentBegin = m_colorScheme->getWideMultiLineCommentBegin();
+	wstring &multiLineCommentEnd = m_colorScheme->getWideMultiLineCommentEnd();
 	
 	TextBlock tb;
 	for(int i = 0; i < m_text.length(); ++i) {

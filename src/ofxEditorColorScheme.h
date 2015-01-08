@@ -52,20 +52,28 @@ class ofxEditorColorScheme {
 	
 		/// set the beginning string to match for a single line comment,
 		/// blank by default
-		void setSingleLineComment(string begin);
+		void setSingleLineComment(const wstring &begin);
+		void setSingleLineComment(const string &begin);
+		wstring& getWideSingleLineComment();
 		string getSingleLineComment();
 	
 		/// set the beginning and ending strings to match for a multi line comment,
 		/// blank by default
-		void setMultiLineComment(string begin, string end);
+		void setMultiLineComment(const wstring &begin, const wstring &end);
+		void setMultiLineComment(const string &begin, const string &end);
+		wstring& getWideMultiLineCommentBegin();
 		string getMultiLineCommentBegin();
+		wstring& getWideMultiLineCommentEnd();
 		string getMultiLineCommentEnd();
 		
 		/// colors for specfic keywords
-		void setWordColor(const string& word, ofColor color);
+		void setWordColor(const wstring &word, ofColor color);
+		void setWordColor(const string &word, ofColor color);
+		ofColor& getWordColor(const wstring &word);
+		ofColor& getWordColor(const string &word);
+		void clearWordColor(const wstring &word);
 		void clearWordColor(const string &word);
 		void clearAllWordColors();
-		ofColor& getWordColor(const string &word);
 		
 	protected:
 	
@@ -73,9 +81,9 @@ class ofxEditorColorScheme {
 		ofColor stringColor;
 		ofColor numberColor;
 		ofColor commentColor;
-		map<string,ofColor> wordColors;
+		map<wstring,ofColor> wordColors;
 	
-		string singleLineComment;
-		string multiLineCommentBegin;
-		string multiLineCommentEnd;
+		wstring singleLineComment;
+		wstring multiLineCommentBegin;
+		wstring multiLineCommentEnd;
 };

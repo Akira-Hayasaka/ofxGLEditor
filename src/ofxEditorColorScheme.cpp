@@ -18,103 +18,164 @@
  * See https://github.com/Akira-Hayasaka/ofxGLEditor for more info.
  */
 #include "ofxEditorColorScheme.h"
+#include "Unicode.h"
 
+//--------------------------------------------------------------
 ofxEditorColorScheme::ofxEditorColorScheme() {
-}
-
-ofxEditorColorScheme::~ofxEditorColorScheme() {
 	wordColors.clear();
 }
 
+//--------------------------------------------------------------
+ofxEditorColorScheme::~ofxEditorColorScheme() {
+	clearAllWordColors();
+}
+
+//--------------------------------------------------------------
 void ofxEditorColorScheme::clear() {
 	textColor.set(255);
-	clearAllWordColors();
 	stringColor.set(255);
 	numberColor.set(255);
 	commentColor.set(255);
+	clearAllWordColors();
 }
 
+//--------------------------------------------------------------
 void ofxEditorColorScheme::setTextColor(ofColor color) {
 	textColor = color;
 }
 
+//--------------------------------------------------------------
 ofColor& ofxEditorColorScheme::getTextColor() {
 	return textColor;
 }
 
+//--------------------------------------------------------------
 void ofxEditorColorScheme::setStringColor(ofColor color) {
 	stringColor = color;
 }
 
+//--------------------------------------------------------------
 ofColor& ofxEditorColorScheme::getStringColor() {
 	return stringColor;
 }
 
+//--------------------------------------------------------------
 void ofxEditorColorScheme::setNumberColor(ofColor color) {
 	numberColor = color;
 }
 
+//--------------------------------------------------------------
 ofColor& ofxEditorColorScheme::getNumberColor() {
 	return numberColor;
 }
 
+//--------------------------------------------------------------
 void ofxEditorColorScheme::setCommentColor(ofColor color) {
 	commentColor = color;
 }
 
+//--------------------------------------------------------------
 ofColor& ofxEditorColorScheme::getCommentColor() {
 	return commentColor;
 }
 
-void ofxEditorColorScheme::setSingleLineComment(string begin) {
+//--------------------------------------------------------------
+void ofxEditorColorScheme::setSingleLineComment(const wstring &begin) {
 	singleLineComment = begin;
 }
 
-string ofxEditorColorScheme::getSingleLineComment() {
+//--------------------------------------------------------------
+void ofxEditorColorScheme::setSingleLineComment(const string &begin) {
+	singleLineComment = string_to_wstring(begin);
+}
+
+//--------------------------------------------------------------
+wstring& ofxEditorColorScheme::getWideSingleLineComment() {
 	return singleLineComment;
 }
 
-/// set the beginning and ending strings to match for a multi line comment,
-/// blank by default
-void ofxEditorColorScheme::setMultiLineComment(string begin, string end) {
+//--------------------------------------------------------------
+string ofxEditorColorScheme::getSingleLineComment() {
+	return wstring_to_string(singleLineComment);
+}
+
+//--------------------------------------------------------------
+void ofxEditorColorScheme::setMultiLineComment(const wstring &begin, const wstring &end) {
 	multiLineCommentBegin = begin;
 	multiLineCommentEnd = end;
 }
 
-string ofxEditorColorScheme::getMultiLineCommentBegin() {
+//--------------------------------------------------------------
+void ofxEditorColorScheme::setMultiLineComment(const string &begin, const string &end) {
+	multiLineCommentBegin = string_to_wstring(begin);
+	multiLineCommentEnd = string_to_wstring(end);
+}
+
+//--------------------------------------------------------------
+wstring& ofxEditorColorScheme::getWideMultiLineCommentBegin() {
 	return multiLineCommentBegin;
 }
 
-string ofxEditorColorScheme::getMultiLineCommentEnd() {
+//--------------------------------------------------------------
+string ofxEditorColorScheme::getMultiLineCommentBegin() {
+	return wstring_to_string(multiLineCommentBegin);
+}
+
+//--------------------------------------------------------------
+wstring& ofxEditorColorScheme::getWideMultiLineCommentEnd() {
 	return multiLineCommentEnd;
 }
 
-void ofxEditorColorScheme::setWordColor(const string& word, ofColor color) {
-	map<string,ofColor>::iterator iter = wordColors.find(word);
+//--------------------------------------------------------------
+string ofxEditorColorScheme::getMultiLineCommentEnd() {
+	return wstring_to_string(multiLineCommentEnd);
+}
+
+//--------------------------------------------------------------
+void ofxEditorColorScheme::setWordColor(const wstring &word, ofColor color) {
+	map<wstring,ofColor>::iterator iter = wordColors.find(word);
 	if(iter != wordColors.end()) { // already exists
 		ofColor &c = (*iter).second;
 		c.set(color);
 	}
 	else { // doesn't exist
-		wordColors.insert(pair<string,ofColor>(word, color));
+		wordColors.insert(pair<wstring,ofColor>(word, color));
 	}
 }
 
-void ofxEditorColorScheme::clearWordColor(const string &word) {
-	map<string,ofColor>::iterator iter = wordColors.find(word);
+//--------------------------------------------------------------
+void ofxEditorColorScheme::setWordColor(const string &word, ofColor color) {
+	setWordColor(string_to_wstring(word), color);
+}
+
+//--------------------------------------------------------------
+ofColor& ofxEditorColorScheme::getWordColor(const wstring &word) {
+	map<wstring,ofColor>::iterator iter = wordColors.find(word);
+	if(iter != wordColors.end()) {
+		return (*iter).second;
+	}
+	return textColor;
+}
+
+//--------------------------------------------------------------
+ofColor& ofxEditorColorScheme::getWordColor(const string &word) {
+	return getWordColor(string_to_wstring(word));
+}
+
+//--------------------------------------------------------------
+void ofxEditorColorScheme::clearWordColor(const wstring &word) {
+	map<wstring,ofColor>::iterator iter = wordColors.find(word);
 	if(iter != wordColors.end()) {
 		wordColors.erase(iter);
 	}
 }
 
-void ofxEditorColorScheme::clearAllWordColors() {
-	wordColors.clear();
+//--------------------------------------------------------------
+void ofxEditorColorScheme::clearWordColor(const string &word) {
+	clearWordColor(string_to_wstring(word));
 }
 
-ofColor& ofxEditorColorScheme::getWordColor(const string &word) {
-	map<string,ofColor>::iterator iter = wordColors.find(word);
-	if(iter != wordColors.end()) {
-		return (*iter).second;
-	}
-	return textColor;
+//--------------------------------------------------------------
+void ofxEditorColorScheme::clearAllWordColors() {
+	wordColors.clear();
 }

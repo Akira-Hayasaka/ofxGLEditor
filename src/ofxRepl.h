@@ -31,7 +31,7 @@ class ofxReplListener {
 	
 		/// this event is triggered when Enter is pressed in the Repl console
 		/// returns the text to be evaluated
-		virtual void evalReplEvent(string &text) = 0;
+		virtual void evalReplEvent(const string &text) = 0;
 };
 
 /// Read-eval-print Loop
@@ -42,9 +42,13 @@ class ofxRepl : public ofxEditor {
 		ofxRepl();
 		ofxRepl(ofxEditorSettings &sharedSettings); //< share settings object
 		virtual ~ofxRepl();
-		
+	
+		/// prints greeting and first prompt
+		void setup();
+	
+		/// prints greeting and first prompt
 		/// set listener to receive eval events
-		void setListener(ofxReplListener *listener);
+		void setup(ofxReplListener *listener);
 		
 		/// handles key events
 		///
@@ -56,10 +60,16 @@ class ofxRepl : public ofxEditor {
 		///
 		void keyPressed(int key);
 		
-		/// add a string to the console
+		/// add a wide string to the console
+		void print(const wstring &what);
+	
+		/// add a string to the console with string conversion
 		void print(const string &what);
 		
-		/// add a string to the console and print a return after
+		/// add a wide string to the console and print a return after
+		void printEvalReturn(const wstring &what);
+	
+		/// add a string to the console and print a return after with string conversion
 		void printEvalReturn(const string &what);
 		
 		/// clear the console
@@ -68,24 +78,28 @@ class ofxRepl : public ofxEditor {
 		/// clear the command history
 		void clearHistory();
 
-	/// \section Util
+	/// \section Static Utils
 	
 		/// set/get the Repl greeting banner, default: ""
+		static void setReplBanner(const wstring &text); //< call this before setup()
 		static void setReplBanner(const string &text); //< call this before setup()
+		static wstring& getWideReplBanner();
 		static string getReplBanner();
 		
 		/// set/get the Repl prompt, default: "> "
+		static void setReplPrompt(const wstring &text); //< call this before setup()
 		static void setReplPrompt(const string &text); //< call this before setup()
+		static wstring& getWideReplPrompt();
 		static string getReplPrompt();
 
 	protected:
-		
+	
 		void eval();
 		void printPrompt();
 		void historyPrev();
 		void historyNext();
 		void historyClear();
-		void historyShow(string what);
+		void historyShow(wstring what);
 		void keepCursorVisible();
 
 		ofxReplListener *m_listener; //< eval event listener
@@ -93,16 +107,16 @@ class ofxRepl : public ofxEditor {
 		unsigned int m_promptPos; //< prompt position in the text buffer
 		unsigned int m_insertPos; //< insert position in the text buffer
 
-		string m_evalText; //< text to be evaluated when enter is pressed
-
-		deque<string> m_history; //< line history
-		deque<string>::iterator m_historyIter; //< current position in line history
+		wstring m_evalText; //< text to be evaluated when enter is pressed
+		
+		deque<wstring> m_history; //< line history
+		deque<wstring>::iterator m_historyIter; //< current position in line history
 		bool m_historyNavStarted; //< is the cursor within the line history?
-		string m_historyPresent; //< current history line (aka live input)
+		wstring m_historyPresent; //< current history line (aka live input)
 		unsigned int m_linePos; //< current line the cursor is on
 	
-		static string s_banner; //< REPL header/greeting, default: ""
-		static string s_prompt; //< prompt string, default: "> "
+		static wstring s_banner; //< REPL header/greeting, default: ""
+		static wstring s_prompt; //< prompt string, default: "> "
 		
 	private:
 
@@ -114,5 +128,4 @@ class ofxRepl : public ofxEditor {
 			void log(ofLogLevel level, const string & module, const char* format, va_list args);
 		};
 		ofPtr<Logger> m_logger;
-	
 };

@@ -41,7 +41,7 @@ class ofxGLEditorListener : public ofxReplListener {
 	
 		/// this event is triggered when Enter is pressed in the Repl console
 		/// returns the text to be evaluated
-		virtual void evalReplEvent(string &text) {}
+		virtual void evalReplEvent(const string &text) {}
 };
 
 /// 9 text editor buffers with a live optional Read-Eval-Print Loop
@@ -193,9 +193,9 @@ class ofxGLEditor {
 		///
 		/// example usage:
 		///
-		///   editor.getSettings().textColor = ofColor::gray;
-		///   editor.getSettings().alpha = 0.5;
-		///   editor.getSettings().tabWidth = 8;
+		///   editor.getSettings().getTextColor(ofColor::gray);
+		///   editor.getSettings().getAlpha(0.5);
+		///   editor.getSettings().getTabWidth(8);
 		///   ... etc
 		///
 		ofxEditorSettings& getSettings();

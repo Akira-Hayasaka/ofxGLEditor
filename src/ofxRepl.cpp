@@ -22,53 +22,31 @@
  */
 #include "ofxRepl.h"
 
-// utils
-bool isBalanced(string s);
-bool isEmpty(string s);
+#include "Unicode.h"
 
-string ofxRepl::s_banner = string("");
-string ofxRepl::s_prompt = string("> ");
+// utils
+bool isBalanced(wstring s);
+bool isEmpty(wstring s);
+
+wstring ofxRepl::s_banner = wstring(L"");
+wstring ofxRepl::s_prompt = wstring(L"> ");
 
 //--------------------------------------------------------------
 ofxRepl::ofxRepl() : ofxEditor() {
-	
 	m_listener = NULL;
 	m_promptPos = 0;
 	m_insertPos = 0;
 	m_historyNavStarted = false;
 	m_linePos = 0;
-	
-	// setup our custom logger
-	m_logger = ofPtr<Logger>(new Logger);
-	m_logger->m_parent = this;
-	ofSetLoggerChannel(m_logger);
-	
-	if(s_banner != "") {
-		resize();
-		print(s_banner);
-	}
-	printPrompt();
 }
 
 //--------------------------------------------------------------
 ofxRepl::ofxRepl(ofxEditorSettings &sharedSettings) : ofxEditor(sharedSettings) {
-	
 	m_listener = NULL;
 	m_promptPos = 0;
 	m_insertPos = 0;
 	m_historyNavStarted = false;
 	m_linePos = 0;
-	
-	// setup our custom logger
-	m_logger = ofPtr<Logger>(new Logger);
-	m_logger->m_parent = this;
-	ofSetLoggerChannel(m_logger);
-	
-	if(s_banner != "") {
-		resize();
-		print(s_banner);
-	}
-	printPrompt();
 }
 
 //--------------------------------------------------------------
@@ -77,7 +55,24 @@ ofxRepl::~ofxRepl() {
 }
 
 //--------------------------------------------------------------
-void ofxRepl::setListener(ofxReplListener *listener) {
+void ofxRepl::setup() {
+
+	// setup our custom logger
+	m_logger = ofPtr<Logger>(new Logger);
+	m_logger->m_parent = this;
+	ofSetLoggerChannel(m_logger);
+
+	// print greeting and first prompt
+	if(s_banner != L"") {
+		resize();
+		print(s_banner);
+	}
+	printPrompt();
+}
+
+//--------------------------------------------------------------
+void ofxRepl::setup(ofxReplListener *listener) {
+	setup();
 	m_listener = listener;
 }
 
@@ -139,12 +134,12 @@ void ofxRepl::keyPressed(int key) {
 }
 
 //--------------------------------------------------------------
-void ofxRepl::print(const string &what) {
+void ofxRepl::print(const wstring &what) {
 
-	string to_print;
-	for(string::const_iterator i = what.begin(); i != what.end(); ++i) {
+	wstring to_print;
+	for(wstring::const_iterator i = what.begin(); i != what.end(); ++i) {
 		m_linePos++;
-		if(*i == '\n') {
+		if(*i == L'\n') {
 			m_linePos = 0;
 		}
 		to_print += *i;
@@ -159,12 +154,22 @@ void ofxRepl::print(const string &what) {
 }
 
 //--------------------------------------------------------------
-void ofxRepl::printEvalReturn(const string &what) {
+void ofxRepl::print(const string &what) {
+	print(string_to_wstring(what));
+}
+
+//--------------------------------------------------------------
+void ofxRepl::printEvalReturn(const wstring &what) {
 	if(what.size() > 0) {
 		print(what);
-		print("\n");
+		print(L"\n");
 	}
 	printPrompt();
+}
+
+//--------------------------------------------------------------
+void ofxRepl::printEvalReturn(const string &what) {
+	printEvalReturn(string_to_wstring(what));
 }
 
 //--------------------------------------------------------------
@@ -185,20 +190,20 @@ void ofxRepl::clearHistory() {
 //--------------------------------------------------------------
 void ofxRepl::eval() {
 	if(m_promptPos < m_text.size()) {
-		string defun = m_text.substr(m_promptPos);
+		wstring defun = m_text.substr(m_promptPos);
 		if(!isEmpty(defun)) {
 			m_insertPos = m_text.length();
-			print("\n");
+			print(L"\n");
 			
 			m_evalText = defun;
 			if(m_listener) {
-				m_listener->evalReplEvent(m_evalText);
+				m_listener->evalReplEvent(wstring_to_string(m_evalText));
 			}
 			else {
 				ofLogWarning("ofxRepl") << "listener not set";
 			}
 
-			if(defun[defun.length()-1] == '\n') {
+			if(defun[defun.length()-1] == L'\n') {
 				defun.resize(defun.length()-1, 0);
 			}
 			m_history.push_back(defun);
@@ -215,8 +220,8 @@ void ofxRepl::eval() {
 //--------------------------------------------------------------
 void ofxRepl::printPrompt() {
 	m_insertPos = m_text.length();
-	if(m_text.length() > 0 && m_text[m_insertPos-1] != '\n') {
-		m_text += '\n';
+	if(m_text.length() > 0 && m_text[m_insertPos-1] != L'\n') {
+		m_text += L'\n';
 		m_insertPos++;
 	}
 	m_text += s_prompt;
@@ -262,7 +267,7 @@ void ofxRepl::historyNext() {
 }
 
 //--------------------------------------------------------------
-void ofxRepl::historyShow(string what) {
+void ofxRepl::historyShow(wstring what) {
 	m_text.resize(m_promptPos, 0);
 	m_text += what;
 	m_position = m_text.length();
@@ -272,37 +277,57 @@ void ofxRepl::historyShow(string what) {
 void ofxRepl::keepCursorVisible() {
 	unsigned int curVisLine = 0;
 	for(int i = m_position; i > m_topTextPosition; i--) {
-		if (m_text[i] == '\n') {
+		if(m_text[i] == L'\n') {
 			curVisLine++;
 		}
 	}
 	while(curVisLine >= m_visibleLines) {
-		if(m_text[m_topTextPosition++] == '\n') {
+		if(m_text[m_topTextPosition++] == L'\n') {
 			curVisLine--;
 		}
 	}
 }
 
-// UTIL
+// STATIC UTILS
 
 //--------------------------------------------------------------
-void ofxRepl::setReplBanner(const string &text) {
+void ofxRepl::setReplBanner(const wstring &text) {
 	s_banner = text;
 }
 
 //--------------------------------------------------------------
-string ofxRepl::getReplBanner() {
+void ofxRepl::setReplBanner(const string &text) {
+	s_banner = string_to_wstring(text);
+}
+
+//--------------------------------------------------------------
+wstring& ofxRepl::getWideReplBanner() {
 	return s_banner;
+}
+
+//--------------------------------------------------------------
+string ofxRepl::getReplBanner() {
+	return wstring_to_string(s_banner);
 }
 	
 //--------------------------------------------------------------
-void ofxRepl::setReplPrompt(const string &text) {
+void ofxRepl::setReplPrompt(const wstring &text) {
 	s_prompt = text;
 }
 
 //--------------------------------------------------------------
-string ofxRepl::getReplPrompt() {
+void ofxRepl::setReplPrompt(const string &text) {
+	s_prompt = string_to_wstring(text);
+}
+
+//--------------------------------------------------------------
+wstring& ofxRepl::getWideReplPrompt() {
 	return s_prompt;
+}
+
+//--------------------------------------------------------------
+string ofxRepl::getReplPrompt() {
+	return wstring_to_string(s_prompt);
 }
 
 // PRIVATE
@@ -310,23 +335,23 @@ string ofxRepl::getReplPrompt() {
 //--------------------------------------------------------------
 void ofxRepl::Logger::log(ofLogLevel level, const string & module, const string & message){
 	ofConsoleLoggerChannel::log(level, module, message);
-	m_parent->print(message);
-	m_parent->print("\n");
+	m_parent->print(string_to_wstring(message));
+	m_parent->print(L"\n");
 }
 
 //--------------------------------------------------------------
 void ofxRepl::Logger::log(ofLogLevel level, const string & module, const char* format, va_list args){
 	ofConsoleLoggerChannel::log(level, module, format, args);
-	m_parent->print(ofVAArgsToString(format, args));
-	m_parent->print("\n");
+	m_parent->print(string_to_wstring(ofVAArgsToString(format, args)));
+	m_parent->print(L"\n");
 }
 
 // OTHER UTIL
 
 //--------------------------------------------------------------
-bool isBalanced(string s) {
+bool isBalanced(wstring s) {
 	int balance = 0;
-	for(string::iterator i = s.begin(); i != s.end(); i++) {
+	for(wstring::iterator i = s.begin(); i != s.end(); i++) {
 		switch(*i) {
 			case '(':
 				balance++;
@@ -343,9 +368,9 @@ bool isBalanced(string s) {
 }
 
 //--------------------------------------------------------------
-bool isEmpty(string s) {
-    const string ws = " \t\n\r";
-	for(string::iterator i = s.begin(); i != s.end(); i++) {
+bool isEmpty(wstring s) {
+    const wstring ws = L" \t\n\r";
+	for(wstring::iterator i = s.begin(); i != s.end(); i++) {
 		if(ws.find(*i) == string::npos) {
 			return false;
 		}

@@ -22,13 +22,15 @@
  */
 #include "ofxFileDialog.h"
 
+#include "Unicode.h"
+
 const unsigned int ofxFileDialog::s_fileDisplayRange = 10;
-const string ofxFileDialog::s_saveAsInfoText = "Save as (esc to exit)";
+wstring ofxFileDialog::s_saveAsText = L"Save as (esc to exit)";
 
 //--------------------------------------------------------------
 ofxFileDialog::ofxFileDialog() : ofxEditor() {
 	m_currentFile = 0;
-	m_path = ofFilePath::getUserHomeDir();
+	m_path = string_to_wstring(ofFilePath::getUserHomeDir());
 	m_saveAs = true;
 	refresh();
 }
@@ -36,7 +38,7 @@ ofxFileDialog::ofxFileDialog() : ofxEditor() {
 //--------------------------------------------------------------
 ofxFileDialog::ofxFileDialog(ofxEditorSettings &sharedSettings) : ofxEditor(sharedSettings) {
 	m_currentFile = 0;
-	m_path = ofFilePath::getUserHomeDir();
+	m_path = string_to_wstring(ofFilePath::getUserHomeDir());
 	m_saveAs = true;
 	refresh();
 }
@@ -94,22 +96,22 @@ void ofxFileDialog::setPath(string path) {
 	}
 	
 	if(!ofFilePath::isAbsolute(path)) {
-		m_path = ofFilePath::getAbsolutePath(path);
+		m_path = string_to_wstring(ofFilePath::getAbsolutePath(path));
 	}
 	else {
-		m_path = path;
+		m_path = string_to_wstring(path);
 	}
 	refresh();
 }
 
 //--------------------------------------------------------------
 string ofxFileDialog::getSelectedPath() {
-	return m_selectedPath;
+	return wstring_to_string(m_selectedPath);
 }
 
 //--------------------------------------------------------------
 void ofxFileDialog::clearSelectedPath() {
-	m_selectedPath = "";
+	m_selectedPath = L"";
 }
 
 //--------------------------------------------------------------
@@ -125,28 +127,50 @@ bool ofxFileDialog::getSaveAsMode() {
 //--------------------------------------------------------------
 void ofxFileDialog::refresh() {
 	
-	ofLogVerbose("ofxFileDialog") << "loading path: " << m_path;
+	ofLogVerbose("ofxFileDialog") << "loading path: " << wstring_to_string(m_path);
 	
 	m_filenames.clear();
 	m_directories.clear();
 	
-	ofDirectory dir(m_path);
+	ofDirectory dir(wstring_to_string(m_path));
 	dir.listDir();
 	vector<ofFile> files = dir.getFiles();
 	ofLogVerbose("ofxFileDialog") << files.size() << " files: ";
 	
 	// one level up
 	m_directories.insert(0);
-	m_filenames.push_back("..");
+	m_filenames.push_back(L"..");
 	
 	// everything else
 	for(int i = 0; i < files.size(); ++i) {
 		if(files[i].isDirectory()) {
 			m_directories.insert(m_filenames.size());
 		}
-		m_filenames.push_back(files[i].getFileName());
-		ofLogVerbose("ofxFileDialog") << "\t" << m_filenames.back();
+		m_filenames.push_back(string_to_wstring(files[i].getFileName()));
+		ofLogVerbose("ofxFileDialog") << "\t" << wstring_to_string(m_filenames.back());
 	}
+}
+
+// STATIC UTILS
+
+//--------------------------------------------------------------
+void ofxFileDialog::setSaveAsText(const wstring &text) {
+	s_saveAsText = text;
+}
+
+//--------------------------------------------------------------
+void ofxFileDialog::setSaveAsText(const string &text) {
+	s_saveAsText = string_to_wstring(text);
+}
+
+//--------------------------------------------------------------
+wstring& ofxFileDialog::getWideSaveAsText() {
+	return s_saveAsText;
+}
+
+//--------------------------------------------------------------
+string ofxFileDialog::getSaveAsText() {
+	return wstring_to_string(s_saveAsText);
 }
 
 // PROTECTED
@@ -158,9 +182,9 @@ void ofxFileDialog::drawSaveAs() {
 	int x = 0, y = -s_charHeight;
 
 	// info text
-	ofSetColor(m_settings->textColor.r, m_settings->textColor.g,
-			   m_settings->textColor.b, m_settings->textColor.a * m_settings->alpha);
-	drawString(s_saveAsInfoText, x, y);
+	ofSetColor(m_settings->getTextColor().r, m_settings->getTextColor().g,
+			   m_settings->getTextColor().b, m_settings->getTextColor().a * m_settings->getAlpha());
+	drawString(s_saveAsText, x, y);
 
 	// new file name with cursor
 	y += s_charHeight*2;
@@ -173,8 +197,8 @@ void ofxFileDialog::drawSaveAs() {
 		}
 		
 		// text
-		ofSetColor(m_settings->textColor.r, m_settings->textColor.g,
-				   m_settings->textColor.b, m_settings->textColor.a * m_settings->alpha);
+		ofSetColor(m_settings->getTextColor().r, m_settings->getTextColor().g,
+				   m_settings->getTextColor().b, m_settings->getTextColor().a * m_settings->getAlpha());
 		s_font->drawCharacter(m_text[i], x, y);
 		x += s_charWidth;
 	}
@@ -189,13 +213,13 @@ void ofxFileDialog::drawSaveAs() {
 void ofxFileDialog::drawOpen() {
 
 	int x = 0;
-	ofColor dirColor = m_settings->textColor; // TODO: separate dir color?
+	ofColor dirColor = m_settings->getTextColor(); // TODO: separate dir color?
 	
 	// start drawing based on current file location in file list so selection is centered vertically
 	float y = (m_currentFile/(float)m_filenames.size()) * -s_charHeight * (float)m_filenames.size();
 
 	unsigned int count = 0;
-	for(vector<string>::iterator i = m_filenames.begin(); i != m_filenames.end(); i++) {
+	for(vector<wstring>::iterator i = m_filenames.begin(); i != m_filenames.end(); i++) {
 	
 		m_numLines = 0;
 		bool isDir = m_directories.find(count) != m_directories.end();
@@ -208,18 +232,18 @@ void ofxFileDialog::drawOpen() {
 			
 				// current file background
 				if(count == m_currentFile) {
-					ofSetColor(m_settings->cursorColor.r, m_settings->cursorColor.g,
-					       m_settings->cursorColor.b, m_settings->cursorColor.a * m_settings->alpha);
+					ofSetColor(m_settings->getCursorColor().r, m_settings->getCursorColor().g,
+					       m_settings->getCursorColor().b, m_settings->getCursorColor().a * m_settings->getAlpha());
 					ofRect(x, y-s_charHeight, s_charWidth, s_charHeight);
 				}
 				
 				// file or dir name
 				if(isDir) {
-					ofSetColor(dirColor.r, dirColor.g, dirColor.b, dirColor.a * m_settings->alpha);
+					ofSetColor(dirColor.r, dirColor.g, dirColor.b, dirColor.a * m_settings->getAlpha());
 				}
 				else {
-					ofSetColor(m_settings->textColor.r, m_settings->textColor.g,
-					           m_settings->textColor.b, m_settings->textColor.a * m_settings->alpha);
+					ofSetColor(m_settings->getTextColor().r, m_settings->getTextColor().g,
+					           m_settings->getTextColor().b, m_settings->getTextColor().a * m_settings->getAlpha());
 				}
 				s_font->drawCharacter((*i)[c], x, y);
 				x += s_charWidth;
@@ -277,7 +301,7 @@ void ofxFileDialog::keyPressedSaveAs(int key) {
 			if(key != '\n' && (key < ' ' || key > 0x80)) { // ignore UTF chars for now ...
 				break;
 			}
-			m_text.insert(m_position, (const char*)&key);
+			m_text.insert(m_position, (const wchar_t*)&key);
 			m_position++;
 			break;
 	}	
@@ -323,7 +347,7 @@ void ofxFileDialog::keyPressedOpen(int key) {
 		case OF_KEY_RETURN:
 			if(m_directories.find(m_currentFile) != m_directories.end()) {
 				m_path += m_filenames[m_currentFile];
-				m_path += "/";
+				m_path += L"/";
 				refresh();
 			}
 			else {

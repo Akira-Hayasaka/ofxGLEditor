@@ -23,43 +23,74 @@
 #include "ofConstants.h"
 
 /// internal editor settings which can be shared between instances
-struct ofxEditorSettings {
+class ofxEditorSettings {
+
+	public:
+
+		ofxEditorSettings();
 	
-	/// tab width in spaces, must be at least 1, default: 4
-	unsigned int tabWidth;
-
-	/// convert tabs to spaces? performed when setting or editing text and *cannot* be undone
-	bool convertTabs;
+		/// set the displayed tab width, must be at least 1, default: 4
+		void setTabWidth(unsigned int numSpaces);
+		unsigned int getTabWidth();
+		
+		/// convert tabs to spaces? performed when setting or editing text and
+		/// *cannot* be undone
+		void setConvertTabs(bool convert=true);
+		bool getConvertTabs();
+		
+		/// set overall text alpha, clamped to 0.0 - 1.0, default: 1.0
+		void setAlpha(float alpha);
+		float getAlpha();
+		
+		/// text color color, default: white
+		/// overridden by color scheme if a scheme is set
+		void setTextColor(ofColor color);
+		ofColor& getTextColor();
+		
+		/// cursor color, default: yellow w/ alpha
+		void setCursorColor(ofColor color);
+		ofColor& getCursorColor();
+		
+		/// selection color, default: green w/ alpha
+		void setSelectionColor(ofColor color);
+		ofColor& getSelectionColor();
 	
-	float alpha;                //< overall text alpha, must be in the range 0.0 - 1.0
-	ofColor textColor;		    //< general text color, default: white, overridden by color scheme
-	ofColor cursorColor;	    //< text pos cursor color, default; yellow w/ alpha
-	ofColor selectionColor;     //< char selection highlight color, default: green w/ alpha
-	ofColor matchingCharsColor; //< matching chars highlight color, default: blue w/ alpha
-	ofColor lineNumberColor;    //< line number color, default: gray
+		/// matching chars highlight color, default: blue w/ alpha
+		void setMatchingCharsColor(ofColor color);
+		ofColor& getMatchingCharsColor();
+	
+		/// line number color, default: gray
+		void setLineNumberColor(ofColor color);
+		ofColor& getLineNumberColor();
+	
+		/// highlight matching open/close chars?, default: true
+		void setHighlightMatchingChars(bool highlight=true);
+		bool getHighlightMatchingChars();
+	
+		/// set the matching open/close chars to highlight,
+		/// default: "([<{" & ")]>}", strings should not be empty
+		/// note: matching chars are not highlighted inside comments
+		void setMatchingChars(wstring openChars, wstring closeChars);
+		void setMatchingChars(string openChars, string closeChars);
+		wstring& getWideOpenChars();
+		string getOpenChars();
+		wstring& getWideCloseChars();
+		string getCloseChars();
+	
+	protected:
+	
+		unsigned int tabWidth; //< tab width in spaces
+		bool convertTabs; //< convert tabs to spaces?
+		
+		float alpha;                //< overall text alpha
+		ofColor textColor;		    //< general text color, overridden by color scheme
+		ofColor cursorColor;	    //< text pos cursor color
+		ofColor selectionColor;     //< char selection highlight color
+		ofColor matchingCharsColor; //< matching chars highlight color
+		ofColor lineNumberColor;    //< line number color
 
-	bool highlightMatchingChars; //< highlight matching open/close chars?, default: true
+		bool highlightMatchingChars; //< highlight matching open/close chars?
 
-	/// set the matching open/close chars to highlight, strings should not be empty
-	/// note: matching chars are not highlighted inside comments
-	string openChars;  //< open chars (parens, brackets, etc) for matching highlight, default: "([<{"
-	string closeChars; //< close chars (parens, bracket, etc) for matching highlight, default: ")]>}"
-
-	// defaults
-	ofxEditorSettings() {
-
-		tabWidth = 4;
-		convertTabs = false;
-
-		alpha = 1.0f;
-		textColor = ofColor(255);
-		cursorColor = ofColor(255, 255, 0, 200);
-		selectionColor = ofColor(0, 255, 0, 127);
-		matchingCharsColor = ofColor(0, 127, 255, 127);
-		lineNumberColor = ofColor(127);
-
-		highlightMatchingChars = true;
-		openChars = "([<{";
-		closeChars = ")]>}";
-	}
+		wstring openChars;  //< open chars (parens, brackets, etc) for matching highlight
+		wstring closeChars; //< close chars (parens, bracket, etc) for matching highlight
 };
