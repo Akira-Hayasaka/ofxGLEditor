@@ -162,6 +162,9 @@ class ofxEditor {
 		/// animate the cursor so it's easy to find
 		void blowupCursor();
 	
+		/// returns true if text is currently selected
+		bool isSelection();
+	
 		/// get the total number of lines in the text buffer
 		unsigned int getNumLines();
 	

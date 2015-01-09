@@ -150,8 +150,13 @@ class ofxGLEditor {
 		
 		/// get the filename of the current editor (default: empty string "")
 		string getEditorFilename(int editor);
+	
+		/// returns true if text is currently selected in an editor
+		/// set editor to 0 for the current editor
+		bool isSelection(int editor=0);
 		
 		/// number of lines of text in an editor
+		/// set editor to 0 for the current editor
 		unsigned int getNumLines(int editor=0);
 		
 		/// current line of an editor

@@ -407,6 +407,16 @@ string ofxGLEditor::getEditorFilename(int editor) {
 }
 
 //--------------------------------------------------------------
+bool ofxGLEditor::isSelection(int editor) {
+	editor = getEditorIndex(editor);
+	if(editor == -1) {
+		ofLogError("ofxGLEditor") << "cannot check selection from unknown editor " << editor;
+		return 0;
+	}
+	return m_editors[editor]->isSelection();
+}
+
+//--------------------------------------------------------------
 unsigned int ofxGLEditor::getNumLines(int editor) {
 	editor = getEditorIndex(editor);
 	if(editor == -1) {

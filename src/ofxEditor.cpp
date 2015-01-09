@@ -973,6 +973,11 @@ void ofxEditor::blowupCursor() {
 }
 
 //--------------------------------------------------------------
+bool ofxEditor::isSelection() {
+	return m_selection;
+}
+
+//--------------------------------------------------------------
 unsigned int ofxEditor::getNumLines() {
 	return m_numLines;
 }

@@ -10,29 +10,38 @@ void ofApp::setup() {
 	script = "scripts/liveCodingExample.lua";
 	
 	// init the lua state
-	lua.init(true);
+	lua.init(true); // true because we want to stop on an error
 	
 	// listen to error events
 	lua.addListener(this);
-	
-	// reinit the lua state, clears test data in state
-	lua.init(true); // true because we want to stop on an error
-	
-	// bind the OF api to the lua state
-	lua.bind<ofxLuaBindings>();
-	
-	// run a script
-	lua.doScript(script);
-	
-	// call the script's setup() function
-	lua.scriptSetup();
     
-    
-    ofxEditor::loadFont("fonts/PrintChar21.ttf", 30);
+    // load editor font
+    ofxEditor::loadFont("fonts/PrintChar21.ttf", 24);
+	hideEditor = false;
     
     // sample lua syntax
-    colorScheme.setWordColor("function", ofColor::fuchsia);
+	// lau 5.1 keywords from http://www.lua.org/manual/5.1/manual.html
+    colorScheme.setWordColor("and", ofColor::fuchsia);
     colorScheme.setWordColor("end", ofColor::fuchsia);
+	colorScheme.setWordColor("in", ofColor::fuchsia);
+	colorScheme.setWordColor("repeat", ofColor::fuchsia);
+	colorScheme.setWordColor("break", ofColor::fuchsia);
+	colorScheme.setWordColor("false", ofColor::fuchsia);
+	colorScheme.setWordColor("local", ofColor::fuchsia);
+	colorScheme.setWordColor("return", ofColor::fuchsia);
+	colorScheme.setWordColor("do", ofColor::fuchsia);
+	colorScheme.setWordColor("for", ofColor::fuchsia);
+	colorScheme.setWordColor("nil", ofColor::fuchsia);
+	colorScheme.setWordColor("then", ofColor::fuchsia);
+	colorScheme.setWordColor("else", ofColor::fuchsia);
+	colorScheme.setWordColor("function", ofColor::fuchsia);
+	colorScheme.setWordColor("not", ofColor::fuchsia);
+	colorScheme.setWordColor("true", ofColor::fuchsia);
+	colorScheme.setWordColor("elseif", ofColor::fuchsia);
+	colorScheme.setWordColor("if", ofColor::fuchsia);
+	colorScheme.setWordColor("or", ofColor::fuchsia);
+	colorScheme.setWordColor("until", ofColor::fuchsia);
+	colorScheme.setWordColor("while", ofColor::fuchsia);
     colorScheme.setSingleLineComment("--");
     colorScheme.setMultiLineComment("--[[", "]]");
     
@@ -42,10 +51,16 @@ void ofApp::setup() {
     colorScheme.setCommentColor(ofColor::gray);
     editor.setColorScheme(&colorScheme);
     
-    // open test file
+    // open script file into editor
     ofFile testFile;
     testFile.open(script, ofFile::ReadOnly);
     editor.setText(testFile.readToBuffer().getText());
+
+	// execute script from editor
+	lua.doString(editor.getText());
+	
+	// call the script's setup() function
+	lua.scriptSetup();
 }
 
 //--------------------------------------------------------------
@@ -58,8 +73,10 @@ void ofApp::update() {
 void ofApp::draw() {
 	// call the script's draw() function
 	lua.scriptDraw();
-    
-    editor.draw();
+	
+	if(!hideEditor) {
+		editor.draw();
+	}
 }
 
 //--------------------------------------------------------------
@@ -74,8 +91,6 @@ void ofApp::exit() {
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key) {
 	
-    lua.scriptKeyPressed(key);
-	
     bool modifierPressed = ofxEditor::getSuperAsModifier() ? ofGetKeyPressed(OF_KEY_SUPER) : ofGetKeyPressed(OF_KEY_CONTROL);
     if(modifierPressed) {
         switch(key) {
@@ -87,8 +102,8 @@ void ofApp::keyPressed(int key) {
                     editor.setColorScheme(&colorScheme);
                 }
                 return;
-            case 'r':
-                reloadScript();
+            case 'e':
+                executeScript();
                 return;
             case 'f':
                 ofToggleFullscreen();
@@ -99,19 +114,19 @@ void ofApp::keyPressed(int key) {
             case 'n':
                 editor.setLineNumbers(!editor.getLineNumbers());
                 return;
-            case '1':
-                ofLogNotice() << "current line: " << editor.getCurrentLine() <<	" pos: " << editor.getCurrentLinePos();
-                editor.setCurrentLinePos(1, 5);
-                ofLogNotice() << "current line: " << editor.getCurrentLine() <<	" pos: " << editor.getCurrentLinePos();
-                break;
-            case '2':
-                ofLogNotice() << "current line: " << editor.getCurrentLine() <<	" pos: " << editor.getCurrentLinePos();
-                editor.setCurrentLinePos(5, 2);
-                ofLogNotice() << "current line: " << editor.getCurrentLine() <<	" pos: " << editor.getCurrentLinePos();
-                break;
+			case 't':
+				hideEditor = !hideEditor;
+				return;
         }
     }
-    editor.keyPressed(key);
+	
+	// sedn regular key pressed to script if the editor is hidden
+	if(hideEditor) {
+		lua.scriptKeyPressed(key);
+	}
+	else {
+		editor.keyPressed(key);
+	}
 }
 
 //--------------------------------------------------------------
@@ -135,17 +150,28 @@ void ofApp::mouseReleased(int x, int y, int button) {
 }
 
 //--------------------------------------------------------------
+void ofApp::windowResized(int w, int h) {
+	editor.resize(w, h);
+}
+
+//--------------------------------------------------------------
 void ofApp::errorReceived(string& msg) {
 	ofLogNotice() << "got a script error: " << msg;
 }
 
 //--------------------------------------------------------------
-void ofApp::reloadScript() {
-	// exit, reinit the lua state, and reload the current script
-	lua.scriptExit();
-	lua.init(true);
-	lua.bind<ofxLuaBindings>(); // rebind
+void ofApp::executeScript() {
+	// only reload lua state if running the entire script, otherwise
+	// run text selection
+	bool selection = editor.isSelection();
+	if(!selection) {
+		// exit, reinit the lua state, and reload the current script
+		lua.scriptExit();
+		lua.init(true);
+	}
     lua.doString(editor.getText());
-	lua.scriptSetup();
+	if(!selection) {
+		lua.scriptSetup();
+	}
 }
 
