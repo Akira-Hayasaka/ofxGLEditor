@@ -30,7 +30,8 @@
 /// based on the Fluxus GLEditor
 ///
 /// uses wide chars internally so string conversion functions are provided
-/// TODO: 3 or 4 byte UTF-8 chars aren't handled in keyPressed
+/// TODO: 3 or 4 byte UTF-8 chars aren't handled in keyPressed no are they
+///       drawn since ofTrueTypeFont currently caps chars at 256
 ///
 class ofxEditor {
 

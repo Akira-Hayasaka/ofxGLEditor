@@ -428,7 +428,12 @@ void ofxEditor::draw() {
 				else {
 					ofSetColor(m_settings->getTextColor().r, m_settings->getTextColor().g,
 						       m_settings->getTextColor().b, m_settings->getTextColor().a * m_settings->getAlpha());
-					s_font->drawCharacter(m_text[i], x, y);
+					if(m_text[i] < 0x80) {
+						s_font->drawCharacter(m_text[i], x, y);
+					}
+					else {
+						s_font->drawStringAsShapes(wstring_to_string(m_text.substr(i, 1)), x, y);
+					}
 					x += s_charWidth;
 					xcount++;
 					textPos++;
@@ -1067,7 +1072,12 @@ void ofxEditor::drawString(wstring s, float x, float y) {
 			xPos += s_charWidth*m_settings->getTabWidth();
 		}
 		else {
-			s_font->drawCharacter(s[i], xPos, yPos);
+			if(m_text[i] < 0x80) {
+				s_font->drawCharacter(s[i], xPos, yPos);
+			}
+			else {
+				s_font->drawStringAsShapes(wstring_to_string(s.substr(i, 1)), xPos, yPos);
+			}
 			xPos += s_charWidth;
 		}
 	}

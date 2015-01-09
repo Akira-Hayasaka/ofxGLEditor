@@ -1,0 +1,9 @@
+show a few utf8 wide chars:
+
+2 bytes: Ø Æ ö ä « » þ
+
+3 or 4 byte chars don't work yet in OF,
+so you should see 3 ?'s after "Japan"
+
+CJK: Japan 日本国
+
