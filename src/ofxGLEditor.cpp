@@ -22,6 +22,7 @@
 //--------------------------------------------------------------
 ofxGLEditor::ofxGLEditor() {
 	m_listener = NULL;
+	m_fileDialog = NULL;
 	m_saveFiles.resize(s_numEditors);
 	m_currentEditor = 0;
 	bModifierPressed = false;
