@@ -63,6 +63,7 @@ void ofxGLEditor::setup(ofxGLEditorListener *listener, bool enableRepl) {
 	m_fileDialog->setPath(ofToDataPath(""));
 	
 	resize();
+	setAutoFocus(true);
 	
 	m_currentEditor = 1;
 }
