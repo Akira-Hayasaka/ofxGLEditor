@@ -117,6 +117,9 @@ void ofApp::keyPressed(int key) {
 			case 't':
 				hideEditor = !hideEditor;
 				return;
+			case 'z':
+				editor.setAutoFocus(!editor.getAutoFocus());
+				return;
         }
     }
 	

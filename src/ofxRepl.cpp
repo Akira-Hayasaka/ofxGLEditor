@@ -102,11 +102,17 @@ void ofxRepl::keyPressed(int key) {
 		return;
 	}
 
+	// key cursor on prompt line
 	if(m_position < m_promptPos) {
 		m_position = m_text.length();
 	}
 	else {
 		switch(key) {
+			case OF_KEY_LEFT:
+				if(m_position == m_promptPos) {
+					return;
+				}
+				break;
 			case OF_KEY_UP:
 				historyPrev();
 				return;
@@ -203,7 +209,7 @@ void ofxRepl::eval() {
 				ofLogWarning("ofxRepl") << "listener not set";
 			}
 
-			if(defun[defun.length()-1] == L'\n') {
+			if(defun[defun.length()-1] == '\n') {
 				defun.resize(defun.length()-1, 0);
 			}
 			m_history.push_back(defun);
@@ -220,8 +226,8 @@ void ofxRepl::eval() {
 //--------------------------------------------------------------
 void ofxRepl::printPrompt() {
 	m_insertPos = m_text.length();
-	if(m_text.length() > 0 && m_text[m_insertPos-1] != L'\n') {
-		m_text += L'\n';
+	if(m_text.length() > 0 && m_text[m_insertPos-1] != '\n') {
+		m_text += '\n';
 		m_insertPos++;
 	}
 	m_text += s_prompt;

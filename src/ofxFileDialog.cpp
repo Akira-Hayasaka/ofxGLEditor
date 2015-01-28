@@ -51,15 +51,15 @@ ofxFileDialog::~ofxFileDialog() {
 void ofxFileDialog::draw() {
 	
 	// default size if not set
-	if(m_viewport.width == 0 || m_viewport.height == 0) {
+	if(m_width == 0 || m_height == 0) {
 		resize(ofGetWidth(), ofGetHeight());
 	}
 
 	ofPushStyle();
 	ofPushView();
 	
-		ofViewport(m_viewport);
-		ofTranslate(s_charWidth*4, m_viewport.height/2);
+		ofViewport(0, 0, m_width, m_height);
+		ofTranslate(s_charWidth*4, m_height/2);
 	
 		ofFill();
 		if(m_saveAs) {

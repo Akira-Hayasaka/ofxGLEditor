@@ -22,8 +22,8 @@
 //--------------------------------------------------------------
 void ofApp::setup() {
 
-	ofBackground(0);
 	ofSetFrameRate(30);
+	ofBackground(0);
 	
 	// let's see what's going on inside
 	ofSetLogLevel("ofxGLEditor", OF_LOG_VERBOSE);
@@ -53,6 +53,7 @@ void ofApp::setup() {
 	// other settings
 	//editor.setLineWrapping(true);
 	//editor.setLineNumbers(true);
+	//editor.setAutoFocus(true);
 	
 	// move the cursor to a specific line
 	//editor.setCurrentLine(4);
@@ -63,7 +64,7 @@ void ofApp::setup() {
 void ofApp::draw() {
 	
 	editor.draw();
-
+	
 	// draw current editor info using the same font as the editor
 	if(!editor.isHidden() && editor.getCurrentEditor() > 0) {
 	
@@ -103,6 +104,9 @@ void ofApp::keyPressed(int key) {
 				return;
 			case 'n': case 14:
 				editor.setLineNumbers(!editor.getLineNumbers());
+				return;
+			case 'z': case 26:
+				editor.setAutoFocus(!editor.getAutoFocus());
 				return;
 		}
 	}

@@ -42,10 +42,14 @@ class ofxEditorSettings {
 		void setAlpha(float alpha);
 		float getAlpha();
 		
-		/// text color color, default: white
+		/// text color, default: white
 		/// overridden by color scheme if a scheme is set
 		void setTextColor(ofColor color);
 		ofColor& getTextColor();
+	
+		/// text offset shadow color, default: black
+		void setTextShadowColor(ofColor color);
+		ofColor& getTextShadowColor();
 		
 		/// cursor color, default: yellow w/ alpha
 		void setCursorColor(ofColor color);
@@ -84,6 +88,7 @@ class ofxEditorSettings {
 		
 		float alpha;                //< overall text alpha
 		ofColor textColor;		    //< general text color, overridden by color scheme
+		ofColor textShadowColor;	//< text offset shadow color
 		ofColor cursorColor;	    //< text pos cursor color
 		ofColor selectionColor;     //< char selection highlight color
 		ofColor matchingCharsColor; //< matching chars highlight color

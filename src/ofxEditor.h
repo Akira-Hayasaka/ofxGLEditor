@@ -52,7 +52,8 @@ class ofxEditor {
 		/// is a font currently loaded?
 		static bool isFontLoaded();
 		
-		/// get the currently loaded editor font
+		/// get the currently loaded editor font,
+		/// returns NULL if not loaded
 		static ofTrueTypeFont* getFont();
 	
 		/// get the fixed width of a char using editor font
@@ -61,11 +62,31 @@ class ofxEditor {
 		/// get the fixed height of a char using editor font
 		static int getCharHeight();
 	
+		/// enable/disable text offset shadow, default: true
+		static void setTextShadow(bool shadow=true);
+	
+		/// is text being drawn with an offset shadow?
+		static bool getTextShadow();
+	
 		/// set useSuper = true if you want to use the Super (Windows key, Mac CMD)
 		/// key as the modifier key, otherwise false uses CTRL key
 		/// default: true on Mac & false on all other platforms
-		static void setSuperAsModifier(bool useSuper);
+		static void setSuperAsModifier(bool useSuper=true);
+	
+		/// is the Super key the modifier key? if not, then CTRL
 		static bool getSuperAsModifier();
+	
+		/// set the minimum auto focus zoom scale, default: 0.5
+		static void setAutoFocusMinScale(float min);
+	
+		/// get the minimum auto focus zoom scale
+		static float getAutoFocusMinScale();
+	
+		/// set the maximum auto focus zoom scale, default: 5.0
+		static void setAutoFocusMaxScale(float max);
+	
+		/// get the maximum auto focs zoom scale
+		static float getAutoFocusMaxScale();
 	
 	/// \section Main
 		
@@ -157,6 +178,12 @@ class ofxEditor {
 		/// get line numbers value
 		bool getLineNumbers();
 	
+		/// enable/disable auto focus zooming
+		void setAutoFocus(bool focus=true);
+	
+		/// get auto focus value
+		bool getAutoFocus();
+	
 	/// \section Current Position & Info
 	
 		/// animate the cursor so it's easy to find
@@ -222,12 +249,24 @@ class ofxEditor {
 		static ofPtr<Font> s_font;       //< global editor font
 		static int s_charWidth;          //< char block pixel width
 		static int s_charHeight;         //< char block pixel height
-		static int s_cursorWidth;		 //< cursor width, 1/3 char width
+		static int s_cursorWidth;        //< cursor width, 1/3 char width
+		static bool s_textShadow;        //< draw text with a 2px offset shadow?
 	
 		static bool s_superAsModifier;   //< use the super key as modifier?
 	
 		/// shared copy/paste buffer if system clipboard isn't available
 		static wstring s_copyBuffer;
+	
+		/// timestamp for calculating animations, shared between editors for smooth
+		/// animation when switching back and forth
+		static float s_time;
+	
+		// auto focus
+		static bool s_debugAutoFocus; //< draw the viewport and text bounding box?
+		static float s_autoFocusError; //< scale snapping amount
+		static float s_autoFocusScaleDrift; //< scale shrink/grow modifier (aka speed)
+		static float s_autoFocusMinScale;   //< minimum allowed scaling
+		static float s_autoFocusMaxScale;   //< maximum allowed scaling
 	
 	/// \section Member Variables
 
@@ -237,7 +276,9 @@ class ofxEditor {
 		wstring m_text; //< text buffer
 		unsigned int m_numLines; //< number of lines in the text buffer
 		
-		ofRectangle m_viewport;     //< viewport when drawing editor
+		//ofRectangle m_viewport;     //< viewport when drawing editor
+		float m_width, m_height; //< editor viewport pixel size
+		float m_posX, m_posY;    //< editor offset, calculated by line pos & auto focus
 		unsigned int m_position;    //< 1D text pos within buffer
 		unsigned int m_desiredXPos; //< desired char pos on current line
 		
@@ -262,12 +303,16 @@ class ofxEditor {
 		bool m_lineWrapping; //< enable line wrapping in this editor?
 		bool m_lineNumbers;  //< enable line numbers?
 		unsigned int m_lineNumWidth; //< line number block width in chars 
-		
-		float m_time;         //< timestamp for calculating animations
+	
 		float m_delta;        //< difference from last timestamp
 		float m_flash;        //< cursor flash animation time
 		bool m_blowupCursor;  //< blow up the cursor?
 		float m_blowup;       //< how much the cursor is being blown up
+	
+		// auto focus
+		bool m_autoFocus;       //< enable auto focus scaling?
+		float m_scale;          //< scale amount calculated by auto focus
+		float m_BBMinX, m_BBMaxX, m_BBMinY, m_BBMaxY; //< current text bounding box
 		
 	/// \section Syntax Parser Types
 		
@@ -309,7 +354,10 @@ class ofxEditor {
 	
 	/// \section Helper Functions
 	
-		// draw a matching char hilight char block rectanlge at pos
+		// draw a char at pos with text colors
+		void drawChar(int c, int x, int y, ofColor &textColor, ofColor &shadowColor);
+	
+		// draw a matching char highlight char block rectanlge at pos
 		void drawMatchingCharBlock(int x, int y);
 	
 		/// draw a selection char block rectangle at pos
@@ -365,6 +413,12 @@ class ofxEditor {
 		/// update the animation timestamps
 		/// make sure to call this of you implement your own draw() function
 		void updateTimestamps();
+	
+		/// expand the auto focus bounding box
+		void expandBoundingBox(float x, float y);
+	
+		// clear the autofocus bounding box
+		void clearBoundingBox();
 		
 	private:
 	

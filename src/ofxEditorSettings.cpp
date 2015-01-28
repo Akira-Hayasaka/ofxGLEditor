@@ -29,6 +29,7 @@ ofxEditorSettings::ofxEditorSettings() {
 
 	alpha = 1.0f;
 	textColor = ofColor(255);
+	textShadowColor = ofColor(0);
 	cursorColor = ofColor(255, 255, 0, 200);
 	selectionColor = ofColor(0, 255, 0, 127);
 	matchingCharsColor = ofColor(0, 127, 255, 127);
@@ -69,6 +70,14 @@ void ofxEditorSettings::setTextColor(ofColor color) {
 
 ofColor& ofxEditorSettings::getTextColor() {
 	return textColor;
+}
+
+void ofxEditorSettings::setTextShadowColor(ofColor color) {
+	textShadowColor = color;
+}
+
+ofColor& ofxEditorSettings::getTextShadowColor() {
+	return textShadowColor;
 }
 
 void ofxEditorSettings::setCursorColor(ofColor color) {

@@ -23,13 +23,13 @@
 void ofApp::setup() {
 
 	ofSetVerticalSync(true);
-	ofSetFrameRate(30);
+	//ofSetFrameRate(60);
 	
 	// handle ESC internally since we use it to exit selection
 	ofSetEscapeQuitsApp(false);
 
 	// make sure to load editor font before anything else!
-	ofxEditor::loadFont("fonts/PrintChar21.ttf", 30);
+	ofxEditor::loadFont("fonts/PrintChar21.ttf", 24);
 	
 	// sample lua syntax
 	colorScheme.setWordColor("function", ofColor::fuchsia);
@@ -48,7 +48,14 @@ void ofApp::setup() {
 	editor.setText(testFile.readToBuffer().getText());
 	ofLogNotice() << "num chars: " << editor.getNumCharacters() << " num lines: " << editor.getNumLines();
 	
+	// default: white text on black background
 	ofBackground(0);
+	
+	// or black text on white background
+	//ofBackground(255);
+	//editor.getSettings().setTextColor(ofColor::black);
+	//editor.getSettings().setTextShadowColor(ofColor::gray);
+	
 	debug = false;
 }
 
@@ -90,6 +97,12 @@ void ofApp::keyPressed(int key) {
 				return;
 			case 'n':
 				editor.setLineNumbers(!editor.getLineNumbers());
+				return;
+			case 'z':
+				editor.setAutoFocus(!editor.getAutoFocus());
+				return;
+			case 'w':
+				ofxEditor::setTextShadow(!ofxEditor::getTextShadow());
 				return;
 			case '1':
 				ofLogNotice() << "current line: " << editor.getCurrentLine() <<	" pos: " << editor.getCurrentLinePos();

@@ -566,6 +566,18 @@ bool ofxGLEditor::getLineNumbers() {
 	return m_editors[1]->getLineNumbers();
 }
 
+//--------------------------------------------------------------
+void ofxGLEditor::setAutoFocus(bool focus) {
+	for(int i = 0; i < s_numEditors; ++i) {
+		m_editors[i]->setAutoFocus(focus);
+	}
+}
+
+//--------------------------------------------------------------
+bool ofxGLEditor::getAutoFocus() {
+	return m_editors[1]->getAutoFocus();
+}
+
 // PRIVATE
 
 //--------------------------------------------------------------

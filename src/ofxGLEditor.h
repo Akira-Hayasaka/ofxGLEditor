@@ -192,7 +192,7 @@ class ofxGLEditor {
 		/// clears Repl history, does not clear buffer text
 		void clearReplHistory();
 	
-	/// \section Settings
+	/// \section Display Settings
 
 		/// access to the internal settings object
 		///
@@ -216,6 +216,12 @@ class ofxGLEditor {
 	
 		/// get editor line numbers value
 		bool getLineNumbers();
+	
+		/// enable/disable auto focus zooming
+		void setAutoFocus(bool focus=true);
+	
+		/// get auto focus value
+		bool getAutoFocus();
 		
 	/// \section Util
 		

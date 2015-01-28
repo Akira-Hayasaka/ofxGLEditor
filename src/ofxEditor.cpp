@@ -27,7 +27,7 @@
 // GLFW needed for clipboard support
 #if !defined(TARGET_NODISPLAY) && !defined(TARGET_OF_IOS) && \
     !defined(TARGET_ANDROID) && !defined(TARGET_RASPBERRY_PI)
-	#include "ofAppGLFWWindow.h"
+    #include "ofAppGLFWWindow.h"
 #endif
 
 #define FLASH_RATE 1
@@ -44,8 +44,17 @@ ofPtr<ofxEditor::Font> ofxEditor::s_font;
 int ofxEditor::s_charWidth = 1;
 int ofxEditor::s_charHeight = 1;
 int ofxEditor::s_cursorWidth = 1;
+bool ofxEditor::s_textShadow = true;
 
 wstring ofxEditor::s_copyBuffer;
+
+float ofxEditor::s_time = 0;
+
+bool ofxEditor::s_debugAutoFocus = false;
+float ofxEditor::s_autoFocusError = 5;
+float ofxEditor::s_autoFocusScaleDrift = 0.3;
+float ofxEditor::s_autoFocusMinScale = 0.5;
+float ofxEditor::s_autoFocusMaxScale = 5.0;
 
 // use CMD on OSX, CTRL for Windows & Linux by default
 #ifdef __APPLE__
@@ -61,6 +70,7 @@ ofxEditor::ofxEditor() {
 	m_settings = new ofxEditorSettings;
 	m_sharedSettings = false;
 	
+	m_width = m_height = 0;
 	m_position = 0;
 	m_desiredXPos = 0;
 	
@@ -79,11 +89,16 @@ ofxEditor::ofxEditor() {
 	m_lineNumbers = false;
 	m_lineNumWidth = 0;
 	
-	m_time = 0;
 	m_delta = 0;
 	m_flash = 0;
 	m_blowupCursor = false;
 	m_blowup = 0;
+	
+	m_autoFocus = false;
+	m_posX = m_posY = 0;
+	m_scale = 1.0;
+	m_BBMinX = 0; m_BBMaxX = 0;
+	m_BBMinY = 0; m_BBMaxY = 0;
 }
 
 //--------------------------------------------------------------
@@ -93,6 +108,7 @@ ofxEditor::ofxEditor(ofxEditorSettings &sharedSettings) {
 	m_settings = &sharedSettings;
 	m_sharedSettings = true;
 	
+	m_width = m_height = 0;
 	m_position = 0;
 	m_desiredXPos = 0;
 	
@@ -111,11 +127,16 @@ ofxEditor::ofxEditor(ofxEditorSettings &sharedSettings) {
 	m_lineNumbers = false;
 	m_lineNumWidth = 0;
 	
-	m_time = 0;
 	m_delta = 0;
 	m_flash = 0;
 	m_blowupCursor = false;
 	m_blowup = 0;
+	
+	m_autoFocus = false;
+	m_posX = m_posY = 0;
+	m_scale = 1.0;
+	m_BBMinX = 0; m_BBMaxX = 0;
+	m_BBMinY = 0; m_BBMaxY = 0;
 }
 
 //--------------------------------------------------------------
@@ -131,7 +152,7 @@ ofxEditor::~ofxEditor() {
 bool ofxEditor::loadFont(const string &font, int size) {
 	
 	string path = ofToDataPath(font);
-	if(!ofFile::doesFileExist(path)){
+	if(!ofFile::doesFileExist(path)) {
 		ofLogFatalError("ofxEditor") << "couldn't find font \"" << font << "\"";
 			return false;
 	}
@@ -168,6 +189,16 @@ int ofxEditor::getCharHeight() {
 }
 
 //--------------------------------------------------------------
+void ofxEditor::setTextShadow(bool shadow) {
+	s_textShadow = shadow;
+}
+
+//--------------------------------------------------------------
+bool ofxEditor::getTextShadow() {
+	return s_textShadow;
+}
+
+//--------------------------------------------------------------
 void ofxEditor::setSuperAsModifier(bool useSuper) {
 	s_superAsModifier = useSuper;
 }
@@ -177,20 +208,65 @@ bool ofxEditor::getSuperAsModifier() {
 	return s_superAsModifier;
 }
 
+//--------------------------------------------------------------
+void ofxEditor::setAutoFocusMinScale(float min) {
+	s_autoFocusMinScale = min;
+}
+	
+//--------------------------------------------------------------
+float ofxEditor::getAutoFocusMinScale() {
+	return s_autoFocusMinScale;
+}
+
+//--------------------------------------------------------------
+void ofxEditor::setAutoFocusMaxScale(float max) {
+	s_autoFocusMaxScale = max;
+}
+
+//--------------------------------------------------------------
+float ofxEditor::getAutoFocusMaxScale() {
+	return s_autoFocusMaxScale;
+}
+
 // MAIN
 
 //--------------------------------------------------------------
 void ofxEditor::draw() {
 
 	// default size if not set
-	if(m_viewport.width == 0 || m_viewport.height == 0) {
+	if(m_width == 0 || m_height == 0) {
 		resize();
+	}
+
+	// update scrolling
+	m_posX = 0;
+	if(!m_lineWrapping && (m_autoFocus ? m_scale <= s_autoFocusMinScale : true)) {
+		m_desiredXPos = offsetToCurrentLineStart();
+		if(m_desiredXPos >= m_visibleChars) {
+			m_posX = -1 * (int)m_leftTextPosition * s_charWidth;
+		}
 	}
 
 	ofPushStyle();
 	ofPushView();
+		ofViewport(0, 0, m_width, m_height);
+		ofPushMatrix();
+		
+		// scale when using auto focus
+		if(m_autoFocus) {
+			if(s_debugAutoFocus) {
+				ofNoFill();
+				ofSetColor(ofColor::green);
+				ofRect(0, 0, m_width, m_height);
+				ofFill();
+			}
+			ofTranslate(0, m_height/2);
+			ofScale(m_scale, m_scale);
+		}
+		ofTranslate(m_posX, m_posY);
 	
-		ofViewport(m_viewport);
+		m_visibleChars = m_width/(s_charWidth*m_scale) - (m_lineNumbers ? m_lineNumWidth : 0);
+		m_visibleLines = m_height/(s_charHeight*m_scale);
 	
 		m_matchingCharsHighlight[0] = -1;
 		m_matchingCharsHighlight[1] = -1;
@@ -203,6 +279,7 @@ void ofxEditor::draw() {
 		int x = 0, y = s_charHeight; // pixel pos
 		unsigned int textPos = 0;
 		unsigned int xcount = 0;
+		clearBoundingBox();
 	
 		// for line numbers
 		int currentLine = 0;
@@ -235,6 +312,7 @@ void ofxEditor::draw() {
 					continue;
 				}
 				
+				ofColor *textColor;
 				switch(tb.type) {
 				
 					case UNKNOWN:
@@ -242,38 +320,17 @@ void ofxEditor::draw() {
 						break;
 						
 					case WORD: {
-						if(comment) {
-							ofColor &c = m_colorScheme->getCommentColor();
-							ofSetColor(c.r, c.g, c.b, c.a * m_settings->getAlpha());
-						}
-						else {
-							ofColor &c = m_colorScheme->getWordColor(tb.text);
-							ofSetColor(c.r, c.g, c.b, c.a * m_settings->getAlpha());
-						}
+						textColor = comment ? &m_colorScheme->getCommentColor() : &m_colorScheme->getWordColor(tb.text);
 						break;
 					}
 						
 					case STRING: {
-						if(comment) {
-							ofColor &c = m_colorScheme->getCommentColor();
-							ofSetColor(c.r, c.g, c.b, c.a * m_settings->getAlpha());
-						}
-						else {
-							ofColor &c = m_colorScheme->getStringColor();
-							ofSetColor(c.r, c.g, c.b, c.a * m_settings->getAlpha());
-						}
+						textColor = comment ? &m_colorScheme->getCommentColor() : &m_colorScheme->getStringColor();
 						break;
 					}
 						
 					case NUMBER: {
-						if(comment) {
-							ofColor &c = m_colorScheme->getCommentColor();
-							ofSetColor(c.r, c.g, c.b, c.a * m_settings->getAlpha());
-						}
-						else {
-							ofColor &c = m_colorScheme->getNumberColor();
-							ofSetColor(c.r, c.g, c.b, c.a * m_settings->getAlpha());
-						}
+						textColor = comment ? &m_colorScheme->getCommentColor() : &m_colorScheme->getNumberColor();
 						break;
 					}
 					
@@ -293,7 +350,8 @@ void ofxEditor::draw() {
 				for(int i = 0; i < tb.text.length(); ++i) {
 					
 					// line wrap at the block level
-					if(m_lineWrapping && xcount >= m_visibleChars) {
+					if(m_lineWrapping && xcount >= m_visibleChars && (m_autoFocus ? m_scale <= s_autoFocusMinScale : true)) {
+						expandBoundingBox(x, y+s_charHeight);
 						x = 0;
 						y += s_charHeight;
 						xcount = 0;
@@ -344,12 +402,13 @@ void ofxEditor::draw() {
 							textPos++;
 							break;
 						default:
-							s_font->drawCharacter(tb.text[i], x, y);
+							drawChar(tb.text[i], x, y, *textColor, m_settings->getTextShadowColor());
 							x += s_charWidth;
 							xcount++;
 							textPos++;
 							break;
 					}
+					expandBoundingBox(x,y);
 				}
 			}
 		}
@@ -366,7 +425,8 @@ void ofxEditor::draw() {
 			for(int i = m_topTextPosition; i < m_text.length() && m_displayedLineCount < m_visibleLines; ++i) {
 			
 				// line wrap
-				if(m_lineWrapping && xcount >= m_visibleChars) {
+				if(m_lineWrapping && xcount >= m_visibleChars && (m_autoFocus ? m_scale <= s_autoFocusMinScale : true)) {
+					expandBoundingBox(x, y+s_charHeight);
 					x = 0;
 					y += s_charHeight;
 					xcount = 0;
@@ -400,6 +460,7 @@ void ofxEditor::draw() {
 			
 				// endline
 				if(m_text[i] == '\n') {
+					expandBoundingBox(x, y+s_charHeight);
 					x = 0;
 					y += s_charHeight;
 					textPos++;
@@ -411,7 +472,6 @@ void ofxEditor::draw() {
 				}
 				// tab
 				else if(m_text[i] == '\t') {
-					
 					if(m_selection && i >= m_highlightStart && i < m_highlightEnd) {
 						int tabX = x+s_charWidth;
 						for(int i = 0; i < m_settings->getTabWidth()-1; ++i) {
@@ -419,24 +479,18 @@ void ofxEditor::draw() {
 							tabX += s_charWidth;
 						}
 					}
-					
 					x += s_charWidth * m_settings->getTabWidth();
 					xcount += m_settings->getTabWidth();
 					textPos++;
+					expandBoundingBox(x, y);
 				}
 				// everything else
 				else {
-					ofSetColor(m_settings->getTextColor().r, m_settings->getTextColor().g,
-						       m_settings->getTextColor().b, m_settings->getTextColor().a * m_settings->getAlpha());
-					if(m_text[i] < 0x80) {
-						s_font->drawCharacter(m_text[i], x, y);
-					}
-					else {
-						s_font->drawStringAsShapes(wstring_to_string(m_text.substr(i, 1)), x, y);
-					}
+					drawChar(m_text[i], x, y, m_settings->getTextColor(), m_settings->getTextShadowColor());
 					x += s_charWidth;
 					xcount++;
 					textPos++;
+					expandBoundingBox(x, y);
 				}
 			}
 		}
@@ -459,6 +513,46 @@ void ofxEditor::draw() {
 			drawCursor(x, y);
 		}
 	
+		// calculate auto focus bounding box and scaling
+		if(m_autoFocus) {
+			m_posY = m_posY*(1-m_delta) - (m_BBMinY+(m_BBMaxY-m_BBMinY)/2)*m_delta;
+			
+			float boxwidth = (m_BBMaxX-m_BBMinX) * m_scale;
+			float boxheight = (m_BBMaxY-m_BBMinY) * m_scale;
+			
+			if(boxwidth > m_width + s_autoFocusError) {
+				m_scale *= 1-s_autoFocusScaleDrift * m_delta; // shrink
+			}
+			else if(boxwidth < m_width - s_autoFocusError &&
+			        boxheight < m_height - s_autoFocusError) {
+				m_scale *= 1+s_autoFocusScaleDrift * m_delta; // grow
+			}
+			else if(boxheight > m_height + s_autoFocusError) {
+				m_scale *= 1-s_autoFocusScaleDrift * m_delta; // shrink
+			}
+			else if(boxwidth < m_width - s_autoFocusError &&
+					boxheight < m_height - s_autoFocusError) {
+				m_scale *= 1+s_autoFocusScaleDrift * m_delta; // grow
+			}
+			m_scale = ofClamp(m_scale, s_autoFocusMinScale, s_autoFocusMaxScale);
+			
+			if(s_debugAutoFocus) {
+				ofNoFill();
+				ofSetColor(ofColor::red);
+				ofBeginShape();
+					ofVertex(m_BBMinX, m_BBMinY, 0);
+					ofVertex(m_BBMaxX, m_BBMinY, 0);
+					ofVertex(m_BBMaxX, m_BBMaxY, 0);
+					ofVertex(m_BBMinX, m_BBMaxY, 0);
+				ofEndShape();
+			}
+		}
+		else {
+			m_posY = 0;
+			m_scale = 1.0;
+		}
+	
+		ofPopMatrix();
 	ofPopView();
 	ofPopStyle();
 	
@@ -469,20 +563,30 @@ void ofxEditor::draw() {
 void ofxEditor::drawGrid() {
 	ofPushStyle();
 	ofPushView();
+		ofViewport(0, 0, m_width, m_height);
+		ofPushMatrix();
 	
-		ofViewport(m_viewport);
+		// scale when using auto focus
+		if(m_autoFocus) {
+			ofTranslate(0, m_height/2);
+			ofScale(m_scale, m_scale);
+		}
+		ofTranslate(m_posX, m_posY);
 	
 		int x = 1, y = 1;
+		int w = m_autoFocus ? m_BBMaxX : (m_visibleChars+m_lineNumWidth)*s_charWidth;
+		int h = m_autoFocus ? m_BBMaxY : m_visibleLines*s_charHeight;
 		ofSetColor(100, 100, 100);
-		for(int i = 0; i < m_visibleChars+m_leftTextPosition+1; ++i) {
-			ofLine(x, 1, x, m_visibleLines*s_charHeight);
+		for(int i = 0; i < w+1; ++i) {
+			ofLine(x, 1, x,  h);
 			x += s_charWidth;
 		}
-		for(int i = 0; i < m_visibleLines+1; ++i) {
-			ofLine(1, y, (m_visibleChars+m_leftTextPosition+1)*s_charWidth, y);
+		for(int i = 0; i < h+1; ++i) {
+			ofLine(1, y, w, y);
 			y += s_charHeight;
 		}
-	
+
+		ofPopMatrix();
 	ofPopView();
 	ofPopStyle();
 }
@@ -552,11 +656,9 @@ void ofxEditor::keyPressed(int key) {
 					m_desiredXPos = (unsigned int)offsetToCurrentLineStart();
 					if(m_desiredXPos >= m_visibleChars) {
 						m_leftTextPosition++;
-						m_viewport.x -= s_charWidth;
 					}
 					else {
 						m_leftTextPosition = 0;
-						m_viewport.x = 0;
 					}
 				}
 				m_flash = HALF_FLASH_RATE; // show cursor after moving
@@ -571,16 +673,13 @@ void ofxEditor::keyPressed(int key) {
 					if(m_desiredXPos >= m_visibleChars) {
 						if(m_leftTextPosition > 0) {
 							m_leftTextPosition--;
-							m_viewport.x += s_charWidth;
 						}
 						else {
 							m_leftTextPosition = m_desiredXPos - m_visibleChars+1;
-							m_viewport.x = -(int)m_leftTextPosition * s_charWidth;
 						}
 					}
 					else {
 						m_leftTextPosition = 0;
-						m_viewport.x = 0;
 					}
 				}
 				m_flash = HALF_FLASH_RATE; // show cursor after moving
@@ -801,8 +900,8 @@ void ofxEditor::resize() {
 
 //--------------------------------------------------------------
 void ofxEditor::resize(int width, int height) {
-	m_viewport.width = width;
-	m_viewport.height = height;
+	m_width = width;
+	m_height = height;
 	
 	m_visibleChars = width/s_charWidth;
 	m_visibleLines = height/s_charHeight;
@@ -839,7 +938,7 @@ void ofxEditor::setText(const wstring& text) {
 	else {
 		m_text = text;
 	}
-	
+		
 	if(m_settings->getConvertTabs()) {
 		processTabs();
 	}
@@ -853,6 +952,12 @@ void ofxEditor::setText(const string& text) {
 
 //--------------------------------------------------------------
 void ofxEditor::insertText(const wstring& text) {
+	if(m_selection) {
+		m_text.erase(m_highlightStart, m_highlightEnd-m_highlightStart);
+		if(m_position >= m_highlightEnd) {
+			m_position -= m_highlightEnd-m_highlightStart;
+		}
+	}
 	m_text.insert(m_position, text);
 	m_selection = false;
 	m_position += text.size();
@@ -878,6 +983,7 @@ void ofxEditor::clearText() {
 	setCurrentLine(0);
 	m_shiftState = false;
 	m_selection = false;
+	m_posX = m_posY = 0;
 }
 
 // SETTINGS
@@ -924,19 +1030,16 @@ ofxEditorColorScheme* ofxEditor::getColorScheme() {
 //--------------------------------------------------------------
 void ofxEditor::setLineWrapping(bool wrap) {
 	m_lineWrapping = wrap;
-	if(m_lineWrapping) { // reset x viewport offset
+	if(m_lineWrapping) { // reset text offset
 		m_leftTextPosition = 0;
-		m_viewport.x = 0;
 	}
-	else { // recalculate x viewport offset if needed
+	else { // recalculate text offset if needed
 		m_desiredXPos = (unsigned int)offsetToCurrentLineStart();
 		if(m_desiredXPos >= m_visibleChars) {
 			m_leftTextPosition = m_desiredXPos-m_visibleChars;
-			m_viewport.x -= s_charWidth * (m_desiredXPos-m_visibleChars);
 		}
 		else {
 			m_leftTextPosition = 0;
-			m_viewport.x = 0;
 		}
 	}
 }
@@ -962,6 +1065,16 @@ void ofxEditor::setLineNumbers(bool numbers) {
 //--------------------------------------------------------------
 bool ofxEditor::getLineNumbers() {
 	return m_lineNumbers;
+}
+
+//--------------------------------------------------------------
+void ofxEditor::setAutoFocus(bool focus) {
+	m_autoFocus = focus;
+}
+	
+//--------------------------------------------------------------
+bool ofxEditor::getAutoFocus() {
+	return m_autoFocus;
 }
 
 // CURSOR POSITION & INFO
@@ -1051,6 +1164,8 @@ void ofxEditor::reset() {
 	setCurrentLine(0);
 	m_shiftState = false;
 	m_selection = false;
+	m_scale = 1.0;
+	m_posX = m_posY = 0;
 }
 
 // DRAWING UTILS
@@ -1094,6 +1209,19 @@ void ofxEditor::drawString(wstring s, ofPoint& p) {
 }
 
 // PROTECTED
+
+//--------------------------------------------------------------
+void ofxEditor::drawChar(int c, int x, int y, ofColor &textColor, ofColor &shadowColor) {
+	if(c > 0x80) { // UTF8 wide chars not supported yet
+		c = '?'; // provide feedback for glyphs at least
+	}
+	if(s_textShadow) {
+		ofSetColor(shadowColor.r, shadowColor.g, shadowColor.b, shadowColor.a * m_settings->getAlpha());
+		s_font->drawCharacter(c, x+1, y+1);
+	}
+	ofSetColor(textColor.r, textColor.g, textColor.b, textColor.a * m_settings->getAlpha());
+	s_font->drawCharacter(c, x, y);
+}
 
 //--------------------------------------------------------------
 void ofxEditor::drawMatchingCharBlock(int x, int y) {
@@ -1154,13 +1282,11 @@ void ofxEditor::drawCursor(int x, int y) {
 //--------------------------------------------------------------
 void ofxEditor::drawLineNumber(int &x, int &y, int &currentLine) {
 	ofPushStyle();
-		ofSetColor(m_settings->getLineNumberColor().r, m_settings->getLineNumberColor().g,
-			       m_settings->getLineNumberColor().b, m_settings->getLineNumberColor().a * m_settings->getAlpha());
 		currentLine++;
 		string currentLineString = ofToString(currentLine);
 		x += s_charWidth*(m_lineNumWidth-currentLineString.length()-1); // 1 for the space
 		for(int i = 0; i < currentLineString.length(); ++i) {
-			s_font->drawCharacter(currentLineString[i], x, y);
+			drawChar(currentLineString[i], x, y, m_settings->getLineNumberColor(), m_settings->getTextShadowColor());
 			x += s_charWidth;
 		}
 		x += s_charWidth; // the space
@@ -1365,11 +1491,24 @@ void ofxEditor::pasteSelection() {
 
 //--------------------------------------------------------------
 void ofxEditor::updateTimestamps() {
-	m_delta = ofGetElapsedTimef() - m_time;
-	m_time = ofGetElapsedTimef();
-	if (m_delta > 100.0f) {
-		m_delta = 0.000001f;
+	m_delta = ofGetElapsedTimef() - s_time;
+	s_time = ofGetElapsedTimef();
+	if (m_delta > 10.0f) {
+		m_delta = 0.00001f;
 	}
+}
+
+//--------------------------------------------------------------
+void ofxEditor::expandBoundingBox(float x, float y) {
+	if(x < m_BBMinX) m_BBMinX = x;
+	if(x > m_BBMaxX) m_BBMaxX = x;
+	if(y < m_BBMinY) m_BBMinY = y;
+	if(y > m_BBMaxY) m_BBMaxY = y;
+}
+
+//--------------------------------------------------------------
+void ofxEditor::clearBoundingBox() {
+	m_BBMinX = m_BBMinY = m_BBMaxX = m_BBMaxY = 0;
 }
 
 // PRIVATE
@@ -1397,11 +1536,9 @@ void ofxEditor::textBufferUpdated() {
 		m_desiredXPos = (unsigned int)offsetToCurrentLineStart();
 		if(m_desiredXPos >= m_visibleChars) {
 			m_leftTextPosition = m_desiredXPos-m_visibleChars;
-			m_viewport.x = -(int)m_leftTextPosition * s_charWidth;
 		}
 		else {
 			m_leftTextPosition = 0;
-			m_viewport.x = 0;
 		}
 	}
 }
