@@ -295,10 +295,10 @@ void ofxFileDialog::keyPressedSaveAs(int key) {
 			
 		case OF_KEY_BACKSPACE:
 			if(!m_text.empty() && m_position != 0) {
-				if(m_selection) {
+				if(m_selection != NONE) {
 					m_text.erase(m_highlightStart, m_highlightEnd - m_highlightStart);
 					m_position -= m_highlightEnd - m_highlightStart;
-					m_selection = false;
+					m_selection = NONE;
 				}
 				else {
 					m_text.erase(m_position-1, 1);

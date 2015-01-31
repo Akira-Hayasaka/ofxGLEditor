@@ -74,7 +74,7 @@ ofxEditor::ofxEditor() {
 	m_position = 0;
 	m_desiredXPos = 0;
 	
-	m_selection = false;
+	m_selection = NONE;
 	
 	m_leftTextPosition = 0;
 	m_topTextPosition = 0;
@@ -112,7 +112,7 @@ ofxEditor::ofxEditor(ofxEditorSettings &sharedSettings) {
 	m_position = 0;
 	m_desiredXPos = 0;
 	
-	m_selection = false;
+	m_selection = NONE;
 	
 	m_leftTextPosition = 0;
 	m_topTextPosition = 0;
@@ -362,12 +362,12 @@ void ofxEditor::draw() {
 					}
 					
 					// draw matching chars highlight
-					if(!comment && !m_selection && textPos >= m_matchingCharsHighlight[0] && textPos <= m_matchingCharsHighlight[1]) {
+					if(!comment && m_selection == NONE && textPos >= m_matchingCharsHighlight[0] && textPos <= m_matchingCharsHighlight[1]) {
 						drawMatchingCharBlock(x, y);
 					}
 					
 					// draw selection
-					if(m_selection && textPos >= m_highlightStart && textPos < m_highlightEnd) {
+					if(m_selection != NONE && textPos >= m_highlightStart && textPos < m_highlightEnd) {
 						if(tb.type == TAB) {
 							for(int i = 0; i < m_settings->getTabWidth(); ++i) {
 								drawSelectionCharBlock(x+s_charWidth*i, y);
@@ -437,12 +437,12 @@ void ofxEditor::draw() {
 				}
 				
 				// draw matching chars highlight
-				if(!m_selection && textPos >= m_matchingCharsHighlight[0] && textPos <= m_matchingCharsHighlight[1]) {
+				if(m_selection == NONE && textPos >= m_matchingCharsHighlight[0] && textPos <= m_matchingCharsHighlight[1]) {
 					drawMatchingCharBlock(x, y);
 				}
 				
 				// draw selection
-				if(m_selection && i >= m_highlightStart && i < m_highlightEnd) {
+				if(m_selection != NONE && i >= m_highlightStart && i < m_highlightEnd) {
 					if(xcount > m_visibleChars) {
 						m_leftTextPosition = xcount-m_visibleChars;
 					}
@@ -472,7 +472,7 @@ void ofxEditor::draw() {
 				}
 				// tab
 				else if(m_text[i] == '\t') {
-					if(m_selection && i >= m_highlightStart && i < m_highlightEnd) {
+					if(m_selection != NONE && i >= m_highlightStart && i < m_highlightEnd) {
 						int tabX = x+s_charWidth;
 						for(int i = 0; i < m_settings->getTabWidth()-1; ++i) {
 							drawSelectionCharBlock(tabX, y);
@@ -614,14 +614,15 @@ void ofxEditor::keyPressed(int key) {
 					clearText();
 				}
 				else { // select all
-					m_selection = true;
+					m_selection = ALL;
 					m_highlightStart = 0;
 					m_highlightEnd = m_text.size();
+					m_position = m_text.size();
 				}
 				break;
 				
 			case 'x': case 24: // cut
-				if(m_selection) {
+				if(m_selection != NONE) {
 					copySelection();
 					m_text.erase(m_highlightStart, m_highlightEnd-m_highlightStart);
 					if(m_position >= m_highlightEnd) {
@@ -758,16 +759,18 @@ void ofxEditor::keyPressed(int key) {
 				
 			case OF_KEY_SHIFT:
 				if(!m_shiftState) {
-					m_highlightStart = m_position;
-					m_highlightEnd = m_position;
 					m_shiftState = true;
-					m_selection = true;
+					if(m_selection == NONE) {
+						m_highlightStart = m_position;
+						m_highlightEnd = m_position;
+						m_selection = FORWARD;
+					}
 				}
 				break;
 				
 			case OF_KEY_DEL:
 				if(m_selection) {
-					m_selection = false;
+					m_selection = NONE;
 					m_highlightStart = 0;
 					m_highlightEnd = 0;
 					clearText();
@@ -780,12 +783,12 @@ void ofxEditor::keyPressed(int key) {
 				
 			case OF_KEY_BACKSPACE:
 				if(!m_text.empty()) {
-					if(m_selection) {
+					if(m_selection != NONE) {
 						m_text.erase(m_highlightStart, m_highlightEnd-m_highlightStart);
 						if(m_position >= m_highlightEnd) {
 							m_position -= m_highlightEnd-m_highlightStart;
 						}						
-						m_selection = false;
+						m_selection = NONE;
 					}
 					else if(m_position != 0) {
 						m_text.erase(m_position-1, 1);
@@ -808,8 +811,13 @@ void ofxEditor::keyPressed(int key) {
 				break;
 				
 			case OF_KEY_ESC:
-				m_selection = false;
-				m_position = m_highlightStart;
+				if(m_selection == FORWARD) {
+					m_position = m_highlightEnd;
+				}
+				else {
+					m_position = m_highlightStart;
+				}
+				m_selection = NONE;
 				break;
 				
 			case OF_KEY_RETURN:
@@ -825,12 +833,12 @@ void ofxEditor::keyPressed(int key) {
 					return;
 				}
 				
-				if(m_selection) {
+				if(m_selection != NONE) {
 					m_text.erase(m_highlightStart, m_highlightEnd-m_highlightStart);
-					if (m_position >= m_highlightEnd) {
+					if(m_position >= m_highlightEnd) {
 						m_position -= m_highlightEnd-m_highlightStart;
 					}
-					m_selection = false;
+					m_selection = NONE;
 				}
 				
 				// ignore control chars
@@ -870,23 +878,39 @@ void ofxEditor::keyPressed(int key) {
 		}
 	}
 	
-	if(m_position >= m_text.size()) {
+	bool over = false;
+	if(m_position > m_text.size()) {
 		m_position = m_text.size();
+		over = true;
 	}
-
-	if(m_shiftState) {
 	
+	// update selection
+	if(m_shiftState) {
+
 		if(!ofGetKeyPressed(OF_KEY_SHIFT)) {
 			m_shiftState = false;
-			m_selection = false;
+			m_selection = NONE;
 			return;
 		}
-		
+	
 		if(m_position < m_highlightStart) {
 			m_highlightStart = m_position;
+			m_selection = BACKWARD;
 		}
 		else {
 			m_highlightEnd = m_position;
+			m_selection = FORWARD;
+		}
+	}
+	else if(m_selection == ALL) {
+		// pressed down or right
+		if(over) {
+			m_selection = NONE; // stay on end
+		}
+		// pressed up or left
+		else if(m_position != m_highlightEnd) {
+			m_selection = NONE;
+			m_position = 0; // jump to start
 		}
 	}
 }
@@ -912,7 +936,7 @@ void ofxEditor::resize(int width, int height) {
 
 //--------------------------------------------------------------
 wstring ofxEditor::getWideText() {
-	if(m_selection) {
+	if(m_selection != NONE) {
 		return m_text.substr(m_highlightStart, m_highlightEnd-m_highlightStart);
 	}
 	return m_text;
@@ -920,7 +944,7 @@ wstring ofxEditor::getWideText() {
 
 //--------------------------------------------------------------
 string ofxEditor::getText() {
-	if(m_selection) {
+	if(m_selection != NONE) {
 		return wstring_to_string(m_text.substr(m_highlightStart, m_highlightEnd-m_highlightStart));
 	}
 	return wstring_to_string(m_text);
@@ -952,14 +976,14 @@ void ofxEditor::setText(const string& text) {
 
 //--------------------------------------------------------------
 void ofxEditor::insertText(const wstring& text) {
-	if(m_selection) {
+	if(m_selection != NONE) {
 		m_text.erase(m_highlightStart, m_highlightEnd-m_highlightStart);
 		if(m_position >= m_highlightEnd) {
 			m_position -= m_highlightEnd-m_highlightStart;
 		}
 	}
 	m_text.insert(m_position, text);
-	m_selection = false;
+	m_selection = NONE;
 	m_position += text.size();
 	if(m_settings->getConvertTabs()) {
 		processTabs();
@@ -982,7 +1006,7 @@ void ofxEditor::clearText() {
 	m_numLines = 0;
 	setCurrentLine(0);
 	m_shiftState = false;
-	m_selection = false;
+	m_selection = NONE;
 	m_posX = m_posY = 0;
 }
 
@@ -1087,7 +1111,7 @@ void ofxEditor::blowupCursor() {
 
 //--------------------------------------------------------------
 bool ofxEditor::isSelection() {
-	return m_selection;
+	return m_selection != NONE;
 }
 
 //--------------------------------------------------------------
@@ -1163,7 +1187,7 @@ void ofxEditor::reset() {
 	m_position = 0;
 	setCurrentLine(0);
 	m_shiftState = false;
-	m_selection = false;
+	m_selection = NONE;
 	m_scale = 1.0;
 	m_posX = m_posY = 0;
 }
@@ -1456,7 +1480,7 @@ unsigned int ofxEditor::lineNumberForPos(unsigned int pos) {
 //--------------------------------------------------------------
 void ofxEditor::copySelection() {
 	
-	if(!m_selection) {
+	if(m_selection == NONE) {
 		return;
 	}
 
@@ -1469,7 +1493,7 @@ void ofxEditor::copySelection() {
 		s_copyBuffer = m_text.substr(m_highlightStart, m_highlightEnd-m_highlightStart);
 	#endif
 	
-	m_selection = false;
+	m_selection = NONE;
 }
 
 //--------------------------------------------------------------

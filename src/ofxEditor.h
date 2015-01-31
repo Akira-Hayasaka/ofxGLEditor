@@ -287,7 +287,14 @@ class ofxEditor {
 	
 		int m_matchingCharsHighlight[2]; //< start & end pos for matching chars highlight
 	
-		bool m_selection; //< is text being selected (shift+arrows)
+		/// selection states
+		enum SelectionState {
+			NONE,
+			FORWARD,
+			BACKWARD,
+			ALL
+		};
+		SelectionState m_selection; //< is text being selected and how
 		unsigned int m_highlightStart; //< highlight start pos in buffer
 		unsigned int m_highlightEnd;   //< highlight end pos in buffer
 	
