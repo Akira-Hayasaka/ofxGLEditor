@@ -78,6 +78,16 @@ void ofxFileDialog::draw() {
 
 //--------------------------------------------------------------
 void ofxFileDialog::keyPressed(int key) {
+	
+	// filter out modifier key events, except SHIFT
+	switch(key) {
+		case OF_KEY_ALT: case OF_KEY_LEFT_ALT: case OF_KEY_RIGHT_ALT:
+		case OF_KEY_LEFT_SHIFT: case OF_KEY_RIGHT_SHIFT:
+		case OF_KEY_CONTROL: case OF_KEY_LEFT_CONTROL: case OF_KEY_RIGHT_CONTROL:
+		case OF_KEY_SUPER: case OF_KEY_LEFT_COMMAND: case OF_KEY_RIGHT_COMMAND:
+			return;
+	}
+	
 	unsigned int startpos = m_position;
 	if(m_saveAs) {
 		keyPressedSaveAs(key);
@@ -298,11 +308,42 @@ void ofxFileDialog::keyPressedSaveAs(int key) {
 			break;
 			
 		default:
-			if(key != '\n' && (key < ' ' || key > 0x80)) { // ignore UTF chars for now ...
+		
+			// build a two byte UTF-8 character
+			// TODO: what happens if it's 3 or 4 bytes?
+			if(key > 0x80 && m_firstUTF8Byte == 0) {
+				m_firstUTF8Byte = key;
+				return;
+			}
+		
+			// ignore control chars
+			if(key != '\n' && key < ' ') {
 				break;
 			}
-			m_text.insert(m_position, (const wchar_t*)&key);
+			
+			// build wide char and insert
+			if(m_firstUTF8Byte > 0) {
+				string temp("  ");
+				temp[0] = m_firstUTF8Byte;
+				temp[1] = key;
+				m_text.insert(m_position, string_to_wstring(temp));
+				m_firstUTF8Byte = 0;
+			}
+			else {
+				if(key < 0x80) {
+					string temp(" ");
+					temp[0] = key;
+					m_text.insert(m_position, string_to_wstring(temp));
+				}
+				else {
+					wchar_t k[2];
+					memset(&k, 0, sizeof(wchar_t)*2);
+					k[0] = key;
+					m_text.insert(m_position, wstring(k));
+				}
+			}
 			m_position++;
+			
 			break;
 	}	
 }
