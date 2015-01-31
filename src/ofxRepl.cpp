@@ -91,14 +91,17 @@ void ofxRepl::keyPressed(int key) {
 					clear();
 				}
 				return;
+			case 'a': case 10:
+				// swallow select all
+				return;
 		}
 	}
 	
 	// swallow text buffer removal
 	if((m_position <= m_promptPos && key == OF_KEY_BACKSPACE) ||
-		(m_position < m_promptPos && key == OF_KEY_DEL) ||
-		((m_position < m_promptPos || m_highlightStart < m_promptPos || m_highlightEnd < m_promptPos) &&
-		(modifierPressed && (key == 'x' || key == 24)))) {
+	   (m_position < m_promptPos && key == OF_KEY_DEL) ||
+	   ((m_position < m_promptPos || m_highlightStart < m_promptPos || m_highlightEnd < m_promptPos) &&
+	   (modifierPressed && (key == 'x' || key == 24)))) {
 		return;
 	}
 
