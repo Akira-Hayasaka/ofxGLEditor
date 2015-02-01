@@ -892,22 +892,50 @@ void ofxEditor::keyPressed(int key) {
 			m_selection = NONE;
 			return;
 		}
-	
-		if(m_position < m_highlightStart) {
-			m_highlightStart = m_position;
-			m_selection = BACKWARD;
-		}
-		else {
-			m_highlightEnd = m_position;
-			m_selection = FORWARD;
+		
+		switch(m_selection) {
+			
+			case ALL:
+				if(m_position < m_highlightEnd) {
+					m_highlightEnd = m_position;
+					m_selection = FORWARD;
+				}
+				break;
+			
+			case BACKWARD:
+				if(m_position < m_highlightStart) {
+					m_highlightStart = m_position;
+				}
+				else if(m_position > m_highlightStart) {
+					if(m_position > m_highlightEnd) {
+						m_highlightStart = m_highlightEnd;
+						m_highlightEnd = m_position;
+						m_selection = FORWARD;
+					}
+					else {
+						m_highlightStart = m_position;
+					}
+				}
+				break;
+			
+			case FORWARD:
+				if(m_position < m_highlightStart) {
+					m_highlightStart = m_position;
+					m_selection = BACKWARD;
+				}
+				else {
+					m_highlightEnd = m_position;
+				}
+				break;
+				
+			case NONE:
+				break;
 		}
 	}
 	else if(m_selection == ALL) {
-		// pressed down or right
 		if(over) {
 			m_selection = NONE; // stay on end
 		}
-		// pressed up or left
 		else if(m_position != m_highlightEnd) {
 			m_selection = NONE;
 			m_position = 0; // jump to start
