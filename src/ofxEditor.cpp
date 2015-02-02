@@ -1264,7 +1264,7 @@ void ofxEditor::drawString(wstring s, ofPoint& p) {
 
 //--------------------------------------------------------------
 void ofxEditor::drawChar(int c, int x, int y, ofColor &textColor, ofColor &shadowColor) {
-	if(c > 0x80) { // UTF8 wide chars not supported yet
+	if(c > 256) { // UTF8 wide chars not supported yet
 		c = '?'; // provide feedback for glyphs at least
 	}
 	if(s_textShadow) {
