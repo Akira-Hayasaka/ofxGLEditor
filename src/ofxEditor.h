@@ -26,6 +26,11 @@
 #include "ofxEditorSettings.h"
 #include "ofxEditorColorScheme.h"
 
+// currently requires ofxFontStash and ofxUnicode for efficient text rendering
+// since ofTrueTypeFont is too slow for lots of chars, this may change in the
+// future as the new ofFont & unicode support are integrated into OpenFrameworks
+#include "ofxFontStash.h"
+
 /// full screen text editor with optional syntax highlighting,
 /// based on the Fluxus GLEditor
 ///
@@ -54,7 +59,7 @@ class ofxEditor {
 		
 		/// get the currently loaded editor font,
 		/// returns NULL if not loaded
-		static ofTrueTypeFont* getFont();
+		static ofxFontStash* getFont();
 	
 		/// get the fixed width of a char using editor font
 		static int getCharWidth();
@@ -236,11 +241,11 @@ class ofxEditor {
 	
 	protected:
 	
-		/// custom font class to get access to protected functions
-		class Font : public ofTrueTypeFont {
+		/// custom extended font class
+		class Font : public ofxFontStash {
 			public:
 				void drawCharacter(int c, float x, float y) {
-					drawCharAsShape(c, x, y);
+					drawString(ofTextConverter::toUTF8(c), x, y);
 				}
 		};
 	

@@ -22,6 +22,8 @@
  */
 #include "ofxEditor.h"
 
+// unicode string conversion, this will be replaced when OF has internal
+// unicode support
 #include "Unicode.h"
 
 // GLFW needed for clipboard support
@@ -161,9 +163,9 @@ bool ofxEditor::loadFont(const string &font, int size) {
 	if(s_font == NULL) {
 		s_font = ofPtr<ofxEditor::Font>(new ofxEditor::Font());
 	}
-	if(s_font->loadFont(font, size, true, true, true)) {
-		s_charWidth = size;
-		s_charHeight = s_font->getLineHeight();
+	if(s_font->loadFont(font, size)) {
+		s_charWidth = s_font->stringWidth("#"); // should be a wide char
+		s_charHeight = s_font->stringHeight("#Iqg"); // catch tall/chars which hang down
 		s_cursorWidth = floor(s_charWidth*0.3);
 	}
 }
@@ -174,7 +176,7 @@ bool ofxEditor::isFontLoaded() {
 }
 
 //--------------------------------------------------------------
-ofTrueTypeFont* ofxEditor::getFont() {
+ofxFontStash* ofxEditor::getFont() {
 	return s_font.get();
 }
 
@@ -231,6 +233,7 @@ float ofxEditor::getAutoFocusMaxScale() {
 // MAIN
 
 //--------------------------------------------------------------
+// TODO: check for some easy performance improvements here
 void ofxEditor::draw() {
 
 	// default size if not set
@@ -1244,12 +1247,7 @@ void ofxEditor::drawString(wstring s, float x, float y) {
 			xPos += s_charWidth*m_settings->getTabWidth();
 		}
 		else {
-			if(m_text[i] < 0x80) {
-				s_font->drawCharacter(s[i], xPos, yPos);
-			}
-			else {
-				s_font->drawStringAsShapes(wstring_to_string(s.substr(i, 1)), xPos, yPos);
-			}
+			s_font->drawCharacter(s[i], xPos, yPos);
 			xPos += s_charWidth;
 		}
 	}
