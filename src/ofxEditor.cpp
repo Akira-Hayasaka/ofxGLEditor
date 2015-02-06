@@ -1573,7 +1573,7 @@ void ofxEditor::textBufferUpdated() {
 	// adjust max screen width for line numbers
 	if(m_lineNumbers) {
 		m_visibleChars += m_lineNumWidth; // back to normal
-		m_lineNumWidth = ofToString(m_numLines).length()+1; // 1 extra for the space
+		m_lineNumWidth = ofToString(m_numLines+1).length()+1; // +1 for 10 & 1 extra for the space
 		m_visibleChars -= m_lineNumWidth;
 	}
 
