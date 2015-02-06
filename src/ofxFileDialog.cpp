@@ -22,6 +22,7 @@
  */
 #include "ofxFileDialog.h"
 
+#include "ofxEditorFont.h"
 #include "Unicode.h"
 
 const unsigned int ofxFileDialog::s_fileDisplayRange = 10;

@@ -44,7 +44,8 @@ class ofxGLEditorListener : public ofxReplListener {
 		virtual void evalReplEvent(const string &text) {}
 };
 
-/// 9 text editor buffers with a live optional Read-Eval-Print Loop
+/// 9 text editor buffers with a live optional Read-Eval-Print Loop,
+/// equivalent to the Fluxus editor
 class ofxGLEditor {
 
 	public:

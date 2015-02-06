@@ -39,47 +39,98 @@ typedef unsigned short   Unicode2Bytes;
 typedef unsigned int     Unicode4Bytes;
 typedef unsigned char    byte;
 
+std::string wchar_to_string(wchar_t input) {
+	string output;
+	// 0xxxxxxx
+	if(input < 0x80) {
+		output.push_back((byte)input);
+	}
+	// 110xxxxx 10xxxxxx
+	else if(input < 0x800) {
+		output.push_back((byte)(MASK2BYTES | input >> 6));
+		output.push_back((byte)(MASKBYTE | (input & MASKBITS)));
+	}
+	// 1110xxxx 10xxxxxx 10xxxxxx
+	else if(input < 0x10000) {
+		output.push_back((byte)(MASK3BYTES | (input >> 12)));
+		output.push_back((byte)(MASKBYTE | (input >> 6 & MASKBITS)));
+		output.push_back((byte)(MASKBYTE | (input & MASKBITS)));
+	}
+	// 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+	else if(input < 0x200000) {
+		output.push_back((byte)(MASK4BYTES | (input >> 18)));
+		output.push_back((byte)(MASKBYTE | (input >> 12 & MASKBITS)));
+		output.push_back((byte)(MASKBYTE | (input >> 6 & MASKBITS)));
+		output.push_back((byte)(MASKBYTE | (input & MASKBITS)));
+	}
+	// 111110xx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx
+	else if(input < 0x4000000) {
+		output.push_back((byte)(MASK5BYTES | (input >> 24)));
+		output.push_back((byte)(MASKBYTE | (input >> 18 & MASKBITS)));
+		output.push_back((byte)(MASKBYTE | (input >> 12 & MASKBITS)));
+		output.push_back((byte)(MASKBYTE | (input >> 6 & MASKBITS)));
+		output.push_back((byte)(MASKBYTE | (input & MASKBITS)));
+	}
+	// 1111110x 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx
+	else if(input < 0x8000000) {
+		output.push_back((byte)(MASK6BYTES | (input >> 30)));
+		output.push_back((byte)(MASKBYTE | (input >> 18 & MASKBITS)));
+		output.push_back((byte)(MASKBYTE | (input >> 12 & MASKBITS)));
+		output.push_back((byte)(MASKBYTE | (input >> 6 & MASKBITS)));
+		output.push_back((byte)(MASKBYTE | (input & MASKBITS)));
+	}
+	return output;
+}
+
+wchar_t string_to_wchar(const std::string &input) {
+	Unicode4Bytes output = 0;
+	// 1111110x 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx
+	if(input.size() > 5 && (input[0] & MASK6BYTES) == MASK6BYTES) {
+		output = ((input[0] & 0x01) << 30) |
+		         ((input[1] & MASKBITS) << 24) |
+		         ((input[2] & MASKBITS) << 18) |
+		         ((input[3] & MASKBITS) << 12) |
+		         ((input[4] & MASKBITS) << 6) |
+		          (input[5] & MASKBITS);
+	}
+	// 111110xx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx
+	else if(input.size() > 4 && (input[0] & MASK5BYTES) == MASK5BYTES) {
+		output = ((input[0] & 0x03) << 24) |
+		         ((input[1] & MASKBITS) << 18) |
+		         ((input[2] & MASKBITS) << 12) |
+		         ((input[3] & MASKBITS) << 6) |
+		          (input[4] & MASKBITS);
+	}
+	// 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+	else if(input.size() > 3 && (input[0] & MASK4BYTES) == MASK4BYTES) {
+		output = ((input[0] & 0x07) << 18) |
+		         ((input[1] & MASKBITS) << 12) |
+		         ((input[2] & MASKBITS) << 6) |
+		          (input[3] & MASKBITS);
+	}
+	// 1110xxxx 10xxxxxx 10xxxxxx
+	else if(input.size() > 2 && (input[0] & MASK3BYTES) == MASK3BYTES) {
+		output = ((input[0] & 0x0F) << 12) |
+				 ((input[1] & MASKBITS) << 6) |
+				  (input[2] & MASKBITS);
+	}
+	// 110xxxxx 10xxxxxx
+	else if(input.size() > 1 && (input[0] & MASK2BYTES) == MASK2BYTES) {
+		output = ((input[0] & 0x1F) << 6) |
+		          (input[1] & MASKBITS);
+	}
+	// 0xxxxxxx
+	else { //if(input[i] < MASKBYTE)
+		output = input[0];
+	}
+	return output;
+}
+
+
 string wstring_to_string(const wstring &input) {
 	string output;
 	for(unsigned int i = 0; i < input.size(); i++) {
-		// 0xxxxxxx
-		if(input[i] < 0x80) {
-			output.push_back((byte)input[i]);
-		}
-		// 110xxxxx 10xxxxxx
-		else if(input[i] < 0x800) {
-			output.push_back((byte)(MASK2BYTES | input[i] >> 6));
-			output.push_back((byte)(MASKBYTE | (input[i] & MASKBITS)));
-		}
-		// 1110xxxx 10xxxxxx 10xxxxxx
-		else if(input[i] < 0x10000) {
-			output.push_back((byte)(MASK3BYTES | (input[i] >> 12)));
-			output.push_back((byte)(MASKBYTE | (input[i] >> 6 & MASKBITS)));
-			output.push_back((byte)(MASKBYTE | (input[i] & MASKBITS)));
-		}
-		// 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
-		else if(input[i] < 0x200000) {
-			output.push_back((byte)(MASK4BYTES | (input[i] >> 18)));
-			output.push_back((byte)(MASKBYTE | (input[i] >> 12 & MASKBITS)));
-			output.push_back((byte)(MASKBYTE | (input[i] >> 6 & MASKBITS)));
-			output.push_back((byte)(MASKBYTE | (input[i] & MASKBITS)));
-		}
-		// 111110xx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx
-		else if(input[i] < 0x4000000) {
-			output.push_back((byte)(MASK5BYTES | (input[i] >> 24)));
-			output.push_back((byte)(MASKBYTE | (input[i] >> 18 & MASKBITS)));
-			output.push_back((byte)(MASKBYTE | (input[i] >> 12 & MASKBITS)));
-			output.push_back((byte)(MASKBYTE | (input[i] >> 6 & MASKBITS)));
-			output.push_back((byte)(MASKBYTE | (input[i] & MASKBITS)));
-		}
-		// 1111110x 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx
-		else if(input[i] < 0x8000000) {
-			output.push_back((byte)(MASK6BYTES | (input[i] >> 30)));
-			output.push_back((byte)(MASKBYTE | (input[i] >> 18 & MASKBITS)));
-			output.push_back((byte)(MASKBYTE | (input[i] >> 12 & MASKBITS)));
-			output.push_back((byte)(MASKBYTE | (input[i] >> 6 & MASKBITS)));
-			output.push_back((byte)(MASKBYTE | (input[i] & MASKBITS)));
-		}
+		output.append(wchar_to_string(input[i]));
 	}
 	return output;
 }

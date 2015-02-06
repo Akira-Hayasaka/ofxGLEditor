@@ -25,6 +25,12 @@
  */
 #include <string>
 
+/// split a single wide char value into UTF-8 bytes
+std::string wchar_to_string(wchar_t input);
+
+/// split a set of UTF-8 bytes into the first single wide char value found
+wchar_t string_to_wchar(const std::string &input);
+
 /// split wide chars into UTF-8 bytes
 std::string wstring_to_string(const std::wstring &input);
 

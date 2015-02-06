@@ -25,6 +25,7 @@
 // unicode string conversion, this will be replaced when OF has internal
 // unicode support
 #include "Unicode.h"
+#include "ofxEditorFont.h"
 
 // GLFW needed for clipboard support
 #if !defined(TARGET_NODISPLAY) && !defined(TARGET_OF_IOS) && \
@@ -42,7 +43,7 @@
 #define CURSOR_MAX_WIDTH 40
 #define CURSOR_MAX_HEIGHT 40
 
-ofPtr<ofxEditor::Font> ofxEditor::s_font;
+ofPtr<ofxEditorFont> ofxEditor::s_font;
 int ofxEditor::s_charWidth = 1;
 int ofxEditor::s_charHeight = 1;
 int ofxEditor::s_cursorWidth = 1;
@@ -52,8 +53,10 @@ wstring ofxEditor::s_copyBuffer;
 
 float ofxEditor::s_time = 0;
 
-bool ofxEditor::s_debugAutoFocus = false;
-float ofxEditor::s_autoFocusError = 5;
+// uncomment to see the viewport and auto focus bounding boxes
+//#define DEBUG_AUTO_FOCUS
+
+float ofxEditor::s_autoFocusError = 10;
 float ofxEditor::s_autoFocusScaleDrift = 0.3;
 float ofxEditor::s_autoFocusMinScale = 0.5;
 float ofxEditor::s_autoFocusMaxScale = 5.0;
@@ -161,22 +164,18 @@ bool ofxEditor::loadFont(const string &font, int size) {
 	ofLogVerbose("ofxEditor") << "loading font \"" << ofFilePath::getFileName(path) << "\"";
 	
 	if(s_font == NULL) {
-		s_font = ofPtr<ofxEditor::Font>(new ofxEditor::Font());
+		s_font = ofPtr<ofxEditorFont>(new ofxEditorFont());
 	}
 	if(s_font->loadFont(font, size)) {
 		s_charWidth = s_font->stringWidth("#"); // should be a wide char
 		s_charHeight = s_font->stringHeight("#Iqg"); // catch tall/chars which hang down
 		s_cursorWidth = floor(s_charWidth*0.3);
+		s_autoFocusError = floor(s_charHeight*0.5); // make sure the error space is proportional to the glyph size
 	}
 }
 
 //--------------------------------------------------------------
 bool ofxEditor::isFontLoaded() {
-	return s_font.get();
-}
-
-//--------------------------------------------------------------
-ofxFontStash* ofxEditor::getFont() {
 	return s_font.get();
 }
 
@@ -257,12 +256,12 @@ void ofxEditor::draw() {
 		
 		// scale when using auto focus
 		if(m_autoFocus) {
-			if(s_debugAutoFocus) {
+			#ifdef DEBUG_AUTO_FOCUS
 				ofNoFill();
 				ofSetColor(ofColor::green);
 				ofRect(0, 0, m_width, m_height);
 				ofFill();
-			}
+			#endif
 			ofTranslate(0, m_height/2);
 			ofScale(m_scale, m_scale);
 		}
@@ -539,7 +538,7 @@ void ofxEditor::draw() {
 			}
 			m_scale = ofClamp(m_scale, s_autoFocusMinScale, s_autoFocusMaxScale);
 			
-			if(s_debugAutoFocus) {
+			#ifdef DEBUG_AUTO_FOCUS
 				ofNoFill();
 				ofSetColor(ofColor::red);
 				ofBeginShape();
@@ -548,7 +547,7 @@ void ofxEditor::draw() {
 					ofVertex(m_BBMaxX, m_BBMaxY, 0);
 					ofVertex(m_BBMinX, m_BBMaxY, 0);
 				ofEndShape();
-			}
+			#endif
 		}
 		else {
 			m_posY = 0;
@@ -1262,9 +1261,6 @@ void ofxEditor::drawString(wstring s, ofPoint& p) {
 
 //--------------------------------------------------------------
 void ofxEditor::drawChar(int c, int x, int y, ofColor &textColor, ofColor &shadowColor) {
-	if(c > 256) { // UTF8 wide chars not supported yet
-		c = '?'; // provide feedback for glyphs at least
-	}
 	if(s_textShadow) {
 		ofSetColor(shadowColor.r, shadowColor.g, shadowColor.b, shadowColor.a * m_settings->getAlpha());
 		s_font->drawCharacter(c, x+1, y+1);

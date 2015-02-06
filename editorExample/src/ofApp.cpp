@@ -42,8 +42,10 @@ void ofApp::setup() {
 	editor.resize(ofGetWidth(), ofGetHeight()-ofxEditor::getCharHeight());
 	
 	// open & load a file into the current editor (1)
-	editor.openFile("hello.txt");
-	ofLogNotice() << "number of lines: " << editor.getNumLines();
+	editor.openFile("hello.txt", 1);
+	ofLogNotice() << "number of lines: " << editor.getNumLines(1);
+	editor.openFile("intl.txt", 2);
+	ofLogNotice() << "number of lines: " << editor.getNumLines(2);
 	
 	// change multi editor settings, see ofxEditorSettings.h for details
 	//editor.getSettings().setTextColor(ofColor::red); // main text color

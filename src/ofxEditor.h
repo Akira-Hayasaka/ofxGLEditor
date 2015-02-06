@@ -26,10 +26,8 @@
 #include "ofxEditorSettings.h"
 #include "ofxEditorColorScheme.h"
 
-// currently requires ofxFontStash and ofxUnicode for efficient text rendering
-// since ofTrueTypeFont is too slow for lots of chars, this may change in the
-// future as the new ofFont & unicode support are integrated into OpenFrameworks
-#include "ofxFontStash.h"
+// custom fontstash wrapper
+class ofxEditorFont;
 
 /// full screen text editor with optional syntax highlighting,
 /// based on the Fluxus GLEditor
@@ -56,10 +54,6 @@ class ofxEditor {
 	
 		/// is a font currently loaded?
 		static bool isFontLoaded();
-		
-		/// get the currently loaded editor font,
-		/// returns NULL if not loaded
-		static ofxFontStash* getFont();
 	
 		/// get the fixed width of a char using editor font
 		static int getCharWidth();
@@ -241,17 +235,9 @@ class ofxEditor {
 	
 	protected:
 	
-		/// custom extended font class
-		class Font : public ofxFontStash {
-			public:
-				void drawCharacter(int c, float x, float y) {
-					drawString(ofTextConverter::toUTF8(c), x, y);
-				}
-		};
-	
 	/// \section Static Variables
 	
-		static ofPtr<Font> s_font;       //< global editor font
+		static ofPtr<ofxEditorFont> s_font; //< global editor font
 		static int s_charWidth;          //< char block pixel width
 		static int s_charHeight;         //< char block pixel height
 		static int s_cursorWidth;        //< cursor width, 1/3 char width
@@ -267,7 +253,6 @@ class ofxEditor {
 		static float s_time;
 	
 		// auto focus
-		static bool s_debugAutoFocus; //< draw the viewport and text bounding box?
 		static float s_autoFocusError; //< scale snapping amount
 		static float s_autoFocusScaleDrift; //< scale shrink/grow modifier (aka speed)
 		static float s_autoFocusMinScale;   //< minimum allowed scaling
