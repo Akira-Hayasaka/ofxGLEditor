@@ -63,7 +63,7 @@ bool ofxEditorFont::loadFont(string filename, int fontsize, int textureDimension
 	fonsSetFont(context, font);
 	fonsSetSize(context, size);
 	fonsSetBlur(context, 0);
-	fonsVertMetrics(context, NULL, NULL, &lineHeight); lineHeight *= 0.5;
+	fonsVertMetrics(context, NULL, NULL, &lineHeight);
 	fonsSetErrorCallback(context, ofxEditorFont::stashError, context);
 	
 	return true;

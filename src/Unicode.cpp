@@ -39,6 +39,7 @@ typedef unsigned short   Unicode2Bytes;
 typedef unsigned int     Unicode4Bytes;
 typedef unsigned char    byte;
 
+//--------------------------------------------------------------
 std::string wchar_to_string(wchar_t input) {
 	string output;
 	// 0xxxxxxx
@@ -82,6 +83,7 @@ std::string wchar_to_string(wchar_t input) {
 	return output;
 }
 
+//--------------------------------------------------------------
 wchar_t string_to_wchar(const std::string &input) {
 	Unicode4Bytes output = 0;
 	// 1111110x 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx
@@ -126,7 +128,7 @@ wchar_t string_to_wchar(const std::string &input) {
 	return output;
 }
 
-
+//--------------------------------------------------------------
 string wstring_to_string(const wstring &input) {
 	string output;
 	for(unsigned int i = 0; i < input.size(); i++) {
@@ -135,6 +137,7 @@ string wstring_to_string(const wstring &input) {
 	return output;
 }
 
+//--------------------------------------------------------------
 wstring string_to_wstring(const string &input) {
 	wstring output;
 	for(unsigned int i = 0; i < input.size();) {

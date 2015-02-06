@@ -5,4 +5,4 @@ show a few utf8 wide chars
 
 3 bytes: € Ж 丽
 
-4 byte: Japan 日本国
+4 bytes: 日本国

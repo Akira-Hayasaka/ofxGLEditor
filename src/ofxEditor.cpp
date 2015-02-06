@@ -22,14 +22,14 @@
  */
 #include "ofxEditor.h"
 
-// unicode string conversion, this will be replaced when OF has internal
-// unicode support
+// string conversion, this will be replaced when OF has internal unicode support
 #include "Unicode.h"
 #include "ofxEditorFont.h"
 
 // GLFW needed for clipboard support
 #if !defined(TARGET_NODISPLAY) && !defined(TARGET_OF_IOS) && \
     !defined(TARGET_ANDROID) && !defined(TARGET_RASPBERRY_PI)
+	#define HAS_GLFW
     #include "ofAppGLFWWindow.h"
 #endif
 
@@ -43,6 +43,9 @@
 #define CURSOR_MAX_WIDTH 40
 #define CURSOR_MAX_HEIGHT 40
 
+// uncomment to see the viewport and auto focus bounding boxes
+//#define DEBUG_AUTO_FOCUS
+
 ofPtr<ofxEditorFont> ofxEditor::s_font;
 int ofxEditor::s_charWidth = 1;
 int ofxEditor::s_charHeight = 1;
@@ -52,9 +55,6 @@ bool ofxEditor::s_textShadow = true;
 wstring ofxEditor::s_copyBuffer;
 
 float ofxEditor::s_time = 0;
-
-// uncomment to see the viewport and auto focus bounding boxes
-//#define DEBUG_AUTO_FOCUS
 
 float ofxEditor::s_autoFocusError = 10;
 float ofxEditor::s_autoFocusScaleDrift = 0.3;
@@ -596,13 +596,15 @@ void ofxEditor::drawGrid() {
 //--------------------------------------------------------------
 void ofxEditor::keyPressed(int key) {
 
-	// filter out modifier key events, except SHIFT
+	// filter out modifier key events, except SHIFT & current modifier
 	switch(key) {
 		case OF_KEY_ALT: case OF_KEY_LEFT_ALT: case OF_KEY_RIGHT_ALT:
 		case OF_KEY_LEFT_SHIFT: case OF_KEY_RIGHT_SHIFT:
-		case OF_KEY_CONTROL: case OF_KEY_LEFT_CONTROL: case OF_KEY_RIGHT_CONTROL:
-		case OF_KEY_SUPER: case OF_KEY_LEFT_COMMAND: case OF_KEY_RIGHT_COMMAND:
 			return;
+		case OF_KEY_CONTROL: case OF_KEY_LEFT_CONTROL: case OF_KEY_RIGHT_CONTROL:
+			if(s_superAsModifier) return;
+		case OF_KEY_SUPER: case OF_KEY_LEFT_COMMAND: case OF_KEY_RIGHT_COMMAND:
+			if(!s_superAsModifier) return;
 	}
 	
 	bool modifierPressed = s_superAsModifier ? ofGetKeyPressed(OF_KEY_SUPER) : ofGetKeyPressed(OF_KEY_CONTROL);
@@ -1507,8 +1509,7 @@ void ofxEditor::copySelection() {
 	}
 
 	// use clipboard if available, otherwise use internal copybuffer
-	#if !defined(TARGET_NODISPLAY) && !defined(TARGET_OF_IOS) && \
-		!defined(TARGET_ANDROID) && !defined(TARGET_RASPBERRY_PI)
+	#ifdef HAS_GLFW
 		ofAppGLFWWindow *window = (ofAppGLFWWindow *) ofGetWindowPtr();
 		glfwSetClipboardString(window->getGLFWWindow(), getText().c_str());
 	#else
@@ -1522,8 +1523,7 @@ void ofxEditor::copySelection() {
 void ofxEditor::pasteSelection() {
 
 	// use clipboard if available, otherwise use internal copybuffer
-	#if !defined(TARGET_NODISPLAY) && !defined(TARGET_OF_IOS) && \
-		!defined(TARGET_ANDROID) && !defined(TARGET_RASPBERRY_PI)
+	#ifdef HAS_GLFW
 		ofAppGLFWWindow *window = (ofAppGLFWWindow *) ofGetWindowPtr();
 		const char * text = glfwGetClipboardString(window->getGLFWWindow());
 		if(!text) {
