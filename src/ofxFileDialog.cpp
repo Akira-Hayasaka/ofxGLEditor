@@ -152,13 +152,21 @@ void ofxFileDialog::refresh() {
 	m_directories.insert(0);
 	m_filenames.push_back(L"..");
 	
-	// everything else
+	// first dirs
 	for(int i = 0; i < files.size(); ++i) {
 		if(files[i].isDirectory()) {
 			m_directories.insert(m_filenames.size());
+			m_filenames.push_back(string_to_wstring(files[i].getFileName()));
+			ofLogVerbose("ofxFileDialog") << "\t" << wstring_to_string(m_filenames.back());
 		}
-		m_filenames.push_back(string_to_wstring(files[i].getFileName()));
-		ofLogVerbose("ofxFileDialog") << "\t" << wstring_to_string(m_filenames.back());
+	}
+	
+	// then files
+	for(int i = 0; i < files.size(); ++i) {
+		if(!files[i].isDirectory()) {
+			m_filenames.push_back(string_to_wstring(files[i].getFileName()));
+			ofLogVerbose("ofxFileDialog") << "\t" << wstring_to_string(m_filenames.back());
+		}
 	}
 }
 
@@ -224,7 +232,7 @@ void ofxFileDialog::drawSaveAs() {
 void ofxFileDialog::drawOpen() {
 
 	int x = 0;
-	ofColor dirColor = m_settings->getTextColor(); // TODO: separate dir color?
+	ofColor &dirColor = m_settings->getTextColor(); // TODO: separate dir color?
 	
 	// start drawing based on current file location in file list so selection is centered vertically
 	float y = (m_currentFile/(float)m_filenames.size()) * -s_charHeight * (float)m_filenames.size();
