@@ -261,6 +261,7 @@ bool ofxGLEditor::openFile(string filename, int editor) {
 	
 	setText(file.readToBuffer().getText(), editor);
 	file.close();
+	m_saveFiles[editor] = ofFilePath::getFileName(path);
 	
 	return true;
 }
@@ -289,6 +290,7 @@ bool ofxGLEditor::saveFile(string filename, int editor) {
 	
 	file << getText(editor);
 	file.close();
+	m_saveFiles[editor] = ofFilePath::getFileName(path);
 		
 	return true;
 }
