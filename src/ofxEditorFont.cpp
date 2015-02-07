@@ -35,6 +35,7 @@ ofxEditorFont::ofxEditorFont() {
 	font = 0;
 	size = 0;
 	lineHeight = 0;
+	textShadowColor = glfonsRGBA(0, 0, 0, 255); // black
 }
 
 //--------------------------------------------------------------
@@ -62,7 +63,7 @@ bool ofxEditorFont::loadFont(string filename, int fontsize, int textureDimension
 	size = fontsize;
 	fonsSetFont(context, font);
 	fonsSetSize(context, size);
-	fonsSetBlur(context, 0);
+	fonsSetColor(context, glfonsRGBA(255, 255, 255, 255)); // white
 	fonsVertMetrics(context, NULL, NULL, &lineHeight);
 	fonsSetErrorCallback(context, ofxEditorFont::stashError, context);
 	
@@ -86,6 +87,11 @@ void ofxEditorFont::clear() {
 }
 
 //--------------------------------------------------------------
+int ofxEditorFont::getFontSize() {
+	return size;
+}
+
+//--------------------------------------------------------------
 float ofxEditorFont::getLineHeight() {
 	return lineHeight;
 }
@@ -105,26 +111,52 @@ float ofxEditorFont::stringHeight(const string& s) {
 }
 
 //--------------------------------------------------------------
-void ofxEditorFont::drawCharacter(int c, float x, float y) {
-	ofEnableAlphaBlending();
-	unsigned int color = glfonsRGBA(ofGetStyle().color.r, ofGetStyle().color.g, ofGetStyle().color.b, ofGetStyle().color.a);
-	fonsSetColor(context, color);
-	if(c < 0x80) { // ASCII
-		string s = " ";
-		s[0] = c;
-		return fonsDrawText(context, x, y, s.c_str(), NULL)-x;
+void ofxEditorFont::drawCharacter(int c, float x, float y, bool shadowed) {
+	string s = wchar_to_string(c);
+	if(shadowed) {
+		fonsPushState(context);
+		fonsSetColor(context, textShadowColor);
+		fonsDrawText(context, x+1, y+1, s.c_str(), NULL);
+		fonsPopState(context);
 	}
-	else { // UTF-8
-		return fonsDrawText(context, x, y, wchar_to_string(c).c_str(), NULL)-x;
-	}
-	ofDisableAlphaBlending();
+	fonsDrawText(context, x, y, s.c_str(), NULL);
 }
 
 //--------------------------------------------------------------
-void ofxEditorFont::drawString(const string& s, float x, float y) {
-	unsigned int color = glfonsRGBA(ofGetStyle().color.r, ofGetStyle().color.g, ofGetStyle().color.b, ofGetStyle().color.a);
-	fonsSetColor(context, color);
+void ofxEditorFont::drawString(const string& s, float x, float y, bool shadowed) {
+	if(shadowed) {
+		fonsPushState(context);
+		fonsSetColor(context, textShadowColor);
+		fonsDrawText(context, x+1, y+1, s.c_str(), NULL);
+		fonsPopState(context);
+	}
 	fonsDrawText(context, x, y, s.c_str(), NULL);
+}
+
+//--------------------------------------------------------------
+void ofxEditorFont::drawString(const wstring& s, float x, float y, bool shadowed) {
+	drawString(wstring_to_string(s), x, y, shadowed);
+}
+
+//--------------------------------------------------------------
+void ofxEditorFont::setColor(ofColor &c, float alpha) {
+	unsigned int textColor = glfonsRGBA(c.r, c.g, c.b, c.a*alpha);
+	fonsSetColor(context, textColor);
+}
+
+//--------------------------------------------------------------
+void ofxEditorFont::setShadowColor(ofColor &c, float alpha) {
+	textShadowColor = glfonsRGBA(c.r, c.g, c.b, c.a*alpha);
+}
+
+//--------------------------------------------------------------
+void ofxEditorFont::pushState() {
+	fonsPushState(context);
+}
+
+//--------------------------------------------------------------
+void ofxEditorFont::popState() {
+	fonsPopState(context);
 }
 
 // PRIVATE

@@ -20,13 +20,18 @@
 #pragma once
 
 #include "ofConstants.h"
+#include "ofColor.h"
 #include "fontstash.h"
 
 /// fontstash library wrapper for efficient text rendering since ofTrueTypeFont
 /// is too slow for lots of chars, this may change in the future as the new
 /// ofFont & unicode support are integrated into OpenFrameworks
 ///
-/// note: don't use this directly
+/// supports UTF8 but is dependent on what glyphs the loaded font supports,
+/// unknown glyphs are simply rendered as spaces
+///
+/// note: don't use this directly, requires alpha blending to avoid per-char
+///       style & color pushes & pops
 class ofxEditorFont {
 
 	public:
@@ -34,16 +39,59 @@ class ofxEditorFont {
 		ofxEditorFont();
 		virtual ~ofxEditorFont();
 	
+	/// \section Main
+	
+		/// create a fonstash context and load a given font
+		/// returns false if the font could not be loaded
 		bool loadFont(string filename, int fontsize, int textureDimension = 512);
-        bool isLoaded();
+	
+		/// returns true if the fonstash context exists (aka font is loaded)
+		bool isLoaded();
+	
+		/// clear the font & fonstash context
 		void clear();
 	
+	/// \section Font Info
+	
+		/// get the currently loaded font size
+		int getFontSize();
+	
+		/// get the calculated font line height (vertical distance to next line)
 		float getLineHeight();
+	
+		/// get bounding box width for a given string
 		float stringWidth(const string& s);
+	
+		/// get bounding box height for a give string (single line only)
         float stringHeight(const string& s);
 	
-		void drawCharacter(int c, float x, float y);
-		void drawString(const string& s, float x, float y);
+	/// \section Drawing
+	
+		/// draw a single char / unicode codepoint using the current state color
+		/// set shadowed=true to draw an offset shadow using the shadow color
+		void drawCharacter(int c, float x, float y, bool shadowed=false);
+	
+		/// draw a UTF8 string using the current state color
+		/// set shadowed=true to draw an offset shadow using the shadow color
+		void drawString(const string& s, float x, float y, bool shadowed=false);
+	
+		/// draw a wide char string using the current state color
+		/// set shadowed=true to draw an offset shadow using the shadow color
+		void drawString(const wstring& s, float x, float y, bool shadowed=false);
+	
+	/// \section Color & State
+	
+		/// set current state color, default: white
+		void setColor(ofColor &c, float alpha=1.0);
+	
+		/// set cached shadow color (not affected by state push/pop), default: black
+		void setShadowColor(ofColor &c, float alpha=1.0);
+	
+		// push current font state (color)
+		void pushState();
+	
+		// pop current font state (color)
+		void popState();
 	
 	private:
 	
@@ -51,6 +99,8 @@ class ofxEditorFont {
 		int font;         //< loaded font id
 		int size;         //< requested font size
 		float lineHeight; //< computed line height
+		
+		unsigned int textShadowColor; //< cached text shadow color
 	
 		/// static C error handler
 		static void stashError(void* uptr, int error, int val);

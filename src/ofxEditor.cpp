@@ -170,7 +170,7 @@ bool ofxEditor::loadFont(const string &font, int size) {
 	}
 	if(s_font->loadFont(font, size)) {
 		s_charWidth = s_font->stringWidth("#"); // should be a wide char
-		s_charHeight = s_font->stringHeight("#Iqg"); // catch tall/chars which hang down
+		s_charHeight = s_font->stringHeight("#Iqg"); // catch tall/chars which may hang down
 		s_cursorWidth = floor(s_charWidth*0.3);
 		s_autoFocusError = floor(s_charHeight*0.5); // make sure the error space is proportional to the glyph size
 	}
@@ -253,6 +253,7 @@ void ofxEditor::draw() {
 
 	ofPushStyle();
 	ofPushView();
+		ofEnableAlphaBlending(); // for fontstash
 		ofViewport(0, 0, m_width, m_height);
 		ofPushMatrix();
 		
@@ -291,6 +292,9 @@ void ofxEditor::draw() {
 		// draw text
 		if(m_colorScheme) { // with colorScheme
 			ofFill();
+			
+			s_font->setColor(m_settings->getTextColor(), m_settings->getAlpha());
+			s_font->setShadowColor(m_settings->getTextShadowColor(), m_settings->getAlpha());
 			
 			// start with line number
 			if(m_lineNumbers) {
@@ -349,6 +353,7 @@ void ofxEditor::draw() {
 					default:
 						break;
 				}
+				s_font->setColor(*textColor, m_settings->getAlpha());
 				
 				// draw block chars
 				for(int i = 0; i < tb.text.length(); ++i) {
@@ -406,7 +411,7 @@ void ofxEditor::draw() {
 							textPos++;
 							break;
 						default:
-							drawChar(tb.text[i], x, y, *textColor, m_settings->getTextShadowColor());
+							s_font->drawCharacter(tb.text[i], x, y, s_textShadow);
 							x += s_charWidth;
 							xcount++;
 							textPos++;
@@ -418,6 +423,9 @@ void ofxEditor::draw() {
 		}
 		else { // without syntax highlighting
 			ofFill();
+			
+			s_font->setColor(m_settings->getTextColor(), m_settings->getAlpha());
+			s_font->setShadowColor(m_settings->getTextShadowColor(), m_settings->getAlpha());
 			
 			// start with line number
 			if(m_lineNumbers) {
@@ -490,7 +498,7 @@ void ofxEditor::draw() {
 				}
 				// everything else
 				else {
-					drawChar(m_text[i], x, y, m_settings->getTextColor(), m_settings->getTextShadowColor());
+					s_font->drawCharacter(m_text[i], x, y, s_textShadow);
 					x += s_charWidth;
 					xcount++;
 					textPos++;
@@ -1232,11 +1240,15 @@ void ofxEditor::drawString(string s, float x, float y) {
 
 //--------------------------------------------------------------
 void ofxEditor::drawString(string s, ofPoint& p) {
-	return drawString(string_to_wstring(s), p.x, p.y);
+	drawString(string_to_wstring(s), p.x, p.y);
 }
 
 //--------------------------------------------------------------
 void ofxEditor::drawString(wstring s, float x, float y) {
+	s_font->pushState();
+	ofColor c = ofGetStyle().color;
+	s_font->setColor(c);
+	
 	int xPos = x, yPos = y+s_charHeight;
 	for(int i = 0; i < s.size(); ++i) {
 		if(s[i] == '\n') {
@@ -1247,10 +1259,12 @@ void ofxEditor::drawString(wstring s, float x, float y) {
 			xPos += s_charWidth*m_settings->getTabWidth();
 		}
 		else {
-			s_font->drawCharacter(s[i], xPos, yPos);
+			s_font->drawCharacter(s[i], xPos, yPos, s_textShadow);
 			xPos += s_charWidth;
 		}
 	}
+	
+	s_font->popState();
 }
 
 //--------------------------------------------------------------
@@ -1261,33 +1275,19 @@ void ofxEditor::drawString(wstring s, ofPoint& p) {
 // PROTECTED
 
 //--------------------------------------------------------------
-void ofxEditor::drawChar(int c, int x, int y, ofColor &textColor, ofColor &shadowColor) {
-	if(s_textShadow) {
-		ofSetColor(shadowColor.r, shadowColor.g, shadowColor.b, shadowColor.a * m_settings->getAlpha());
-		s_font->drawCharacter(c, x+1, y+1);
-	}
-	ofSetColor(textColor.r, textColor.g, textColor.b, textColor.a * m_settings->getAlpha());
-	s_font->drawCharacter(c, x, y);
-}
-
-//--------------------------------------------------------------
 void ofxEditor::drawMatchingCharBlock(int x, int y) {
-	ofPushStyle();
-		ofSetColor(
-			m_settings->getMatchingCharsColor().r, m_settings->getMatchingCharsColor().g,
-			m_settings->getMatchingCharsColor().b, m_settings->getMatchingCharsColor().a * m_settings->getAlpha());
-		ofRect(x, y-s_charHeight, s_charWidth, s_charHeight);
-	ofPopStyle();
+	ofSetColor(
+		m_settings->getMatchingCharsColor().r, m_settings->getMatchingCharsColor().g,
+		m_settings->getMatchingCharsColor().b, m_settings->getMatchingCharsColor().a * m_settings->getAlpha());
+	ofRect(x, y-s_charHeight, s_charWidth, s_charHeight);
 }
 
 //--------------------------------------------------------------
 void ofxEditor::drawSelectionCharBlock(int x, int y) {
-	ofPushStyle();
-		ofSetColor(
-			m_settings->getSelectionColor().r, m_settings->getSelectionColor().g,
-			m_settings->getSelectionColor().b, m_settings->getSelectionColor().a * m_settings->getAlpha());
-		ofRect(x, y-s_charHeight, s_charWidth, s_charHeight);
-	ofPopStyle();
+	ofSetColor(
+		m_settings->getSelectionColor().r, m_settings->getSelectionColor().g,
+		m_settings->getSelectionColor().b, m_settings->getSelectionColor().a * m_settings->getAlpha());
+	ofRect(x, y-s_charHeight, s_charWidth, s_charHeight);
 }
 
 //--------------------------------------------------------------
@@ -1303,12 +1303,10 @@ void ofxEditor::drawCursor(int x, int y) {
 		else {
 			float maxCW = (BLOWUP_FLASHES - m_blowup) / BLOWUP_FLASHES * (CURSOR_MAX_WIDTH * s_cursorWidth * 0.5f) + s_cursorWidth * 0.5f;
 			float maxCH = (BLOWUP_FLASHES - m_blowup) / BLOWUP_FLASHES * (CURSOR_MAX_HEIGHT * s_charHeight) + s_charHeight;
-			ofPushStyle();
-				ofSetRectMode(OF_RECTMODE_CENTER);
-				ofSetColor(m_settings->getCursorColor().r, m_settings->getCursorColor().g,
-					       m_settings->getCursorColor().b, m_settings->getCursorColor().a * m_settings->getAlpha() * m_blowup/BLOWUP_FLASHES);
-				ofRect(MAX(x+maxCW/2, x), MAX(y-s_charHeight+maxCH/2, y-s_charHeight), MAX(maxCW, s_cursorWidth), MAX(maxCH, s_charHeight));
-			ofPopStyle();
+			ofSetRectMode(OF_RECTMODE_CENTER);
+			ofSetColor(m_settings->getCursorColor().r, m_settings->getCursorColor().g,
+					   m_settings->getCursorColor().b, m_settings->getCursorColor().a * m_settings->getAlpha() * m_blowup/BLOWUP_FLASHES);
+			ofRect(MAX(x+maxCW/2, x), MAX(y-s_charHeight+maxCH/2, y-s_charHeight), MAX(maxCW, s_cursorWidth), MAX(maxCH, s_charHeight));
 		}
 	}
 	else {
@@ -1317,27 +1315,28 @@ void ofxEditor::drawCursor(int x, int y) {
 			m_flash = 0;
 		}
 		if (m_flash > HALF_FLASH_RATE) {
-			ofPushStyle();
-				ofSetColor(m_settings->getCursorColor().r, m_settings->getCursorColor().g,
-					       m_settings->getCursorColor().b, m_settings->getCursorColor().a * m_settings->getAlpha());
-				ofRect(x, y-s_charHeight, s_cursorWidth, s_charHeight);
-			ofPopStyle();
+			ofSetColor(m_settings->getCursorColor().r, m_settings->getCursorColor().g,
+					   m_settings->getCursorColor().b, m_settings->getCursorColor().a * m_settings->getAlpha());
+			ofRect(x, y-s_charHeight, s_cursorWidth, s_charHeight);
 		}
 	}
 }
 
 //--------------------------------------------------------------
 void ofxEditor::drawLineNumber(int &x, int &y, int &currentLine) {
-	ofPushStyle();
-		currentLine++;
-		string currentLineString = ofToString(currentLine);
-		x += s_charWidth*(m_lineNumWidth-currentLineString.length()-1); // 1 for the space
-		for(int i = 0; i < currentLineString.length(); ++i) {
-			drawChar(currentLineString[i], x, y, m_settings->getLineNumberColor(), m_settings->getTextShadowColor());
-			x += s_charWidth;
-		}
-		x += s_charWidth; // the space
-	ofPopStyle();
+	s_font->pushState();
+	s_font->setColor(m_settings->getLineNumberColor(), m_settings->getAlpha());
+	
+	currentLine++;
+	string currentLineString = ofToString(currentLine);
+	x += s_charWidth*(m_lineNumWidth-currentLineString.length()-1); // 1 for the space
+	for(int i = 0; i < currentLineString.length(); ++i) {
+		s_font->drawCharacter(currentLineString[i], x, y, s_textShadow);
+		x += s_charWidth;
+	}
+	x += s_charWidth; // the space
+	
+	s_font->popState();
 }
 
 //--------------------------------------------------------------

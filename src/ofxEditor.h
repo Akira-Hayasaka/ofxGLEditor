@@ -349,7 +349,7 @@ class ofxEditor {
 	/// \section Helper Functions
 	
 		// draw a char at pos with text colors
-		void drawChar(int c, int x, int y, ofColor &textColor, ofColor &shadowColor);
+		//void drawCharacter(int c, int x, int y);
 	
 		// draw a matching char highlight char block rectanlge at pos
 		void drawMatchingCharBlock(int x, int y);

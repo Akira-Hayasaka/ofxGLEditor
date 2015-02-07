@@ -58,7 +58,7 @@ void ofxFileDialog::draw() {
 
 	ofPushStyle();
 	ofPushView();
-	
+		ofEnableAlphaBlending(); // for fontstash
 		ofViewport(0, 0, m_width, m_height);
 		ofTranslate(s_charWidth*4, m_height/2);
 	
@@ -199,11 +199,11 @@ void ofxFileDialog::drawSaveAs() {
 
 	bool drawnCursor = false;
 	int x = 0, y = -s_charHeight;
+	s_font->setColor(m_settings->getTextColor(), m_settings->getAlpha());
+	s_font->setShadowColor(m_settings->getTextShadowColor(), m_settings->getAlpha());
 
 	// info text
-	ofSetColor(m_settings->getTextColor().r, m_settings->getTextColor().g,
-			   m_settings->getTextColor().b, m_settings->getTextColor().a * m_settings->getAlpha());
-	drawString(s_saveAsText, x, y);
+	s_font->drawString(s_saveAsText, x, y, s_textShadow);
 
 	// new file name with cursor
 	y += s_charHeight*2;
@@ -216,9 +216,7 @@ void ofxFileDialog::drawSaveAs() {
 		}
 		
 		// text
-		ofSetColor(m_settings->getTextColor().r, m_settings->getTextColor().g,
-				   m_settings->getTextColor().b, m_settings->getTextColor().a * m_settings->getAlpha());
-		s_font->drawCharacter(m_text[i], x, y);
+		s_font->drawCharacter(m_text[i], x, y, s_textShadow);
 		x += s_charWidth;
 	}
 
@@ -232,7 +230,8 @@ void ofxFileDialog::drawSaveAs() {
 void ofxFileDialog::drawOpen() {
 
 	int x = 0;
-	ofColor &dirColor = m_settings->getTextColor(); // TODO: separate dir color?
+	s_font->setColor(m_settings->getTextColor(), m_settings->getAlpha());
+	s_font->setShadowColor(m_settings->getTextShadowColor(), m_settings->getAlpha());
 	
 	// start drawing based on current file location in file list so selection is centered vertically
 	float y = (m_currentFile/(float)m_filenames.size()) * -s_charHeight * (float)m_filenames.size();
@@ -257,14 +256,7 @@ void ofxFileDialog::drawOpen() {
 				}
 				
 				// file or dir name
-				if(isDir) {
-					ofSetColor(dirColor.r, dirColor.g, dirColor.b, dirColor.a * m_settings->getAlpha());
-				}
-				else {
-					ofSetColor(m_settings->getTextColor().r, m_settings->getTextColor().g,
-					           m_settings->getTextColor().b, m_settings->getTextColor().a * m_settings->getAlpha());
-				}
-				s_font->drawCharacter((*i)[c], x, y);
+				s_font->drawCharacter((*i)[c], x, y, s_textShadow);
 				x += s_charWidth;
 			}
 			x = 0;
