@@ -106,6 +106,7 @@ float ofxEditorFont::stringHeight(const string& s) {
 
 //--------------------------------------------------------------
 void ofxEditorFont::drawCharacter(int c, float x, float y) {
+	ofEnableAlphaBlending();
 	unsigned int color = glfonsRGBA(ofGetStyle().color.r, ofGetStyle().color.g, ofGetStyle().color.b, ofGetStyle().color.a);
 	fonsSetColor(context, color);
 	if(c < 0x80) { // ASCII
@@ -116,6 +117,7 @@ void ofxEditorFont::drawCharacter(int c, float x, float y) {
 	else { // UTF-8
 		return fonsDrawText(context, x, y, wchar_to_string(c).c_str(), NULL)-x;
 	}
+	ofDisableAlphaBlending();
 }
 
 //--------------------------------------------------------------
