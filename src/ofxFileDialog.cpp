@@ -318,11 +318,20 @@ void ofxFileDialog::keyPressedSaveAs(int key) {
 			
 		default:
 		
-			// build a two byte UTF-8 character
-			// TODO: what happens if it's 3 or 4 bytes?
-			if(key > 0x80 && m_firstUTF8Byte == 0) {
-				m_firstUTF8Byte = key;
-				return;
+			// build multibyte UTF-8 character
+			if(key > 0x80) {
+				if(m_UTF8Bytes == 0) {
+					m_UTF8Bytes = wchar_width(key);
+				}
+				m_UTF8Char.push_back(key);
+				if(m_UTF8Char.length() < m_UTF8Bytes) {
+					return;
+				}
+			}
+			else if(m_UTF8Bytes > 0) {
+				ofLogWarning("ofxFileDialog") << "dropping bad UTF8 bytes";
+				m_UTF8Bytes = 0;
+				m_UTF8Char = "";
 			}
 		
 			// ignore control chars
@@ -330,27 +339,15 @@ void ofxFileDialog::keyPressedSaveAs(int key) {
 				break;
 			}
 			
-			// build wide char and insert
-			if(m_firstUTF8Byte > 0) {
-				string temp("  ");
-				temp[0] = m_firstUTF8Byte;
-				temp[1] = key;
-				m_text.insert(m_position, string_to_wstring(temp));
-				m_firstUTF8Byte = 0;
+			// multibyte UTF8
+			if(m_UTF8Bytes > 0) {
+				m_UTF8Bytes = 0;
 			}
-			else {
-				if(key < 0x80) {
-					string temp(" ");
-					temp[0] = key;
-					m_text.insert(m_position, string_to_wstring(temp));
-				}
-				else {
-					wchar_t k[2];
-					memset(&k, 0, sizeof(wchar_t)*2);
-					k[0] = key;
-					m_text.insert(m_position, wstring(k));
-				}
+			else { // single byte UTF8 & ASCII
+				m_UTF8Char.push_back(key);
 			}
+			m_text.insert(m_position, string_to_wstring(m_UTF8Char));
+			m_UTF8Char = "";
 			m_position++;
 			
 			break;

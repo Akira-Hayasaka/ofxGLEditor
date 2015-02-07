@@ -88,15 +88,11 @@ void ofApp::draw() {
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key) {
 	
-	// see ofxGLEditor.h for key commands
-	editor.keyPressed(key);
-	
-	// can check modifiers from editor
-	//
 	// note: when using CTRL as the modifier key, CTRL + key might be an ascii
 	// control char so check for both the char 'f' and 6, the ascii value for
 	// CTRL + f, see also: http://ascii-table.com/control-chars.php
-	if(editor.isModifierPressed()) {
+	bool modifier = ofGetKeyPressed(ofxEditor::getSuperAsModifier() ? OF_KEY_SUPER : OF_KEY_CONTROL);
+	if(modifier) {
 		switch(key) {
 			case 'f': case 6:
 				ofToggleFullscreen();
@@ -112,6 +108,9 @@ void ofApp::keyPressed(int key) {
 				return;
 		}
 	}
+	
+	// see ofxGLEditor.h for key commands
+	editor.keyPressed(key);
 }
 
 //--------------------------------------------------------------

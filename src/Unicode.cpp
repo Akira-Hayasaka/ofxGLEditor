@@ -40,6 +40,28 @@ typedef unsigned int     Unicode4Bytes;
 typedef unsigned char    byte;
 
 //--------------------------------------------------------------
+unsigned int wchar_width(int input) {
+	if((input & MASK6BYTES) == MASK6BYTES) {
+		return 6;
+	}
+	else if((input & MASK5BYTES) == MASK5BYTES) {
+		return 5;
+	}
+	else if((input & MASK4BYTES) == MASK4BYTES) {
+		return 4;
+	}
+	else if((input & MASK3BYTES) == MASK3BYTES) {
+		return 3;
+	}
+	else if((input & MASK2BYTES) == MASK2BYTES) {
+		return 2;
+	}
+	else {
+		return 1;
+	}
+}
+
+//--------------------------------------------------------------
 std::string wchar_to_string(wchar_t input) {
 	string output;
 	// 0xxxxxxx

@@ -20,10 +20,13 @@
  * Algorithm by Marius Bancila
  * http://www.codeguru.com/cpp/misc/misc/multi-lingualsupport/article.php/c10451/
  *
- * Code originally in Fluxus http://www.pawfal.org/fluxus
+ * Expanded from code originally in Fluxus http://www.pawfal.org/fluxus
  * Copyright (C) Dave Griffiths
  */
 #include <string>
+
+/// get the number of bytes for a UTF-8 wchar from a (suspected) leading byte
+unsigned int wchar_width(int input);
 
 /// split a single wide char value into UTF-8 bytes
 std::string wchar_to_string(wchar_t input);

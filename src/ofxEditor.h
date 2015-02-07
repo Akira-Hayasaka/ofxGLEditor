@@ -33,9 +33,6 @@ class ofxEditorFont;
 /// based on the Fluxus GLEditor
 ///
 /// uses wide chars internally so string conversion functions are provided
-/// TODO: 3 or 4 byte UTF-8 chars aren't handled in keyPressed no are they
-///       drawn since ofTrueTypeFont currently caps chars at 256
-///
 class ofxEditor {
 
 	public:
@@ -108,7 +105,7 @@ class ofxEditor {
 		///
 		/// ARROWS + SHIFT: select text
 		///
-		/// Note: ESC clears the current selection, but you'll need to set
+		/// note: ESC clears the current selection, but you'll need to set
 		///       ofSetEscapeQuitsApp(false) to use it
 		///
 		virtual void keyPressed(int key);
@@ -266,7 +263,6 @@ class ofxEditor {
 		wstring m_text; //< text buffer
 		unsigned int m_numLines; //< number of lines in the text buffer
 		
-		//ofRectangle m_viewport;     //< viewport when drawing editor
 		float m_width, m_height; //< editor viewport pixel size
 		float m_posX, m_posY;    //< editor offset, calculated by line pos & auto focus
 		unsigned int m_position;    //< 1D text pos within buffer
@@ -294,7 +290,8 @@ class ofxEditor {
 		unsigned int m_displayedLineCount; //< current number of displayed lines (may be diff from m_visibleLines)
 	
 		bool m_shiftState; //< is shift pressed?
-		char m_firstUTF8Byte; //< used to handle multibyte chars
+		unsigned int m_UTF8Bytes; //< number of expected UTF8 input bytes
+		string m_UTF8Char; //< used to build multibyte UTF8 input char
 		
 		ofxEditorColorScheme *m_colorScheme; //< optional syntax color scheme
 		bool m_lineWrapping; //< enable line wrapping in this editor?
