@@ -1,0 +1,16 @@
+0.3.0
+
+	- replaced ofTrueTypeFont with the fontstash library to improve performance,
+      now draws using textures instead of paths at the expense of slightly
+      blurry edges (depends on the font)
+    - now supports full UTF-8 char set (available glyphs depend on the font)
+
+0.2.0
+
+	- rewrote GLEditor classes using ofTrueTypeFont and a pixel based grid
+	- added syntax coloring and a simple syntax parser
+	- various other improvements
+
+0.1.0
+
+	- original version using the Fluxus GLEditor classes
