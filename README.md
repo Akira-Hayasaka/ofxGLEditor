@@ -11,7 +11,10 @@ For information on usage and redistribution, and for a DISCLAIMER OF ALL WARRANT
 
 This is a rewrite of the GLEditor from [Fluxus](http://www.pawfal.org/fluxus) Copyright © 2005 Dave Griffiths
 
-PrintChar21 font from Kreative Software
+Uses:
+
+* [fontstash](https://github.com/memononen/fontstash) for text rendering
+* PrintChar21 font from Kreative Software (used in examples)
 
 See https://github.com/Akira-Hayasaka/ofxGLEditor for documentation as well as the [OF forum post on ofxGLEditor](http://forum.openframeworks.cc/t/ofxgleditor/10425)
 
@@ -69,4 +72,4 @@ This is a simple livecoding example using ofxLua including lua keyword syntax hi
 
 ### Font
 
-You will need a monospaced font as variable width fonts are not currently supported. PrintChar21.ttf is included with the example projects.
+You will need a monospaced font as variable width fonts are not currently supported. PrintChar21.ttf is included with the example projects. Unicode glyphs are supported if your font has them.
