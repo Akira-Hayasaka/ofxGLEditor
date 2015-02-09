@@ -4,7 +4,7 @@
 	  now draws using textures instead of paths at the expense of slightly
 	  blurry edges (depends on the font)
 	- reimplemented auto focus scaling (weee!)
-	- now supports full UTF-8 char set (available glyphs depend on the font)
+	- now supports full unicode char set (available glyphs depend on the font)
 	- selection & select all now work correctly
 	- dirs now listed before files in browser
 	- fixed line num = 10 not expanding to 2 digits
