@@ -3,7 +3,14 @@
 	- replaced ofTrueTypeFont with the fontstash library to improve performance,
 	  now draws using textures instead of paths at the expense of slightly
 	  blurry edges (depends on the font)
+	- reimplemented auto focus scaling (weee!)
 	- now supports full UTF-8 char set (available glyphs depend on the font)
+	- selection & select all now work correctly
+	- dirs now listed before files in browser
+	- fixed line num = 10 not expanding to 2 digits
+	- fixed ofxGLEditor not remembering filenames after opening & saving
+	- can now save utf8 filenames
+	- improved animations between editors by sharing timestamp
 
 0.2.0
 
