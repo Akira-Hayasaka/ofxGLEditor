@@ -52,7 +52,7 @@ class ofxEditor {
 		/// is a font currently loaded?
 		static bool isFontLoaded();
 	
-		/// get the fixed width of a char using editor font
+		/// get the fixed width of the space char using editor font
 		static int getCharWidth();
 	
 		/// get the fixed height of a char using editor font
@@ -88,9 +88,6 @@ class ofxEditor {
 		
 		/// draw the editor, pushes view and applies viewport
 		virtual void draw();
-	
-		/// draw the text field character grid, mainly for debugging
-		void drawGrid();
 
 		/// handles editor key events
 		///
@@ -223,19 +220,22 @@ class ofxEditor {
 	/// \section Drawing Utils
 	
 		/// draw a wide char string using the current editor font
-		void drawString(wstring s, float x, float y);
-		void drawString(wstring s, ofPoint& p);
+		/// returns the width of drawn text
+		float drawString(wstring s, float x, float y);
+		float drawString(wstring s, ofPoint& p);
 	
 		/// draw a string using the current editor font
-		void drawString(string s, float x, float y);
-		void drawString(string s, ofPoint& p);
+		/// returns the width of drawn text
+		float drawString(string s, float x, float y);
+		float drawString(string s, ofPoint& p);
 	
 	protected:
 	
 	/// \section Static Variables
 	
 		static ofPtr<ofxEditorFont> s_font; //< global editor font
-		static int s_charWidth;          //< char block pixel width
+		static int s_charWidth;          //< space char pixel width
+		static int s_zeroWidth;          //< zero char pixel width for line nums
 		static int s_charHeight;         //< char block pixel height
 		static int s_cursorWidth;        //< cursor width, 1/3 char width
 		static bool s_textShadow;        //< draw text with a 2px offset shadow?
@@ -267,8 +267,8 @@ class ofxEditor {
 		float m_posX, m_posY;    //< editor offset, calculated by line pos & auto focus
 		unsigned int m_position;    //< 1D text pos within buffer
 		unsigned int m_desiredXPos; //< desired char pos on current line
-		
-		int m_visibleChars; //< computed text field char width
+	
+		int m_visibleWidth; //< computed text field pixel width minus line nums
 		int m_visibleLines; //< computed text field num lines
 	
 		int m_matchingCharsHighlight[2]; //< start & end pos for matching chars highlight
@@ -284,7 +284,6 @@ class ofxEditor {
 		unsigned int m_highlightStart; //< highlight start pos in buffer
 		unsigned int m_highlightEnd;   //< highlight end pos in buffer
 	
-		unsigned int m_leftTextPosition;   //< left start char pos for horz scrolling
 		unsigned int m_topTextPosition;    //< top start pos in buffer for vert scrolling
 		unsigned int m_bottomTextPosition; //< bottom end pos in buffer for vert scrolling
 		unsigned int m_displayedLineCount; //< current number of displayed lines (may be diff from m_visibleLines)
@@ -348,14 +347,15 @@ class ofxEditor {
 	
 	/// \section Helper Functions
 	
-		// draw a char at pos with text colors
-		//void drawCharacter(int c, int x, int y);
+		/// get the width of a given character,
+		/// endlines are 1 space and tabs are depending on the tab width setting
+		float characterWidth(int c);
 	
-		// draw a matching char highlight char block rectanlge at pos
-		void drawMatchingCharBlock(int x, int y);
+		/// draw a matching char highlight char block rectangle at pos
+		void drawMatchingCharBlock(int c, int x, int y);
 	
 		/// draw a selection char block rectangle at pos
-		void drawSelectionCharBlock(int x, int y);
+		void drawSelectionCharBlock(int c, int x, int y);
 	
 		/// draw the cursor at pos
 		void drawCursor(int x, int y);

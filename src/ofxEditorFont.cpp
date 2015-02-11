@@ -97,10 +97,18 @@ float ofxEditorFont::getLineHeight() {
 }
 
 //--------------------------------------------------------------
+float ofxEditorFont::characterWidth(int c) {
+	return fonsTextBounds(context, 0, 0, wchar_to_string(c).c_str(), NULL, NULL);
+}
+
+//--------------------------------------------------------------
 float ofxEditorFont::stringWidth(const string& s) {
-	float bounds[4] = {0, 0, 0, 0};
-	fonsTextBounds(context, 0, 0, s.c_str(), NULL, bounds);
-	return bounds[2] - bounds[0]; // maxx - minx
+	return fonsTextBounds(context, 0, 0, s.c_str(), NULL, NULL);
+}
+
+//--------------------------------------------------------------
+float ofxEditorFont::stringWidth(const wstring& s) {
+	return stringWidth(wstring_to_string(s));
 }
 
 //--------------------------------------------------------------
@@ -111,7 +119,12 @@ float ofxEditorFont::stringHeight(const string& s) {
 }
 
 //--------------------------------------------------------------
-void ofxEditorFont::drawCharacter(int c, float x, float y, bool shadowed) {
+float ofxEditorFont::stringHeight(const wstring& s) {
+	return stringHeight(wstring_to_string(s));
+}
+
+//--------------------------------------------------------------
+float ofxEditorFont::drawCharacter(int c, float x, float y, bool shadowed) {
 	string s = wchar_to_string(c);
 	if(shadowed) {
 		fonsPushState(context);
@@ -119,23 +132,23 @@ void ofxEditorFont::drawCharacter(int c, float x, float y, bool shadowed) {
 		fonsDrawText(context, x+1, y+1, s.c_str(), NULL);
 		fonsPopState(context);
 	}
-	fonsDrawText(context, x, y, s.c_str(), NULL);
+	return fonsDrawText(context, x, y, s.c_str(), NULL);
 }
 
 //--------------------------------------------------------------
-void ofxEditorFont::drawString(const string& s, float x, float y, bool shadowed) {
+float ofxEditorFont::drawString(const string& s, float x, float y, bool shadowed) {
 	if(shadowed) {
 		fonsPushState(context);
 		fonsSetColor(context, textShadowColor);
 		fonsDrawText(context, x+1, y+1, s.c_str(), NULL);
 		fonsPopState(context);
 	}
-	fonsDrawText(context, x, y, s.c_str(), NULL);
+	return fonsDrawText(context, x, y, s.c_str(), NULL);
 }
 
 //--------------------------------------------------------------
-void ofxEditorFont::drawString(const wstring& s, float x, float y, bool shadowed) {
-	drawString(wstring_to_string(s), x, y, shadowed);
+float ofxEditorFont::drawString(const wstring& s, float x, float y, bool shadowed) {
+	return drawString(wstring_to_string(s), x, y, shadowed);
 }
 
 //--------------------------------------------------------------

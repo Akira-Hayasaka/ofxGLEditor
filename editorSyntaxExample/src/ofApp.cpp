@@ -29,7 +29,7 @@ void ofApp::setup() {
 	ofSetEscapeQuitsApp(false);
 
 	// make sure to load editor font before anything else!
-	ofxEditor::loadFont("fonts/PrintChar21.ttf", 24);
+	ofxEditor::loadFont("fonts/Arial Unicode.ttf", 48);
 	
 	// sample lua syntax
 	colorScheme.setWordColor("function", ofColor::fuchsia);
@@ -65,7 +65,7 @@ void ofApp::draw() {
 	editor.draw();
 	
 	if(debug) {
-		editor.drawGrid();
+		//editor.drawGrid();
 	
 		ofSetColor(255);
 		ofDrawBitmapString("fps: "+ofToString((int)ofGetFrameRate()), ofGetWidth()-70, ofGetHeight()-10);

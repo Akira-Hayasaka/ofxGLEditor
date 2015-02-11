@@ -85,7 +85,7 @@ void ofxFileDialog::keyPressed(int key) {
 		case OF_KEY_ALT: case OF_KEY_LEFT_ALT: case OF_KEY_RIGHT_ALT:
 		case OF_KEY_LEFT_SHIFT: case OF_KEY_RIGHT_SHIFT:
 		case OF_KEY_CONTROL: case OF_KEY_LEFT_CONTROL: case OF_KEY_RIGHT_CONTROL:
-		case OF_KEY_SUPER: case OF_KEY_LEFT_COMMAND: case OF_KEY_RIGHT_COMMAND:
+		case OF_KEY_SUPER: case OF_KEY_LEFT_SUPER: case OF_KEY_RIGHT_SUPER:
 			return;
 	}
 	
@@ -216,8 +216,7 @@ void ofxFileDialog::drawSaveAs() {
 		}
 		
 		// text
-		s_font->drawCharacter(m_text[i], x, y, s_textShadow);
-		x += s_charWidth;
+		x = s_font->drawCharacter(m_text[i], x, y, s_textShadow);
 	}
 
 	// draw cursor if we have no text, or if we're at the end of the buffer
@@ -252,12 +251,11 @@ void ofxFileDialog::drawOpen() {
 				if(count == m_currentFile) {
 					ofSetColor(m_settings->getCursorColor().r, m_settings->getCursorColor().g,
 					       m_settings->getCursorColor().b, m_settings->getCursorColor().a * m_settings->getAlpha());
-					ofRect(x, y-s_charHeight, s_charWidth, s_charHeight);
+					ofRect(x, y-s_charHeight, characterWidth((*i)[c]), s_charHeight);
 				}
 				
 				// file or dir name
-				s_font->drawCharacter((*i)[c], x, y, s_textShadow);
-				x += s_charWidth;
+				x = s_font->drawCharacter((*i)[c], x, y, s_textShadow);
 			}
 			x = 0;
 		}
