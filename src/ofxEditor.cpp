@@ -174,7 +174,7 @@ bool ofxEditor::loadFont(const string &font, int size) {
 		s_zeroWidth = s_font->characterWidth('0');
 		s_charHeight = s_font->stringHeight("#Iqg"); // catch tall/chars which may hang down
 		s_cursorWidth = MAX(floor(s_charWidth*0.3), 6);
-		s_autoFocusError = floor(s_charHeight*0.5); // make sure the error space is proportional to the glyph size
+		s_autoFocusError = MAX(floor(s_charHeight*0.5), 12); // make sure the error space is proportional to the glyph size
 	}
 }
 
@@ -243,13 +243,19 @@ void ofxEditor::draw() {
 	if(m_width == 0 || m_height == 0) {
 		resize();
 	}
-
+	
+	m_visibleWidth = m_width - (m_autoFocus ? 0 : s_charWidth);
+	m_visibleLines = m_height/(s_charHeight*m_scale);
+	
 	// update scrolling
 	m_posX = 0;
-	if(!m_lineWrapping) {// && (m_autoFocus ? m_scale <= s_autoFocusMinScale : true)) {
-		int w = s_font->stringWidth(m_text.substr(lineStart(m_position), m_desiredXPos+1));
-		if(w >= m_width) {
-			m_posX = -(w-m_width);
+	if(!m_lineWrapping) {
+		int currentLineWidth =
+			m_lineNumWidth +
+			s_font->stringWidth(m_text.substr(lineStart(m_position), m_desiredXPos)) +// + s_charWidth;
+			(s_charWidth == s_zeroWidth ? 0 : s_charWidth); // fixed width fonts don't need the extra padding
+		if(currentLineWidth > m_width) {
+			m_posX = -(currentLineWidth-m_width);
 		}
 		m_desiredXPos = offsetToCurrentLineStart();
 	}
@@ -272,9 +278,6 @@ void ofxEditor::draw() {
 			ofScale(m_scale, m_scale);
 		}
 		ofTranslate(m_posX, m_posY);
-	
-		m_visibleWidth = m_width - (m_lineNumbers ? m_lineNumWidth : 0)*s_charWidth;
-		m_visibleLines = m_height/(s_charHeight*m_scale);
 	
 		m_matchingCharsHighlight[0] = -1;
 		m_matchingCharsHighlight[1] = -1;
@@ -360,12 +363,12 @@ void ofxEditor::draw() {
 				for(int i = 0; i < tb.text.length(); ++i) {
 					
 					// line wrap at the block level
-					if(m_lineWrapping && x >= m_visibleWidth-s_charWidth) {// && (m_autoFocus ? m_scale <= s_autoFocusMinScale : true)) {
+					if(m_lineWrapping && x >= m_visibleWidth) {
 						y += s_charHeight;
 						expandBoundingBox(x, y);
 						x = 0;
 						if(m_lineNumbers) { // pad for line numbers
-							x += m_lineNumWidth * s_charWidth;
+							x += m_lineNumWidth;
 						}
 						m_displayedLineCount++;
 					}
@@ -383,6 +386,7 @@ void ofxEditor::draw() {
 					// draw cursor
 					if(textPos == m_position) {
 						drawCursor(x, y);
+						expandBoundingBox(x+s_zeroWidth, y); // extra space for the cursor
 						drawnCursor = true;
 					}
 					
@@ -426,12 +430,12 @@ void ofxEditor::draw() {
 			for(int i = m_topTextPosition; i < m_text.length() && m_displayedLineCount < m_visibleLines; ++i) {
 				
 				// line wrap
-				if(m_lineWrapping && x >= m_visibleWidth-s_charWidth) {// && (m_autoFocus ? m_scale <= s_autoFocusMinScale : true)) {
+				if(m_lineWrapping && x >= m_visibleWidth) {
 					y += s_charHeight;
 					expandBoundingBox(x, y);
 					x = 0;
 					if(m_lineNumbers) { // pad for line numbers
-						x += m_lineNumWidth * s_charWidth;
+						x += m_lineNumWidth;
 					}
 					m_displayedLineCount++;
 				}
@@ -449,6 +453,7 @@ void ofxEditor::draw() {
 				// draw cursor
 				if(i == m_position) {
 					drawCursor(x, y);
+					expandBoundingBox(x+s_zeroWidth, y); // extra space for the cursor
 					drawnCursor = true;
 				}
 			
@@ -477,7 +482,8 @@ void ofxEditor::draw() {
 				}
 			}
 		}
-		
+	
+		// update vertical scrolling
 		if(m_displayedLineCount >= m_visibleLines) {
 			m_bottomTextPosition = textPos;
 		}
@@ -488,6 +494,7 @@ void ofxEditor::draw() {
 		// draw cursor if we have no text, or if we're at the end of the buffer
 		if(!drawnCursor) {
 			drawCursor(x, y);
+			expandBoundingBox(x+s_zeroWidth, y); // extra space for the cursor
 		}
 	
 		// calculate auto focus bounding box and scaling
@@ -882,7 +889,6 @@ void ofxEditor::resize(int width, int height) {
 	m_width = width;
 	m_height = height;
 	
-//	m_visibleChars = width/s_charWidth;
 	m_visibleLines = height/s_charHeight;
 	
 	ofLogVerbose("ofxEditor") << "pixel size: " << width << " " << height;
@@ -1023,11 +1029,9 @@ bool ofxEditor::getLineWrapping() {
 void ofxEditor::setLineNumbers(bool numbers) {
 	m_lineNumbers = numbers;
 	if(m_lineNumbers) {
-		m_lineNumWidth = ofToString(m_numLines).length()+1; // 1 extra for the space
-//		m_visibleChars -= m_lineNumWidth;
+		m_lineNumWidth = ofToString(m_numLines+1).length()*s_zeroWidth + s_charWidth; // include space
 	}
 	else {
-//		m_visibleChars += m_lineNumWidth;
 		m_lineNumWidth = 0;
 	}
 }
@@ -1250,11 +1254,11 @@ void ofxEditor::drawLineNumber(int &x, int &y, int &currentLine) {
 	
 	currentLine++;
 	string currentLineString = ofToString(currentLine);
-	x += s_zeroWidth*(m_lineNumWidth-currentLineString.length()-1); // 1 for the space
+	x += s_zeroWidth*(ofToString(m_numLines).length()-currentLineString.length()); // leading space padding
 	for(int i = 0; i < currentLineString.length(); ++i) {
 		x = s_font->drawCharacter(currentLineString[i], x, y, s_textShadow);
 	}
-	x += s_charWidth; // the space
+	x += s_charWidth; // the trailing space
 	
 	s_font->popState();
 }
@@ -1490,14 +1494,12 @@ void ofxEditor::textBufferUpdated() {
 	
 	// adjust max screen width for line numbers
 	if(m_lineNumbers) {
-//		m_visibleChars += m_lineNumWidth; // back to normal
-		m_lineNumWidth = ofToString(m_numLines+1).length()+1; // +1 for 10 & 1 extra for the space
-//		m_visibleChars -= m_lineNumWidth;
+		m_lineNumWidth = ofToString(m_numLines+1).length()*s_zeroWidth + s_charWidth; // +1 for 10 & 1 extra for the space
 	}
 
 	// scroll if we've added content at the far right
 	if(!m_lineWrapping) {
-		m_desiredXPos = (unsigned int)offsetToCurrentLineStart();
+		m_desiredXPos = offsetToCurrentLineStart();
 	}
 }
 
