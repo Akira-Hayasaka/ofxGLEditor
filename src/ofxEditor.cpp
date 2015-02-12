@@ -252,7 +252,7 @@ void ofxEditor::draw() {
 	if(!m_lineWrapping) {
 		int currentLineWidth =
 			m_lineNumWidth +
-			s_font->stringWidth(m_text.substr(lineStart(m_position), m_desiredXPos)) +// + s_charWidth;
+			s_font->stringWidth(m_text.substr(lineStart(m_position), m_desiredXPos)) +
 			(s_charWidth == s_zeroWidth ? 0 : s_charWidth); // fixed width fonts don't need the extra padding
 		if(currentLineWidth > m_width) {
 			m_posX = -(currentLineWidth-m_width);

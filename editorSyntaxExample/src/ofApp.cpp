@@ -23,13 +23,12 @@
 void ofApp::setup() {
 
 	ofSetVerticalSync(true);
-	//ofSetFrameRate(60);
 	
 	// handle ESC internally since we use it to exit selection
 	ofSetEscapeQuitsApp(false);
 
 	// make sure to load editor font before anything else!
-	ofxEditor::loadFont("fonts/Arial Unicode.ttf", 48);
+	ofxEditor::loadFont("fonts/PrintChar21.ttf", 24);
 	
 	// sample lua syntax
 	colorScheme.setWordColor("function", ofColor::fuchsia);

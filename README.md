@@ -28,6 +28,9 @@ ofxEditor provides a rewrite of the [Fluxus live coding environment](http://www.
 
 [See a video of the livecodingExample which demonstrates the basic ofxEditor class with syntax highlighting using ofxLua.](https://vimeo.com/116370247)
 
+Variable width font and full unicode glyph support (here using Arial Unicode.tff):  
+![image](https://github.com/Akira-Hayasaka/ofxGLEditor/raw/master/doc/arial_unicode.png)
+
 Open file dialog:  
 ![image](https://github.com/Akira-Hayasaka/ofxGLEditor/raw/master/doc/file_dialog.png)
 
