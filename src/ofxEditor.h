@@ -283,6 +283,7 @@ class ofxEditor {
 		SelectionState m_selection; //< is text being selected and how
 		unsigned int m_highlightStart; //< highlight start pos in buffer
 		unsigned int m_highlightEnd;   //< highlight end pos in buffer
+		unsigned int m_selectAllStartPos; //< return pos when pressed lect after select all
 	
 		unsigned int m_topTextPosition;    //< top start pos in buffer for vert scrolling
 		unsigned int m_bottomTextPosition; //< bottom end pos in buffer for vert scrolling
@@ -405,7 +406,7 @@ class ofxEditor {
 		void pasteSelection();
 	
 		/// update the animation timestamps
-		/// make sure to call this of you implement your own draw() function
+		/// make sure to call this if you implement your own draw() function
 		void updateTimestamps();
 	
 		/// expand the auto focus bounding box

@@ -82,6 +82,9 @@ ofxEditor::ofxEditor() {
 	m_visibleWidth = 0;
 	
 	m_selection = NONE;
+	m_highlightStart = 0;
+	m_highlightEnd = 0;
+	m_selectAllStartPos = 0;
 	
 	m_topTextPosition = 0;
 	m_bottomTextPosition = 0;
@@ -121,6 +124,9 @@ ofxEditor::ofxEditor(ofxEditorSettings &sharedSettings) {
 	m_visibleWidth = 0;
 	
 	m_selection = NONE;
+	m_highlightStart = 0;
+	m_highlightEnd = 0;
+	m_selectAllStartPos = 0;
 	
 	m_topTextPosition = 0;
 	m_bottomTextPosition = 0;
@@ -872,7 +878,7 @@ void ofxEditor::keyPressed(int key) {
 		}
 		else if(m_position != m_highlightEnd) {
 			m_selection = NONE;
-			m_position = 0; // jump to start
+			m_position = m_selectAllStartPos; // jump to start
 		}
 	}
 }

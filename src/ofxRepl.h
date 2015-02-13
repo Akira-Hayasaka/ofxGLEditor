@@ -55,8 +55,11 @@ class ofxRepl : public ofxEditor {
 		/// MOD -> CTRL or Super (Windows Key, Mac CMD), set with
 		///        ofxEditor::setSuperAsModifier()
 		///
-		/// MOD + c: clear console
+		/// MOD + a + SHIFT: clear console
 		/// MOD + c + SHIFT: clear console history
+		///
+		/// UP & DOWN: step through command history
+		/// RETURN: eval current command
 		///
 		void keyPressed(int key);
 		
