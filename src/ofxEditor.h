@@ -414,8 +414,6 @@ class ofxEditor {
 	
 		// clear the autofocus bounding box
 		void clearBoundingBox();
-		
-	private:
 	
 		/// text buffer changed, so update syntax text blocks and/or other info
 		///
@@ -423,6 +421,8 @@ class ofxEditor {
 		/// approach that updates only those text blocks around the current
 		/// editor area
 		void textBufferUpdated();
+	
+	private:
 	
 		/// parses text into text blocks
 		void parseTextBlocks();

@@ -76,6 +76,7 @@ ofxEditor::ofxEditor() {
 	m_settings = new ofxEditorSettings;
 	m_sharedSettings = false;
 	
+	m_numLines = 0;
 	m_width = m_height = 0;
 	m_position = 0;
 	m_desiredXPos = 0;
@@ -118,6 +119,7 @@ ofxEditor::ofxEditor(ofxEditorSettings &sharedSettings) {
 	m_settings = &sharedSettings;
 	m_sharedSettings = true;
 	
+	m_numLines = 0;
 	m_width = m_height = 0;
 	m_position = 0;
 	m_desiredXPos = 0;
@@ -1103,7 +1105,7 @@ unsigned int ofxEditor::getCurrentLine() {
 void ofxEditor::setCurrentLine(unsigned int line) {
 	m_position = 0;
 	int count = 0;
-	for(unsigned int i = 0; i < m_text.size(); i++) {
+	for(unsigned int i = 0; count <= line && i < m_text.size(); i++) {
 		if(m_text[i] == '\n') {
 			count++;
 		}
@@ -1485,8 +1487,6 @@ void ofxEditor::clearBoundingBox() {
 	m_BBMinX = m_BBMinY = m_BBMaxX = m_BBMaxY = 0;
 }
 
-// PRIVATE
-
 //--------------------------------------------------------------
 void ofxEditor::textBufferUpdated() {
 	
@@ -1508,6 +1508,8 @@ void ofxEditor::textBufferUpdated() {
 		m_desiredXPos = offsetToCurrentLineStart();
 	}
 }
+
+// PRIVATE
 
 //--------------------------------------------------------------
 // simple syntax parser

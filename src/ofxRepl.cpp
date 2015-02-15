@@ -24,6 +24,7 @@
 
 #include "Unicode.h"
 
+#define MAX_TEXT_LINES	256
 #define MAX_HISTORY_LEN	256
 
 // utils
@@ -171,6 +172,24 @@ void ofxRepl::keyPressed(int key) {
 
 //--------------------------------------------------------------
 void ofxRepl::print(const wstring &what) {
+
+	// trim half of text if we overflow the max num of lines
+	if(m_numLines > MAX_TEXT_LINES) {
+		int line = (int)m_numLines*0.25;
+		int count = 0;
+		int pos = 0;
+		for(unsigned int i = 0; count <= line && i < m_text.size(); i++) {
+			if(m_text[i] == '\n') {
+				count++;
+				pos = i+1;
+			}
+		}
+		m_text.erase(0, pos);
+		textBufferUpdated();
+		m_position = m_promptPos = m_insertPos = m_text.size();
+		m_topTextPosition -= pos;
+		m_bottomTextPosition -= pos;
+	}
 
 	wstring to_print;
 	for(wstring::const_iterator i = what.begin(); i != what.end(); ++i) {
