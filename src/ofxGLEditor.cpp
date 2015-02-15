@@ -248,6 +248,11 @@ bool ofxGLEditor::openFile(string filename, int editor) {
 		editor = m_currentEditor;
 	}
 	
+	if(editor == 0) {
+		ofLogWarning("ofxGLEditor") << "ignoring load into repl";
+		return false;
+	}
+	
 	string path = ofToDataPath(filename);
 	ofLogVerbose("ofxGLEditor") << "loading \"" << ofFilePath::getFileName(path)
 		<< "\" into editor " << editor;
@@ -275,6 +280,11 @@ bool ofxGLEditor::saveFile(string filename, int editor) {
 	}
 	else if(editor == 0) {
 		editor = m_currentEditor;
+	}
+	
+	if(editor == 0) {
+		ofLogWarning("ofxGLEditor") << "ignore save from repl";
+		return false;
 	}
 	
 	string path = ofToDataPath(filename);
@@ -347,6 +357,11 @@ void ofxGLEditor::clearText(int editor) {
 	}
 	else if(editor == 0) {
 		editor = m_currentEditor;
+	}
+	
+	if(editor == 0) {
+		ofLogWarning("ofxGLEditor") << "ignoring repl clearText(), use clearRepl() instead";
+		return;
 	}
 	
 	 // reset filename
@@ -500,7 +515,7 @@ void ofxGLEditor::evalReplReturn(const string &text) {
 void ofxGLEditor::clearRepl() {
 	if(m_editors[0]) {
 		ofxRepl *repl = (ofxRepl*) m_editors[0];
-		repl->clear();
+		repl->clearText();
 		ofLogVerbose("ofxGLEditor") << "cleared repl";
 	}
 }

@@ -97,7 +97,7 @@ void ofxRepl::keyPressed(int key) {
 		switch(key) {
 			case 'a': case 10: // select all / clear all text
 				if(ofGetKeyPressed(OF_KEY_SHIFT)) {
-					clear();
+					clearText();
 				}
 				else { // select all
 					m_selection = ALL;
@@ -162,6 +162,11 @@ void ofxRepl::keyPressed(int key) {
     }
 
 	ofxEditor::keyPressed(key);
+	
+	// keep selection within prompt line
+	if(m_highlightStart < m_promptPos) {
+		m_highlightStart = m_promptPos;
+	}
 }
 
 //--------------------------------------------------------------
@@ -176,11 +181,13 @@ void ofxRepl::print(const wstring &what) {
 		to_print += *i;
 	}
 	m_text.insert(m_insertPos, to_print);
-		
+	
 	m_position += to_print.length();
 	m_promptPos += to_print.length();
 	m_insertPos += to_print.length();
 	m_selectAllStartPos = m_promptPos;
+	m_highlightStart = m_promptPos;
+	m_highlightEnd = m_promptPos;
 	
 	keepCursorVisible();
 }
@@ -205,8 +212,8 @@ void ofxRepl::printEvalReturn(const string &what) {
 }
 
 //--------------------------------------------------------------
-void ofxRepl::clear() {
-	clearText();
+void ofxRepl::clearText() {
+	ofxEditor::clearText();
 	m_promptPos = 0;
 	m_selectAllStartPos = 0;
 	m_insertPos = 0;
@@ -241,6 +248,7 @@ void ofxRepl::eval() {
 			}
 			if(m_history.size() >= MAX_HISTORY_LEN) {
 				m_history.pop_front();
+				m_historyIter--;
 			}
 			m_history.push_back(defun);
 			m_historyNavStarted = false;

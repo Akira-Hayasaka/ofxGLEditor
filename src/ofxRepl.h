@@ -76,7 +76,7 @@ class ofxRepl : public ofxEditor {
 		void printEvalReturn(const string &what);
 		
 		/// clear the console
-		void clear();
+		void clearText();
 		
 		/// clear the command history
 		void clearHistory();

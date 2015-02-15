@@ -250,7 +250,7 @@ void ofxEditor::draw() {
 		resize();
 	}
 	
-	m_visibleWidth = m_width - (m_autoFocus ? 0 : s_charWidth);
+	m_visibleWidth = (m_width - s_charWidth) * (m_autoFocus ? 1/m_scale : 1.0);
 	m_visibleLines = m_height/(s_charHeight*m_scale);
 	
 	// update scrolling
@@ -260,8 +260,8 @@ void ofxEditor::draw() {
 			m_lineNumWidth +
 			s_font->stringWidth(m_text.substr(lineStart(m_position), m_desiredXPos)) +
 			(s_charWidth == s_zeroWidth ? 0 : s_charWidth); // fixed width fonts don't need the extra padding
-		if(currentLineWidth > m_width) {
-			m_posX = -(currentLineWidth-m_width);
+		if(currentLineWidth > m_visibleWidth) {
+			m_posX = -(currentLineWidth-m_visibleWidth);
 		}
 		m_desiredXPos = offsetToCurrentLineStart();
 	}
