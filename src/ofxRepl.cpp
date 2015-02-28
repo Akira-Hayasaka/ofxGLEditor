@@ -395,7 +395,7 @@ string ofxRepl::getReplPrompt() {
 //--------------------------------------------------------------
 void ofxRepl::Logger::log(ofLogLevel level, const string & module, const string & message){
 	ofConsoleLoggerChannel::log(level, module, message);
-	if(level > ofGetLogLevel()) {
+	if(level >= ofGetLogLevel()) {
 		m_parent->print(string_to_wstring(message));
 		m_parent->print(L"\n");
 	}
@@ -404,7 +404,7 @@ void ofxRepl::Logger::log(ofLogLevel level, const string & module, const string 
 //--------------------------------------------------------------
 void ofxRepl::Logger::log(ofLogLevel level, const string & module, const char* format, va_list args){
 	ofConsoleLoggerChannel::log(level, module, format, args);
-	if(level > ofGetLogLevel()) {
+	if(level >= ofGetLogLevel()) {
 		m_parent->print(string_to_wstring(ofVAArgsToString(format, args)));
 		m_parent->print(L"\n");
 	}
