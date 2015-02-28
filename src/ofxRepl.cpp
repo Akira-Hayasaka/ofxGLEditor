@@ -107,33 +107,35 @@ void ofxRepl::keyPressed(int key) {
 					m_position = m_text.size();
 				}
 				return;
-			case 'c': case 3:
+			case 'c': case 3: // clear
 				if(ofGetKeyPressed(OF_KEY_SHIFT)) {
 					clearHistory();
+					return;
 				}
+				break;
+			case 'v': case 22: // only paste on the current prompt line
+				if(m_position < m_promptPos) {
+					m_position = m_text.length();
+					m_selection = NONE;
+				}
+				break;
+			case 'x': case 24: // convert cut into copy
+				if(m_position < m_promptPos || m_highlightStart < m_promptPos || m_highlightEnd < m_promptPos) {
+					key = 'c';
+				}
+				break;
 		}
 	}
 	
 	// swallow text buffer removal
 	if((m_position <= m_promptPos && key == OF_KEY_BACKSPACE) ||
-	   (m_position < m_promptPos && key == OF_KEY_DEL) ||
-	   ((m_position < m_promptPos || m_highlightStart < m_promptPos || m_highlightEnd < m_promptPos) &&
-	   (modifierPressed && (key == 'x' || key == 24)))) {
+	   (m_position < m_promptPos && key == OF_KEY_DEL)) {
 		return;
 	}
-
-	// key cursor on prompt line
-	if(m_position < m_promptPos) {
-		m_position = m_text.length();
-	}
-	else {
+	
+	// prompt line history etc
+	if(m_position >= m_promptPos) {
 		switch(key) {
-			case OF_KEY_LEFT:
-				// increment since super will decrement
-				if(m_position == m_promptPos) {
-					m_position = m_promptPos+1;
-				}
-				break;
 			case OF_KEY_UP:
 				historyPrev();
 				m_selection = NONE;
@@ -163,11 +165,6 @@ void ofxRepl::keyPressed(int key) {
     }
 
 	ofxEditor::keyPressed(key);
-	
-	// keep selection within prompt line
-	if(m_highlightStart < m_promptPos) {
-		m_highlightStart = m_promptPos;
-	}
 }
 
 //--------------------------------------------------------------
@@ -398,15 +395,19 @@ string ofxRepl::getReplPrompt() {
 //--------------------------------------------------------------
 void ofxRepl::Logger::log(ofLogLevel level, const string & module, const string & message){
 	ofConsoleLoggerChannel::log(level, module, message);
-	m_parent->print(string_to_wstring(message));
-	m_parent->print(L"\n");
+	if(level > ofGetLogLevel()) {
+		m_parent->print(string_to_wstring(message));
+		m_parent->print(L"\n");
+	}
 }
 
 //--------------------------------------------------------------
 void ofxRepl::Logger::log(ofLogLevel level, const string & module, const char* format, va_list args){
 	ofConsoleLoggerChannel::log(level, module, format, args);
-	m_parent->print(string_to_wstring(ofVAArgsToString(format, args)));
-	m_parent->print(L"\n");
+	if(level > ofGetLogLevel()) {
+		m_parent->print(string_to_wstring(ofVAArgsToString(format, args)));
+		m_parent->print(L"\n");
+	}
 }
 
 // OTHER UTIL

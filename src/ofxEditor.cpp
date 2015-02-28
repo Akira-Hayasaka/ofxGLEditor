@@ -558,11 +558,9 @@ void ofxEditor::keyPressed(int key) {
 	switch(key) {
 		case OF_KEY_ALT: case OF_KEY_LEFT_ALT: case OF_KEY_RIGHT_ALT:
 		case OF_KEY_LEFT_SHIFT: case OF_KEY_RIGHT_SHIFT:
-			return;
 		case OF_KEY_CONTROL: case OF_KEY_LEFT_CONTROL: case OF_KEY_RIGHT_CONTROL:
-			if(s_superAsModifier) return;
 		case OF_KEY_SUPER: case OF_KEY_LEFT_SUPER: case OF_KEY_RIGHT_SUPER:
-			if(!s_superAsModifier) return;
+		return;
 	}
 	
 	bool modifierPressed = s_superAsModifier ? ofGetKeyPressed(OF_KEY_SUPER) : ofGetKeyPressed(OF_KEY_CONTROL);
@@ -590,6 +588,7 @@ void ofxEditor::keyPressed(int key) {
 					if(m_position >= m_highlightEnd) {
 						m_position -= m_highlightEnd-m_highlightStart;
 					}
+					m_selection = NONE;
 				}
 				break;
 			
@@ -599,6 +598,7 @@ void ofxEditor::keyPressed(int key) {
 			
 			case 'v': case 22: // paste
 				pasteSelection();
+				m_selection = NONE;
 				break;
 			
 			case 'b' : // show cursor location
@@ -829,7 +829,7 @@ void ofxEditor::keyPressed(int key) {
 	// update selection
 	if(m_shiftState) {
 
-		if(!ofGetKeyPressed(OF_KEY_SHIFT)) {
+		if(!ofGetKeyPressed(OF_KEY_SHIFT) && !modifierPressed) {
 			m_shiftState = false;
 			m_selection = NONE;
 			return;
@@ -1445,8 +1445,6 @@ void ofxEditor::copySelection() {
 	#else
 		s_copyBuffer = m_text.substr(m_highlightStart, m_highlightEnd-m_highlightStart);
 	#endif
-	
-	m_selection = NONE;
 }
 
 //--------------------------------------------------------------
