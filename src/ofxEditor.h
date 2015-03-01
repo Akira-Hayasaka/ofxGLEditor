@@ -28,6 +28,7 @@
 
 // custom fontstash wrapper
 class ofxEditorFont;
+class ofxGLEditor;
 
 /// full screen text editor with optional syntax highlighting,
 /// based on the Fluxus GLEditor
@@ -230,6 +231,8 @@ class ofxEditor {
 		float drawString(string s, ofPoint& p);
 	
 	protected:
+	
+		friend ofxGLEditor;
 	
 	/// \section Static Variables
 	
