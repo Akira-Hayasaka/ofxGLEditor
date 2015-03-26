@@ -330,8 +330,9 @@ class ofxEditor {
 			SPACE,
 			TAB,
 			ENDLINE,
-			COMMENT_BEGIN, // tag only, no text
-			COMMENT_END    // tag only, no text
+			MATCHING_CHAR, //< open/close chars in settings aka []{}()<>
+			COMMENT_BEGIN, //< tag only, no text
+			COMMENT_END    //< tag only, no text
 		};
 		
 		/// syntax parser custom class to represent a contextual block of text

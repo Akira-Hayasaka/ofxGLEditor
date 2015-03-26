@@ -46,6 +46,11 @@ class ofxEditorColorScheme {
 		void setNumberColor(ofColor color);
 		ofColor& getNumberColor();
 	
+		/// matching characters coloring (aka ()[]{}<>),
+		/// set characters in ofxEditorSettings
+		void setMatchingCharsColor(ofColor color);
+		ofColor& getMatchingCharsColor();
+	
 		/// single & multi line comment coloring
 		void setCommentColor(ofColor color);
 		ofColor& getCommentColor();
@@ -80,6 +85,7 @@ class ofxEditorColorScheme {
 		ofColor textColor;
 		ofColor stringColor;
 		ofColor numberColor;
+		ofColor matchingCharsColor;
 		ofColor commentColor;
 		map<wstring,ofColor> wordColors;
 	

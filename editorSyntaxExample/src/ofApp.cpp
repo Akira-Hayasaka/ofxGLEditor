@@ -31,14 +31,16 @@ void ofApp::setup() {
 	ofxEditor::loadFont("fonts/PrintChar21.ttf", 24);
 	
 	// sample lua syntax
-	colorScheme.setWordColor("function", ofColor::fuchsia);
-	colorScheme.setWordColor("end", ofColor::fuchsia);
+	colorScheme.setWordColor("function", ofColor::fuchsia); // keyword
+	colorScheme.setWordColor("end", ofColor::fuchsia); // keyword
+	colorScheme.setWordColor("print", ofColor::green); // built in function
 	colorScheme.setSingleLineComment("--");
 	colorScheme.setMultiLineComment("--[[", "]]");
 	
 	// syntax highlighter colors
 	colorScheme.setStringColor(ofColor::yellow);
 	colorScheme.setNumberColor(ofColor::orangeRed);
+	colorScheme.setMatchingCharsColor(ofColor::lightBlue); // ()[]{}<> by default
 	colorScheme.setCommentColor(ofColor::gray);
 	
 	// open test file

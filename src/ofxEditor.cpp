@@ -339,20 +339,21 @@ void ofxEditor::draw() {
 						ofLogWarning("ofxEditor") << "trying to draw UNKNOWN text block, contents: " << wstring_to_string(tb.text);
 						break;
 						
-					case WORD: {
+					case WORD:
 						textColor = comment ? &m_colorScheme->getCommentColor() : &m_colorScheme->getWordColor(tb.text);
 						break;
-					}
 						
-					case STRING: {
+					case STRING:
 						textColor = comment ? &m_colorScheme->getCommentColor() : &m_colorScheme->getStringColor();
 						break;
-					}
 						
-					case NUMBER: {
+					case NUMBER:
 						textColor = comment ? &m_colorScheme->getCommentColor() : &m_colorScheme->getNumberColor();
 						break;
-					}
+					
+					case MATCHING_CHAR:
+						textColor = comment ? &m_colorScheme->getCommentColor() : &m_colorScheme->getMatchingCharsColor();
+						break;
 					
 					case COMMENT_BEGIN:
 						comment = true;
@@ -1654,7 +1655,23 @@ void ofxEditor::parseTextBlocks() {
 						tb.clear();
 					case UNKNOWN:
 						tb.type = WORD;
-					case WORD: case STRING:
+					case WORD:
+						// check for open/close characters
+						if(!singleComment && !multiComment) {
+							if(m_settings->getOpenChars().find(m_text[i], 0) != string::npos ||
+							   m_settings->getCloseChars().find(m_text[i], 0) != string::npos) {
+								if(tb.type != UNKNOWN) {
+									m_textBlocks.push_back(tb);
+									tb.clear();
+								}
+								tb.type = MATCHING_CHAR;
+								tb.text += m_text[i];
+								m_textBlocks.push_back(tb);
+								tb.clear();
+								break;
+							}
+						}
+					case STRING:
 						tb.text += m_text[i];
 					default:
 						if(tb.type == WORD) {
