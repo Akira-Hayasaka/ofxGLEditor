@@ -892,7 +892,7 @@ void ofxEditor::resize() {
 	resize(w, h);
 }
 
-//--------------------------------------------------------------
+
 void ofxEditor::resize(int width, int height) {
 	m_width = width;
 	m_height = height;
@@ -901,6 +901,32 @@ void ofxEditor::resize(int width, int height) {
 	
 	ofLogVerbose("ofxEditor") << "pixel size: " << width << " " << height;
 	ofLogVerbose("ofxEditor") << "num lines: " << m_visibleLines;
+}
+
+//--------------------------------------------------------------
+bool ofxEditor::openFile(string filename) {
+	ofFile file;
+	if(!file.open(ofToDataPath(filename), ofFile::ReadOnly)) {
+		ofLogError() << "ofxEditor: couldn't load \""
+			<< ofFilePath::getFileName(filename) << "\"";
+		return false;
+	}
+	setText(file.readToBuffer().getText());
+	file.close();
+	return true;
+}
+		
+//--------------------------------------------------------------
+bool ofxEditor::saveFile(string filename) {
+	ofFile file;
+	if(!file.open(ofToDataPath(filename), ofFile::WriteOnly)) {
+		ofLogError() << "ofxGLEditor: couldn't open \""
+			<< ofFilePath::getFileName(filename) << "\" for saving";
+		return false;
+	}
+	file << getText();
+	file.close();
+	return true;
 }
 
 //--------------------------------------------------------------

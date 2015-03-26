@@ -105,15 +105,19 @@ class ofxGLEditor {
 		
 	/// \section Editor
 	
-		/// open & load a file into the an editor, clears existing text
+		/// open & load a file into an editor, clears existing text
 		///
 		/// set editor to 0 for the current editor
 		/// or an editor index from 1- 9
+		///
+		/// returns true on success
 		bool openFile(string filename, int editor=0);
 		
-		/// save the text in the current editor to a file
+		/// save the text in an editor to a file
 		///
 		/// set editor to 0 for the current editor or an editor index from 1- 9
+		///
+		/// returns true on success
 		bool saveFile(string filename, int editor=0);
 	
 		/// get the contents of an editor or contents of editor selection

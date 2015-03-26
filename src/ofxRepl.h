@@ -80,6 +80,9 @@ class ofxRepl : public ofxEditor {
 		
 		/// clear the command history
 		void clearHistory();
+	
+		bool openFile(string filename); //< dummy implementation
+		bool saveFile(string filename); //< dummy implementation
 
 	/// \section Static Utils
 	

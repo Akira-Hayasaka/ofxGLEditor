@@ -246,6 +246,18 @@ void ofxRepl::clearHistory() {
 	historyClear();
 }
 
+//--------------------------------------------------------------
+bool ofxRepl::openFile(string filename) {
+	ofLogWarning("ofxRepl") << "ignoring openFile";
+	return false;
+}
+
+//--------------------------------------------------------------
+bool ofxRepl::saveFile(string filename) {
+	ofLogWarning("ofxRepl") << "ignoring saveFile";
+	return false;
+}
+
 // PROTECTED
 
 //--------------------------------------------------------------

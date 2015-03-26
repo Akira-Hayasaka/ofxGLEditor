@@ -64,6 +64,9 @@ class ofxFileDialog : public ofxEditor {
 		/// currently in save as mode?
 		bool getSaveAsMode();
 	
+		bool openFile(string filename); //< dummy implementation
+		bool saveFile(string filename); //< dummy implementation
+	
 	/// \section Static Utils
 	
 		/// set/get the save as info text, default: "Save as (esc to exit)"
