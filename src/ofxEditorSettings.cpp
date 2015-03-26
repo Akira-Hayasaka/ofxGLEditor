@@ -63,7 +63,7 @@ bool ofxEditorSettings::getConvertTabs() {
 
 //--------------------------------------------------------------
 void ofxEditorSettings::setAlpha(float alpha) {
-	alpha = ofClamp(alpha, 0.0f, 1.0f);
+	this->alpha = ofClamp(alpha, 0.1f, 1.0f);
 }
 
 //--------------------------------------------------------------

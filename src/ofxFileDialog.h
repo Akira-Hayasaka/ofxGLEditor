@@ -24,6 +24,12 @@
 
 #include "ofxEditor.h"
 
+/// key events
+///
+/// ARROWS: select file to open
+/// RETURN: open/save file
+/// ESC: exit file dialog
+///
 class ofxFileDialog : public ofxEditor {
 
 	public:

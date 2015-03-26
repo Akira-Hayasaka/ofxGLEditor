@@ -253,7 +253,7 @@ void ofxEditor::draw() {
 	}
 	
 	m_visibleWidth = (m_width - s_charWidth) * (m_autoFocus ? 1/m_scale : 1.0);
-	m_visibleLines = m_height/(s_charHeight*m_scale);
+	m_visibleLines = m_height/(s_charHeight * (m_autoFocus ? s_autoFocusMinScale : 1.0));
 	
 	// update scrolling
 	m_posX = 0;

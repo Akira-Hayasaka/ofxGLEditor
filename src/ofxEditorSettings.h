@@ -38,7 +38,7 @@ class ofxEditorSettings {
 		void setConvertTabs(bool convert=true);
 		bool getConvertTabs();
 		
-		/// set overall text alpha, clamped to 0.0 - 1.0, default: 1.0
+		/// set overall text alpha, clamped to 0.1 - 1.0, default: 1.0
 		void setAlpha(float alpha);
 		float getAlpha();
 		
