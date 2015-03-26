@@ -38,4 +38,12 @@ class ofApp : public ofBaseApp {
 		bool debug; //< show grid and fps?
     
         SyntaxHighlight syntaxHighlight;
+    
+        ofShader shader;
+        ofFbo fbo;
+        ofFile testFile;
+private:
+    vector<string> shaderFileName;
+    int width, height;
+
 };

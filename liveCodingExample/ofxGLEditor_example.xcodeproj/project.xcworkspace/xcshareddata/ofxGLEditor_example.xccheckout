@@ -13,10 +13,10 @@
 		<key>96A84E6713B17481F37C8B1E6FDAD12829F92249</key>
 		<string>https://github.com/danomatika/ofxLua</string>
 		<key>DA298CE2AB975BA2CF43E11863DF98F71A466522</key>
-		<string>https://github.com/Akira-Hayasaka/ofxGLEditor</string>
+		<string>https://github.com/JoshuaBatty/ofxGLEditor</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
-	<string>ofxGLEditor_liveCodingExample/ofxGLEditor_example.xcodeproj</string>
+	<string>liveCodingExample/ofxGLEditor_example.xcodeproj</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
 		<key>96A84E6713B17481F37C8B1E6FDAD12829F92249</key>
@@ -25,7 +25,7 @@
 		<string>../../..</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
-	<string>https://github.com/Akira-Hayasaka/ofxGLEditor</string>
+	<string>https://github.com/JoshuaBatty/ofxGLEditor</string>
 	<key>IDESourceControlProjectVersion</key>
 	<integer>111</integer>
 	<key>IDESourceControlProjectWCCIdentifier</key>

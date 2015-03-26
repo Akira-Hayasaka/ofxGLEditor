@@ -33,10 +33,10 @@ void ofApp::setup() {
 	
     syntaxHighlight.setup(&colorScheme);
 	editor.setColorScheme(&colorScheme);
+    editor.setLineNumbers(!editor.getLineNumbers());
     
 	// open test file
-	ofFile testFile;
-	testFile.open("test.frag", ofFile::ReadOnly);
+    testFile.open("EmptyShader.frag", ofFile::ReadWrite);
 	editor.setText(testFile.readToBuffer().getText());
 	ofLogNotice() << "num chars: " << editor.getNumCharacters() << " num lines: " << editor.getNumLines();
 	
@@ -49,11 +49,40 @@ void ofApp::setup() {
 	//editor.getSettings().setTextShadowColor(ofColor::gray);
 	
 	debug = false;
+    
+    /// Shader stuff
+    width = ofGetWidth();//640;
+    height = ofGetHeight();//480;
+    
+    shaderFileName = ofSplitString(testFile.getFileName(), "/"); //Find on the last name in the path
+    shaderFileName = ofSplitString(shaderFileName.at(shaderFileName.size()-1), "."); //Remove the .frag extension from the fileName
+    
+    shader.load(shaderFileName[0]);
+
+    fbo.allocate(width, height, GL_RGBA);
+    fbo.begin();
+    ofClear(0, 0, 0, 0);
+    fbo.end();
+    
 }
 
 //--------------------------------------------------------------
 void ofApp::draw() {
-	
+    
+    shader.load(shaderFileName[0]);
+
+    fbo.begin();
+    ofClear(0,0,0,0);
+        shader.begin();
+        shader.setUniform1f("iGlobalTime", ofGetElapsedTimef());
+        shader.setUniform3f("iResolution", width, height,1);
+    
+        ofSetColor(255, 255, 255);
+        ofRect(0, 0, width, height);
+        shader.end();
+    fbo.end();
+    fbo.draw(0,0,ofGetWidth(),ofGetHeight());
+
 	editor.draw();
 	
 	if(debug) {
@@ -62,6 +91,7 @@ void ofApp::draw() {
 		ofSetColor(255);
 		ofDrawBitmapString("fps: "+ofToString((int)ofGetFrameRate()), ofGetWidth()-70, ofGetHeight()-10);
 	}
+    
 }
 
 //--------------------------------------------------------------
@@ -78,6 +108,11 @@ void ofApp::keyPressed(int key) {
 					editor.setColorScheme(&colorScheme);
 				}
 				return;
+            case 'r':
+                testFile << editor.getText(); testFile.close();
+                cout << "FUCK " << endl;
+             //   editor::ofxGLEditor::saveFile(shaderFileName, 1);
+                break;
 			case 'd':
 				debug = !debug;
 				return;

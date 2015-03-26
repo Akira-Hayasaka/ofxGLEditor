@@ -68,9 +68,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		03538CE11AC424370061AA13 /* EmptyShader.frag */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = EmptyShader.frag; path = bin/data/EmptyShader.frag; sourceTree = SOURCE_ROOT; };
 		037654E11AC3D7A400211D8C /* SyntaxHighlight.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SyntaxHighlight.cpp; sourceTree = "<group>"; };
 		037654E21AC3D7A400211D8C /* SyntaxHighlight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SyntaxHighlight.h; sourceTree = "<group>"; };
-		037654E41AC3DA0800211D8C /* test.frag */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = test.frag; path = bin/data/test.frag; sourceTree = SOURCE_ROOT; };
 		16440F42B6E23F2F6793334F /* ofxGLEditor.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxGLEditor.h; path = ../../../addons/ofxGLEditor/src/ofxGLEditor.h; sourceTree = SOURCE_ROOT; };
 		199D3E543E8D50FFFBB159F9 /* ofxEditorFont.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = ofxEditorFont.cpp; path = ../../../addons/ofxGLEditor/src/ofxEditorFont.cpp; sourceTree = SOURCE_ROOT; };
 		24BC94DC303139BF39B61369 /* ofxGLEditor.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = ofxGLEditor.cpp; path = ../../../addons/ofxGLEditor/src/ofxGLEditor.cpp; sourceTree = SOURCE_ROOT; };
@@ -275,7 +275,7 @@
 				E4B69E1F0A3A1BDC003C02F2 /* ofApp.h */,
 				037654E11AC3D7A400211D8C /* SyntaxHighlight.cpp */,
 				037654E21AC3D7A400211D8C /* SyntaxHighlight.h */,
-				037654E41AC3DA0800211D8C /* test.frag */,
+				03538CE11AC424370061AA13 /* EmptyShader.frag */,
 			);
 			path = src;
 			sourceTree = SOURCE_ROOT;
