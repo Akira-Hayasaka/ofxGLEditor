@@ -332,7 +332,7 @@ void ofxEditor::draw() {
 					continue;
 				}
 				
-				ofColor *textColor;
+				ofColor *textColor = NULL;
 				switch(tb.type) {
 				
 					case UNKNOWN:
@@ -366,7 +366,10 @@ void ofxEditor::draw() {
 					default:
 						break;
 				}
-				s_font->setColor(*textColor, m_settings->getAlpha());
+
+				if (textColor) {
+					s_font->setColor(*textColor, m_settings->getAlpha());
+				}
 				
 				// draw block chars
 				for(int i = 0; i < tb.text.length(); ++i) {
