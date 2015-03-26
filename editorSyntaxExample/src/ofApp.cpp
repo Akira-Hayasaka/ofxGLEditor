@@ -66,8 +66,6 @@ void ofApp::draw() {
 	editor.draw();
 	
 	if(debug) {
-		//editor.drawGrid();
-	
 		ofSetColor(255);
 		ofDrawBitmapString("fps: "+ofToString((int)ofGetFrameRate()), ofGetWidth()-70, ofGetHeight()-10);
 	}
