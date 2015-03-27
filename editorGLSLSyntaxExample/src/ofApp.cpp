@@ -28,7 +28,6 @@ void ofApp::setup() {
 	ofSetEscapeQuitsApp(false);
 
 	// make sure to load editor font before anything else!
-	//ofxEditor::loadFont("fonts/PrintChar21.ttf", 24);
     ofxEditor::loadFont("fonts/DecimaMonoPro.ttf", 24);
 	
     syntaxHighlight.setup(&colorScheme);
@@ -42,12 +41,7 @@ void ofApp::setup() {
 	
 	// default: white text on black background
 	ofBackground(0);
-	
-	// or black text on white background
-	//ofBackground(255);
-	//editor.getSettings().setTextColor(ofColor::black);
-	//editor.getSettings().setTextShadowColor(ofColor::gray);
-	
+
 	debug = false;
     
     /// Shader stuff
@@ -63,7 +57,7 @@ void ofApp::setup() {
     fbo.begin();
     ofClear(0, 0, 0, 0);
     fbo.end();
-    
+
 }
 
 //--------------------------------------------------------------
@@ -109,9 +103,7 @@ void ofApp::keyPressed(int key) {
 				}
 				return;
             case 'r':
-                testFile << editor.getText(); testFile.close();
-                cout << "FUCK " << endl;
-             //   editor::ofxGLEditor::saveFile(shaderFileName, 1);
+                editor.saveFile(testFile.getFileName());
                 break;
 			case 'd':
 				debug = !debug;
