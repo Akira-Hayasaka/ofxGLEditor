@@ -256,22 +256,13 @@ bool ofxGLEditor::openFile(string filename, int editor) {
 		return false;
 	}
 	
-	string path = ofToDataPath(filename);
-	ofLogVerbose("ofxGLEditor") << "loading \"" << ofFilePath::getFileName(path)
+	ofLogVerbose("ofxGLEditor") << "loading \"" << ofFilePath::getFileName(filename)
 		<< "\" into editor " << editor;
-	
-	ofFile file;
-	if(!file.open(ofToDataPath(path), ofFile::ReadOnly)) {
-		ofLogError() << "ofxGLEditor: couldn't load \""
-			<< ofFilePath::getFileName(path) << "\"";
-		return false;
+	bool ret = m_editors[editor]->openFile(filename);
+	if(ret) {
+		m_saveFiles[editor] = ofFilePath::getFileName(filename);
 	}
-	
-	setText(file.readToBuffer().getText(), editor);
-	file.close();
-	m_saveFiles[editor] = ofFilePath::getFileName(path);
-	
-	return true;
+	return ret;
 }
 
 //--------------------------------------------------------------
@@ -290,22 +281,13 @@ bool ofxGLEditor::saveFile(string filename, int editor) {
 		return false;
 	}
 	
-	string path = ofToDataPath(filename);
 	ofLogVerbose("ofxGLEditor") << "saving editor " << editor
-		<< " to \"" << ofFilePath::getFileName(path) << "\"";
-	
-	ofFile file;
-	if(!file.open(path, ofFile::WriteOnly)) {
-		ofLogError() << "ofxGLEditor: couldn't open \""
-			<< ofFilePath::getFileName(path) << "\" for saving";
-		return false;
+		<< " to \"" << ofFilePath::getFileName(filename) << "\"";
+	bool ret = m_editors[editor]->saveFile(filename);
+	if(ret) {
+		m_saveFiles[editor] = ofFilePath::getFileName(filename);
 	}
-	
-	file << getText(editor);
-	file.close();
-	m_saveFiles[editor] = ofFilePath::getFileName(path);
-		
-	return true;
+	return ret;
 }
 
 //--------------------------------------------------------------

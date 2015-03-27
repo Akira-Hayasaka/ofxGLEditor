@@ -70,6 +70,16 @@ ofColor& ofxEditorColorScheme::getNumberColor() {
 }
 
 //--------------------------------------------------------------
+void ofxEditorColorScheme::setMatchingCharsColor(ofColor color) {
+	matchingCharsColor = color;
+}
+
+//--------------------------------------------------------------
+ofColor& ofxEditorColorScheme::getMatchingCharsColor() {
+	return matchingCharsColor;
+}
+
+//--------------------------------------------------------------
 void ofxEditorColorScheme::setCommentColor(ofColor color) {
 	commentColor = color;
 }

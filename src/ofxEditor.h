@@ -113,6 +113,14 @@ class ofxEditor {
 		virtual void resize();
 		virtual void resize(int width, int height);
 	
+		/// open & load a file, clears existing text
+		/// returns true on success
+		virtual bool openFile(string filename);
+		
+		/// save the text to a file
+		/// returns true on success
+		virtual bool saveFile(string filename);
+	
 		/// get wide char text buffer contents or current selection
 		virtual wstring getWideText();
 	
@@ -322,8 +330,9 @@ class ofxEditor {
 			SPACE,
 			TAB,
 			ENDLINE,
-			COMMENT_BEGIN, // tag only, no text
-			COMMENT_END    // tag only, no text
+			MATCHING_CHAR, //< open/close chars in settings aka []{}()<>
+			COMMENT_BEGIN, //< tag only, no text
+			COMMENT_END    //< tag only, no text
 		};
 		
 		/// syntax parser custom class to represent a contextual block of text

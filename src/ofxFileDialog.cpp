@@ -170,6 +170,18 @@ void ofxFileDialog::refresh() {
 	}
 }
 
+//--------------------------------------------------------------
+bool ofxFileDialog::openFile(string filename) {
+	ofLogWarning("ofxFileDialog") << "ignoring openFile";
+	return false;
+}
+
+//--------------------------------------------------------------
+bool ofxFileDialog::saveFile(string filename) {
+	ofLogWarning("ofxFileDialog") << "ignoring saveFile";
+	return false;
+}
+
 // STATIC UTILS
 
 //--------------------------------------------------------------

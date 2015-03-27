@@ -28,7 +28,6 @@
 #define MAX_HISTORY_LEN	256
 
 // utils
-bool isBalanced(wstring s);
 bool isEmpty(wstring s);
 
 wstring ofxRepl::s_banner = wstring(L"");
@@ -91,6 +90,7 @@ void ofxRepl::keyPressed(int key) {
 		case OF_KEY_SUPER: case OF_KEY_LEFT_SUPER: case OF_KEY_RIGHT_SUPER:
 			return;
 	}
+	bool copying = false;
 	
 	// check modifier keys
 	bool modifierPressed = ofxEditor::getSuperAsModifier() ? ofGetKeyPressed(OF_KEY_SUPER) : ofGetKeyPressed(OF_KEY_CONTROL);
@@ -112,6 +112,7 @@ void ofxRepl::keyPressed(int key) {
 					clearHistory();
 					return;
 				}
+				copying = true;
 				break;
 			case 'v': case 22: // only paste on the current prompt line
 				if(m_position < m_promptPos) {
@@ -123,6 +124,7 @@ void ofxRepl::keyPressed(int key) {
 				if(m_position < m_promptPos || m_highlightStart < m_promptPos || m_highlightEnd < m_promptPos) {
 					key = 'c';
 				}
+				copying = true;
 				break;
 		}
 	}
@@ -131,6 +133,11 @@ void ofxRepl::keyPressed(int key) {
 	if((m_position <= m_promptPos && key == OF_KEY_BACKSPACE) ||
 	   (m_position < m_promptPos && key == OF_KEY_DEL)) {
 		return;
+	}
+	
+	// any text input moves cursor to end of the prompt line
+	if(key < OF_KEY_MODIFIER && m_position < m_promptPos && !copying) {
+		m_position = m_text.length();
 	}
 	
 	// prompt line history etc
@@ -191,16 +198,14 @@ void ofxRepl::print(const wstring &what) {
 	wstring to_print;
 	for(wstring::const_iterator i = what.begin(); i != what.end(); ++i) {
 		m_linePos++;
-		if(*i == L'\n') {
+		if(*i == '\n') {
 			m_linePos = 0;
 		}
 		to_print += *i;
 	}
-	m_text.insert(m_insertPos, to_print);
+	insertText(to_print);
 	
-	m_position += to_print.length();
-	m_promptPos += to_print.length();
-	m_insertPos += to_print.length();
+	m_promptPos = m_insertPos = m_position;
 	m_selectAllStartPos = m_promptPos;
 	m_highlightStart = m_promptPos;
 	m_highlightEnd = m_promptPos;
@@ -239,6 +244,18 @@ void ofxRepl::clearText() {
 //--------------------------------------------------------------
 void ofxRepl::clearHistory() {
 	historyClear();
+}
+
+//--------------------------------------------------------------
+bool ofxRepl::openFile(string filename) {
+	ofLogWarning("ofxRepl") << "ignoring openFile";
+	return false;
+}
+
+//--------------------------------------------------------------
+bool ofxRepl::saveFile(string filename) {
+	ofLogWarning("ofxRepl") << "ignoring saveFile";
+	return false;
 }
 
 // PROTECTED
@@ -283,9 +300,10 @@ void ofxRepl::printPrompt() {
 	if(m_text.length() > 0 && m_text[m_insertPos-1] != '\n') {
 		m_text += '\n';
 		m_insertPos++;
+		m_position++;
 	}
-	m_text += s_prompt;
-	m_position = m_promptPos = m_selectAllStartPos = m_text.length();
+	insertText(s_prompt);
+	m_promptPos = m_selectAllStartPos = m_position;
 }
 
 //--------------------------------------------------------------
@@ -337,12 +355,12 @@ void ofxRepl::historyShow(wstring what) {
 void ofxRepl::keepCursorVisible() {
 	unsigned int curVisLine = 0;
 	for(int i = m_position; i > m_topTextPosition; i--) {
-		if(m_text[i] == L'\n') {
+		if(m_text[i] == '\n') {
 			curVisLine++;
 		}
 	}
 	while(curVisLine >= m_visibleLines) {
-		if(m_text[m_topTextPosition++] == L'\n') {
+		if(m_text[m_topTextPosition++] == '\n') {
 			curVisLine--;
 		}
 	}
@@ -411,25 +429,6 @@ void ofxRepl::Logger::log(ofLogLevel level, const string & module, const char* f
 }
 
 // OTHER UTIL
-
-//--------------------------------------------------------------
-bool isBalanced(wstring s) {
-	int balance = 0;
-	for(wstring::iterator i = s.begin(); i != s.end(); i++) {
-		switch(*i) {
-			case '(':
-				balance++;
-				break;
-			case ')':
-				balance--;
-				break;
-		}
-		if(balance < 0) {
-			return false;
-		}
-	}
-	return balance == 0;
-}
 
 //--------------------------------------------------------------
 bool isEmpty(wstring s) {

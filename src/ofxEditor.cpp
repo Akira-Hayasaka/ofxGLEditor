@@ -253,7 +253,7 @@ void ofxEditor::draw() {
 	}
 	
 	m_visibleWidth = (m_width - s_charWidth) * (m_autoFocus ? 1/m_scale : 1.0);
-	m_visibleLines = m_height/(s_charHeight*m_scale);
+	m_visibleLines = m_height/(s_charHeight * (m_autoFocus ? s_autoFocusMinScale : 1.0));
 	
 	// update scrolling
 	m_posX = 0;
@@ -339,20 +339,21 @@ void ofxEditor::draw() {
 						ofLogWarning("ofxEditor") << "trying to draw UNKNOWN text block, contents: " << wstring_to_string(tb.text);
 						break;
 						
-					case WORD: {
+					case WORD:
 						textColor = comment ? &m_colorScheme->getCommentColor() : &m_colorScheme->getWordColor(tb.text);
 						break;
-					}
 						
-					case STRING: {
+					case STRING:
 						textColor = comment ? &m_colorScheme->getCommentColor() : &m_colorScheme->getStringColor();
 						break;
-					}
 						
-					case NUMBER: {
+					case NUMBER:
 						textColor = comment ? &m_colorScheme->getCommentColor() : &m_colorScheme->getNumberColor();
 						break;
-					}
+					
+					case MATCHING_CHAR:
+						textColor = comment ? &m_colorScheme->getCommentColor() : &m_colorScheme->getMatchingCharsColor();
+						break;
 					
 					case COMMENT_BEGIN:
 						comment = true;
@@ -892,7 +893,7 @@ void ofxEditor::resize() {
 	resize(w, h);
 }
 
-//--------------------------------------------------------------
+
 void ofxEditor::resize(int width, int height) {
 	m_width = width;
 	m_height = height;
@@ -901,6 +902,32 @@ void ofxEditor::resize(int width, int height) {
 	
 	ofLogVerbose("ofxEditor") << "pixel size: " << width << " " << height;
 	ofLogVerbose("ofxEditor") << "num lines: " << m_visibleLines;
+}
+
+//--------------------------------------------------------------
+bool ofxEditor::openFile(string filename) {
+	ofFile file;
+	if(!file.open(ofToDataPath(filename), ofFile::ReadOnly)) {
+		ofLogError() << "ofxEditor: couldn't load \""
+			<< ofFilePath::getFileName(filename) << "\"";
+		return false;
+	}
+	setText(file.readToBuffer().getText());
+	file.close();
+	return true;
+}
+		
+//--------------------------------------------------------------
+bool ofxEditor::saveFile(string filename) {
+	ofFile file;
+	if(!file.open(ofToDataPath(filename), ofFile::WriteOnly)) {
+		ofLogError() << "ofxGLEditor: couldn't open \""
+			<< ofFilePath::getFileName(filename) << "\" for saving";
+		return false;
+	}
+	file << getText();
+	file.close();
+	return true;
 }
 
 //--------------------------------------------------------------
@@ -1628,7 +1655,23 @@ void ofxEditor::parseTextBlocks() {
 						tb.clear();
 					case UNKNOWN:
 						tb.type = WORD;
-					case WORD: case STRING:
+					case WORD:
+						// check for open/close characters
+						if(!singleComment && !multiComment) {
+							if(m_settings->getOpenChars().find(m_text[i], 0) != string::npos ||
+							   m_settings->getCloseChars().find(m_text[i], 0) != string::npos) {
+								if(tb.type != UNKNOWN) {
+									m_textBlocks.push_back(tb);
+									tb.clear();
+								}
+								tb.type = MATCHING_CHAR;
+								tb.text += m_text[i];
+								m_textBlocks.push_back(tb);
+								tb.clear();
+								break;
+							}
+						}
+					case STRING:
 						tb.text += m_text[i];
 					default:
 						if(tb.type == WORD) {

@@ -24,6 +24,12 @@
 
 #include "ofxEditor.h"
 
+/// key events
+///
+/// ARROWS: select file to open
+/// RETURN: open/save file
+/// ESC: exit file dialog
+///
 class ofxFileDialog : public ofxEditor {
 
 	public:
@@ -57,6 +63,9 @@ class ofxFileDialog : public ofxEditor {
 	
 		/// currently in save as mode?
 		bool getSaveAsMode();
+	
+		bool openFile(string filename); //< dummy implementation
+		bool saveFile(string filename); //< dummy implementation
 	
 	/// \section Static Utils
 	
