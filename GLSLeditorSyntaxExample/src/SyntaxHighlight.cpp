@@ -18,7 +18,6 @@ void SyntaxHighlight::setup(ofxEditorColorScheme *colorScheme){
     // DATA TYPES
     for (int i = 0; i < dataType.size(); i++) {
         colorScheme->setWordColor(dataType[i], ofColor(246,70,185));
-        colorScheme->setWordColor(dataType[i]+"(", ofColor(246,70,185));
     }
     
     // PREPROCESSOR
@@ -29,13 +28,13 @@ void SyntaxHighlight::setup(ofxEditorColorScheme *colorScheme){
     // FUNCTIONS
     for (int i = 0; i < functions.size(); i++) {
         colorScheme->setWordColor(functions[i], ofColor(11,179,244));
-        colorScheme->setWordColor(functions[i]+"(", ofColor(11,179,244));
     }
     
     colorScheme->setSingleLineComment("//");
     colorScheme->setMultiLineComment("/*", "*/");
     
     // syntax highlighter colors
+    colorScheme->setMatchingCharsColor(ofColor::lightBlue); // ()[]{}<> by default
     colorScheme->setStringColor(ofColor::green);
     colorScheme->setNumberColor(ofColor::white);
     colorScheme->setCommentColor(ofColor::green);

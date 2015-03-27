@@ -36,7 +36,7 @@ void ofApp::setup() {
     editor.setLineNumbers(!editor.getLineNumbers());
     
 	// open test file
-    testFile.open("EmptyShader.frag", ofFile::ReadWrite);
+    testFile.open("EmptyShader.frag", ofFile::ReadOnly);
 	editor.setText(testFile.readToBuffer().getText());
 	ofLogNotice() << "num chars: " << editor.getNumCharacters() << " num lines: " << editor.getNumLines();
 	

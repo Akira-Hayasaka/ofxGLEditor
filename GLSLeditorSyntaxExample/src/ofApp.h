@@ -42,8 +42,9 @@ class ofApp : public ofBaseApp {
         ofShader shader;
         ofFbo fbo;
         ofFile testFile;
-private:
-    vector<string> shaderFileName;
-    int width, height;
+    
+    private:
+        vector<string> shaderFileName;
+        int width, height;
 
 };
