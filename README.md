@@ -71,7 +71,7 @@ Point the ProjectGenerator to `addons/ofxGLEditor`, change the project name to t
 
 #### liveCodingExample
 
-This is a simple livecoding example using ofxLua including lua keyword syntax hilighting. **It currently uses the ofxLua `swig` branch, so make sure you checkout the right branch.** Also, you will need to select `ofxLua` from the addons list when you generate the project files for this example.
+This is a simple livecoding example using ofxLua including lua keyword syntax highlighting. Also, you will need to select `ofxLua` from the addons list when you generate the project files for this example.
 
 ### Font
 
