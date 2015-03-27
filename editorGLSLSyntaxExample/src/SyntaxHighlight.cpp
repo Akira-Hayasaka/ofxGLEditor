@@ -122,6 +122,11 @@ void SyntaxHighlight::setPreprocessor(){
 
 void SyntaxHighlight::setFunctions(){
     
+    // Built in varibales
+        functions.push_back("gl_FragCoord");
+        functions.push_back("gl_FragColor");
+        functions.push_back("gl_FragDepth");
+    
     // Angle and Trigonometry Functions
         functions.push_back("radians");
         functions.push_back("degrees");
@@ -193,6 +198,7 @@ void SyntaxHighlight::setFunctions(){
         functions.push_back("not");
         
     // Texture Access Functions
+        functions.push_back("texture2D");
         functions.push_back("textureSize");
         functions.push_back("texture");
         functions.push_back("textureProj");

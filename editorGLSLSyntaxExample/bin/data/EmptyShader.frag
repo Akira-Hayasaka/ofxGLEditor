@@ -15,3 +15,4 @@ void main(void)
 //    color *= smoothstep(r, r+0.2, length(q));
     gl_FragColor = vec4(color,1.0);
 }
+
