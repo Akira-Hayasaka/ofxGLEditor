@@ -42,6 +42,7 @@ void ofApp::setup() {
 	// default: white text on black background
 	ofBackground(0);
 
+    bToggleVisable = true;
 	debug = false;
     
     /// Shader stuff
@@ -63,8 +64,6 @@ void ofApp::setup() {
 //--------------------------------------------------------------
 void ofApp::draw() {
     
-    shader.load(shaderFileName[0]);
-
     fbo.begin();
     ofClear(0,0,0,0);
         shader.begin();
@@ -77,7 +76,9 @@ void ofApp::draw() {
     fbo.end();
     fbo.draw(0,0,ofGetWidth(),ofGetHeight());
 
-	editor.draw();
+    if(bToggleVisable){
+        editor.draw();
+    }
 	
 	if(debug) {
 		//editor.drawGrid();
@@ -102,8 +103,11 @@ void ofApp::keyPressed(int key) {
 					editor.setColorScheme(&colorScheme);
 				}
 				return;
+            case 'e':
+                bToggleVisable = !bToggleVisable;
             case 'r':
                 editor.saveFile(testFile.getFileName());
+                shader.load(shaderFileName[0]);
                 break;
 			case 'd':
 				debug = !debug;

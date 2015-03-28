@@ -46,5 +46,6 @@ class ofApp : public ofBaseApp {
     private:
         vector<string> shaderFileName;
         int width, height;
+        bool bToggleVisable;
 
 };
