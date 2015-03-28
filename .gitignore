@@ -52,7 +52,7 @@ liveCodingExample/ofxGLEditor_example.xcodeproj
 liveCodingExample/openFrameworks-Info.plist
 
 editorGLSLSyntaxExample/Makefile
-editorGLSLSyntaxExample/Project.xconfig
+editorGLSLSyntaxExample/Project.xcconfig
 editorGLSLSyntaxExample/addons.make
 editorGLSLSyntaxExample/config.make
 editorGLSLSyntaxExample/ofxGLEditor_example.xcodeproj
