@@ -1,8 +1,0 @@
-show a few utf8 wide chars
-(if the font supports them)
-
-2 bytes: Ø Æ ö ä « » þ
-
-3 bytes: € Ж 丽
-
-4 bytes: 日本国
