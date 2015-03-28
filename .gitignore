@@ -50,3 +50,10 @@ livecodingExample/addons.make
 livecodingExample/config.make
 livecodingExample/livecodingExample.xcodeproj
 livecodingExample/openFrameworks-Info.plist
+
+editorGLSLSyntaxExample/Makefile
+editorGLSLSyntaxExample/Project.xconfig
+editorGLSLSyntaxExample/addons.make
+editorGLSLSyntaxExample/config.make
+editorGLSLSyntaxExample/ofxGLEditor_example.xcodeproj
+editorGLSLSyntaxExample/openFrameworks-Info.plist
