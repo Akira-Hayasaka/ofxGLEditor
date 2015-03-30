@@ -58,7 +58,7 @@ wstring ofxEditor::s_copyBuffer;
 float ofxEditor::s_time = 0;
 
 float ofxEditor::s_autoFocusError = 10;
-float ofxEditor::s_autoFocusScaleDrift = 0.3;
+float ofxEditor::s_autoFocusScaleDrift = 0.9;
 float ofxEditor::s_autoFocusMinScale = 0.5;
 float ofxEditor::s_autoFocusMaxScale = 5.0;
 
@@ -516,10 +516,8 @@ void ofxEditor::draw() {
 		if(m_autoFocus) {
 			
 			// add top and bottom padding for small text
-			if(m_scale < 1.0) {
-				m_BBMinY -= s_charHeight;
-				m_BBMaxY += s_charHeight;
-			}
+			m_BBMinY -= s_charHeight;
+			m_BBMaxY += s_charHeight;
 			
 			// y scroll
 			m_posY = m_posY*(1-m_delta) - (m_BBMinY+((m_BBMaxY-m_BBMinY)/2))*m_delta;
