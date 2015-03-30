@@ -354,7 +354,7 @@ void ofxRepl::historyShow(wstring what) {
 //--------------------------------------------------------------
 void ofxRepl::keepCursorVisible() {
 	unsigned int curVisLine = 0;
-	for(int i = m_position; i > m_topTextPosition; i--) {
+	for(int i = m_topTextPosition; i < m_position; i++) {
 		if(m_text[i] == '\n') {
 			curVisLine++;
 		}
