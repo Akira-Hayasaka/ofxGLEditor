@@ -440,6 +440,9 @@ class ofxEditor {
 		/// editor area
 		void textBufferUpdated();
 	
+		/// update visible char size based on pixel size, char size, & auto focus
+		void updateVisibleSize();
+	
 	private:
 	
 		/// parses text into text blocks

@@ -252,9 +252,6 @@ void ofxEditor::draw() {
 		resize();
 	}
 	
-	m_visibleWidth = (m_width - s_charWidth) * (m_autoFocus ? 1/m_scale : 1.0);
-	m_visibleLines = m_height/(s_charHeight * (m_autoFocus ? s_autoFocusMinScale : 1.0));
-	
 	// update scrolling
 	m_posX = 0;
 	if(!m_lineWrapping) {
@@ -517,7 +514,15 @@ void ofxEditor::draw() {
 	
 		// calculate auto focus bounding box and scaling
 		if(m_autoFocus) {
-			m_posY = m_posY*(1-m_delta) - (m_BBMinY+(m_BBMaxY-m_BBMinY)/2)*m_delta;
+			
+			// add top and bottom padding for small text
+			if(m_scale < 1.0) {
+				m_BBMinY -= s_charHeight;
+				m_BBMaxY += s_charHeight;
+			}
+			
+			// y scroll
+			m_posY = m_posY*(1-m_delta) - (m_BBMinY+((m_BBMaxY-m_BBMinY)/2))*m_delta;
 			
 			float boxwidth = (m_BBMaxX-m_BBMinX) * m_scale;
 			float boxheight = (m_BBMaxY-m_BBMinY) * m_scale;
@@ -906,9 +911,7 @@ void ofxEditor::resize() {
 void ofxEditor::resize(int width, int height) {
 	m_width = width;
 	m_height = height;
-	
-	m_visibleLines = height/s_charHeight;
-	
+	updateVisibleSize();
 	ofLogVerbose("ofxEditor") << "pixel size: " << width << " " << height;
 	ofLogVerbose("ofxEditor") << "num lines: " << m_visibleLines;
 }
@@ -1088,6 +1091,7 @@ bool ofxEditor::getLineNumbers() {
 //--------------------------------------------------------------
 void ofxEditor::setAutoFocus(bool focus) {
 	m_autoFocus = focus;
+	updateVisibleSize();
 }
 	
 //--------------------------------------------------------------
@@ -1566,6 +1570,19 @@ void ofxEditor::textBufferUpdated() {
 	// scroll if we've added content at the far right
 	if(!m_lineWrapping) {
 		m_desiredXPos = offsetToCurrentLineStart();
+	}
+}
+
+//--------------------------------------------------------------
+void ofxEditor::updateVisibleSize() {
+	if(m_autoFocus) {
+		m_visibleWidth = (m_width - s_charWidth) * 1.0/m_scale;
+		// subtract 2 vertical padding lines
+		m_visibleLines = (m_height/(s_charHeight*s_autoFocusMinScale)) - 2;
+	}
+	else {
+		m_visibleWidth = m_width - s_charWidth;
+		m_visibleLines = m_height/s_charHeight;
 	}
 }
 
