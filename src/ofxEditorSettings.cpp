@@ -145,6 +145,7 @@ bool ofxEditorSettings::getHighlightMatchingChars() {
 void ofxEditorSettings::setMatchingChars(wstring openChars, wstring closeChars) {
 	if(openChars.length() == 0 || closeChars.length() == 0) {
 		ofLogWarning("ofxEditorSettings") << "empty open or close char string";
+		return;
 	}
 	openChars = openChars;
 	closeChars = closeChars;

@@ -95,7 +95,6 @@ class ofxEditorSettings {
 		ofColor lineNumberColor;    //< line number color
 
 		bool highlightMatchingChars; //< highlight matching open/close chars?
-
 		wstring openChars;  //< open chars (parens, brackets, etc) for matching highlight
 		wstring closeChars; //< close chars (parens, bracket, etc) for matching highlight
 };

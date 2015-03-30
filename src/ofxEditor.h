@@ -226,7 +226,7 @@ class ofxEditor {
 		/// reset position & selection
 		void reset();
 	
-	/// \section Drawing Utils
+	/// \section Utils
 	
 		/// draw a wide char string using the current editor font
 		/// returns the width of drawn text
@@ -237,6 +237,9 @@ class ofxEditor {
 		/// returns the width of drawn text
 		float drawString(string s, float x, float y);
 		float drawString(string s, ofPoint& p);
+	
+		/// print the current syntax parser text blocks, useful for debugging
+		void printSyntax();
 	
 	protected:
 	
@@ -324,23 +327,26 @@ class ofxEditor {
 		/// syntax parser TextBlock types
 		enum TextBlockType {
 			UNKNOWN,
-			WORD,
-			STRING,
-			NUMBER,
-			SPACE,
-			TAB,
-			ENDLINE,
-			MATCHING_CHAR, //< open/close chars in settings aka []{}()<>
-			COMMENT_BEGIN, //< tag only, no text
-			COMMENT_END    //< tag only, no text
+			WORD,             //< basic text
+			STRING_BEGIN,     //< tag only, no text
+			STRING_END,       //< tag only, no text
+			NUMBER,           //< number including .
+			SPACE,            //< whitespace
+			TAB,              //< whitespace
+			ENDLINE,          //< whitespace
+			MATCHING_CHAR,    //< open/close chars in settings aka []{}()<>
+			MATH_CHAR,        //< common mathematical chars aka =+-*/!|&~
+			PUNCTUATION_CHAR, //< standard punctuation chars aka ;:,?
+			COMMENT_BEGIN,    //< tag only, no text
+			COMMENT_END       //< tag only, no text
 		};
 		
 		/// syntax parser custom class to represent a contextual block of text
 		class TextBlock {
 			public:
 				
-				TextBlockType type; ///< block type
-				wstring text; ///< block text string
+				TextBlockType type; //< block type
+				wstring text; //< block text string
 				
 				TextBlock() {
 					clear();

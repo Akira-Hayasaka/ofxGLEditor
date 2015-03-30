@@ -19,10 +19,11 @@
  */
 #include "ofxEditorColorScheme.h"
 #include "Unicode.h"
+#include "ofLog.h"
 
 //--------------------------------------------------------------
 ofxEditorColorScheme::ofxEditorColorScheme() {
-	wordColors.clear();
+	clear();
 }
 
 //--------------------------------------------------------------
@@ -37,6 +38,9 @@ void ofxEditorColorScheme::clear() {
 	numberColor.set(255);
 	commentColor.set(255);
 	clearAllWordColors();
+	
+	mathChars = L"+-*/!|&~";
+	punctuationChars = L";:,?";
 }
 
 //--------------------------------------------------------------
@@ -67,16 +71,6 @@ void ofxEditorColorScheme::setNumberColor(ofColor color) {
 //--------------------------------------------------------------
 ofColor& ofxEditorColorScheme::getNumberColor() {
 	return numberColor;
-}
-
-//--------------------------------------------------------------
-void ofxEditorColorScheme::setMatchingCharsColor(ofColor color) {
-	matchingCharsColor = color;
-}
-
-//--------------------------------------------------------------
-ofColor& ofxEditorColorScheme::getMatchingCharsColor() {
-	return matchingCharsColor;
 }
 
 //--------------------------------------------------------------
@@ -188,4 +182,52 @@ void ofxEditorColorScheme::clearWordColor(const string &word) {
 //--------------------------------------------------------------
 void ofxEditorColorScheme::clearAllWordColors() {
 	wordColors.clear();
+}
+
+//--------------------------------------------------------------
+void ofxEditorColorScheme::setMathChars(wstring chars) {
+	if(chars.length() == 0) {
+		ofLogWarning("ofxEditorSettings") << "empty math string";
+		return;
+	}
+	mathChars = chars;
+}
+
+//--------------------------------------------------------------
+void ofxEditorColorScheme::setMathChars(string chars) {
+	setMathChars(string_to_wstring(chars));
+}
+
+//--------------------------------------------------------------
+wstring& ofxEditorColorScheme::getWideMathChars() {
+	return mathChars;
+}
+
+//--------------------------------------------------------------
+string ofxEditorColorScheme::getMathChars() {
+	return wstring_to_string(mathChars);
+}
+
+//--------------------------------------------------------------
+void ofxEditorColorScheme::setPunctuationChars(wstring chars) {
+	if(chars.length() == 0) {
+		ofLogWarning("ofxEditorSettings") << "empty punctuation string";
+		return;
+	}
+	punctuationChars = chars;
+}
+
+//--------------------------------------------------------------
+void ofxEditorColorScheme::setPunctuationChars(string chars) {
+	setPunctuationChars(string_to_wstring(chars));
+}
+
+//--------------------------------------------------------------
+wstring& ofxEditorColorScheme::getWidePunctuationChars() {
+	return punctuationChars;
+}
+
+//--------------------------------------------------------------
+string ofxEditorColorScheme::getPunctuationChars() {
+	return wstring_to_string(punctuationChars);
 }

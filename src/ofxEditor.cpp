@@ -315,6 +315,7 @@ void ofxEditor::draw() {
 				drawLineNumber(x, y, currentLine);
 			}
 			
+			bool string = false;
 			bool comment = false;
 			for(list<TextBlock>::iterator iter = m_textBlocks.begin();
 			    iter != m_textBlocks.end() && m_displayedLineCount < m_visibleLines; iter++) {
@@ -332,41 +333,49 @@ void ofxEditor::draw() {
 					continue;
 				}
 				
-				ofColor *textColor;
+				// set font color based on block type
 				switch(tb.type) {
 				
 					case UNKNOWN:
 						ofLogWarning("ofxEditor") << "trying to draw UNKNOWN text block, contents: " << wstring_to_string(tb.text);
-						break;
+						continue; // skip
 						
 					case WORD:
-						textColor = comment ? &m_colorScheme->getCommentColor() : &m_colorScheme->getWordColor(tb.text);
+						if(!string && !comment) s_font->setColor(m_colorScheme->getWordColor(tb.text), m_settings->getAlpha());
 						break;
 						
-					case STRING:
-						textColor = comment ? &m_colorScheme->getCommentColor() : &m_colorScheme->getStringColor();
-						break;
+					case STRING_BEGIN:
+						string = true;
+						s_font->setColor(m_colorScheme->getStringColor(), m_settings->getAlpha());
+						continue; // nothing to draw
+						
+					case STRING_END:
+						string = false;
+						s_font->setColor(m_colorScheme->getTextColor(), m_settings->getAlpha());
+						continue; // nothing to draw
 						
 					case NUMBER:
-						textColor = comment ? &m_colorScheme->getCommentColor() : &m_colorScheme->getNumberColor();
+						if(!string && !comment) s_font->setColor(m_colorScheme->getNumberColor(), m_settings->getAlpha());
 						break;
 					
-					case MATCHING_CHAR:
-						textColor = comment ? &m_colorScheme->getCommentColor() : &m_colorScheme->getMatchingCharsColor();
+					case MATCHING_CHAR: case MATH_CHAR: case PUNCTUATION_CHAR:
+						if(!comment) s_font->setColor(m_colorScheme->getTextColor(), m_settings->getAlpha());
 						break;
 					
 					case COMMENT_BEGIN:
 						comment = true;
+						s_font->setColor(m_colorScheme->getCommentColor(), m_settings->getAlpha());
 						continue; // nothing to draw
 						
 					case COMMENT_END:
 						comment = false;
+						s_font->setColor(m_colorScheme->getTextColor(), m_settings->getAlpha());
 						continue; // nothing to draw
 					
-					default:
+					case SPACE: case TAB: case ENDLINE: // whitespace
+						if(!string && !comment) s_font->setColor(m_colorScheme->getTextColor(), m_settings->getAlpha()); // for fonts with whitespace glyphs
 						break;
 				}
-				s_font->setColor(*textColor, m_settings->getAlpha());
 				
 				// draw block chars
 				for(int i = 0; i < tb.text.length(); ++i) {
@@ -1177,7 +1186,7 @@ void ofxEditor::reset() {
 	m_posX = m_posY = 0;
 }
 
-// DRAWING UTILS
+// UTILS
 
 //--------------------------------------------------------------
 float ofxEditor::drawString(string s, float x, float y) {
@@ -1216,6 +1225,32 @@ float ofxEditor::drawString(wstring s, float x, float y) {
 //--------------------------------------------------------------
 float ofxEditor::drawString(wstring s, ofPoint& p) {
 	return drawString(s, p.x, p.y);
+}
+
+//--------------------------------------------------------------
+void ofxEditor::printSyntax() {
+	if(!m_colorScheme) return;
+	for(list<TextBlock>::iterator iter = m_textBlocks.begin();
+		iter != m_textBlocks.end() && m_displayedLineCount < m_visibleLines; iter++) {
+		TextBlock &tb = (*iter);
+		string type;
+		switch(tb.type) {
+			case UNKNOWN:          type += "UNKNOWN"; break;
+			case WORD:             type += "WORD"; break;
+			case STRING_BEGIN:     ofLogNotice() << "STRING_BEGIN"; continue;
+			case STRING_END:       ofLogNotice() << "STRING_END"; continue;
+			case NUMBER:           type += "NUMBER"; break;
+			case SPACE:            type += "SPACE"; break;
+			case TAB:              type += "TAB"; break;
+			case ENDLINE:          ofLogNotice() << "ENDLINE"; continue;
+			case MATCHING_CHAR:    type += "MATCHING_CHAR"; break;
+			case MATH_CHAR:        type += "MATH_CHAR"; break;
+			case PUNCTUATION_CHAR: type += "PUNCTUATION_CHAR"; break;
+			case COMMENT_BEGIN:    ofLogNotice() << "COMMENT_BEGIN"; continue;
+			case COMMENT_END:      ofLogNotice() << "COMMENT_END"; continue;
+		}
+		ofLogNotice() << type << ": \"" << wstring_to_string(tb.text) << "\"";
+	}
 }
 
 // PROTECTED
@@ -1543,6 +1578,7 @@ void ofxEditor::parseTextBlocks() {
 	clearTextBlocks();
 	m_numLines = 0;
 	
+	int string = false;
 	bool singleComment = false;
 	bool multiComment = false;
 	wstring &singleLineComment = m_colorScheme->getWideSingleLineComment();
@@ -1556,15 +1592,8 @@ void ofxEditor::parseTextBlocks() {
 		
 			case ' ':
 				if(tb.type != UNKNOWN) {
-					// catch spaces inside STRINGS
-					if(tb.type == STRING) {
-						tb.text += m_text[i];
-						break;
-					}
-					else {
-						m_textBlocks.push_back(tb);
-						tb.clear();
-					}
+					m_textBlocks.push_back(tb);
+					tb.clear();
 				}
 				tb.type = SPACE;
 				tb.text = m_text[i];
@@ -1602,24 +1631,60 @@ void ofxEditor::parseTextBlocks() {
 				break;
 				
 			case '"': case '\'':
-				if(tb.type == STRING) {
+				if(singleComment || multiComment) { // ignore strings in comments
+					tb.text += m_text[i];
+					break;
+				}
+				if(string == m_text[i]) { // same as the opening string char?
+				
+					// don't terminate an escaping slash
+					if(tb.text.length() > 1 && tb.text[tb.text.size()-1] == '\\') {
+						tb.text += m_text[i];
+						break;
+					}
+
+					if(tb.type == UNKNOWN) {
+						tb.type = WORD;
+					}
 					tb.text += m_text[i];
 					m_textBlocks.push_back(tb);
 					tb.clear();
-					break;
+					
+					// push string end
+					TextBlock stringBlock;
+					stringBlock.type = STRING_END;
+					m_textBlocks.push_back(stringBlock);
+					
+					string = false;
 				}
-				else if(tb.type != UNKNOWN) {
-					m_textBlocks.push_back(tb);
-					tb.clear();
+				else if(string) { // wrong char, keep going
+					tb.text += m_text[i];
 				}
-				tb.type = STRING;
-				tb.text += m_text[i];
+				else { // opening string char
+					
+					if(tb.type != UNKNOWN) {
+						m_textBlocks.push_back(tb);
+						tb.clear();
+					}
+					
+					if(tb.type == UNKNOWN) {
+						tb.type = WORD;
+					}
+					tb.text += m_text[i];
+					
+					// push string begin
+					TextBlock stringBlock;
+					stringBlock.type = STRING_BEGIN;
+					m_textBlocks.push_back(stringBlock);
+					
+					string = m_text[i];
+				}
 				break;
 				
 			case '0': case '1': case '2': case '3': case '4':
 			case '5': case '6': case '7': case '8': case '9':
 				if(tb.type != UNKNOWN) {
-					if(tb.type == STRING) {
+					if(string) {
 						tb.text += m_text[i];
 						break;
 					}
@@ -1642,11 +1707,10 @@ void ofxEditor::parseTextBlocks() {
 				break;
 		
 			case '.': // could be number decimal point
-				if(tb.type == UNKNOWN) {
-					tb.type = WORD;
+				if(tb.type == NUMBER) {
+					tb.text += m_text[i];
+					break;
 				}
-				tb.text += m_text[i];
-				break;
 		
 			default: // everything else
 				switch(tb.type) {
@@ -1656,81 +1720,113 @@ void ofxEditor::parseTextBlocks() {
 					case UNKNOWN:
 						tb.type = WORD;
 					case WORD:
-						// check for open/close characters
-						if(!singleComment && !multiComment) {
-							if(m_settings->getOpenChars().find(m_text[i], 0) != string::npos ||
-							   m_settings->getCloseChars().find(m_text[i], 0) != string::npos) {
-								if(tb.type != UNKNOWN) {
-									m_textBlocks.push_back(tb);
-									tb.clear();
-								}
-								tb.type = MATCHING_CHAR;
-								tb.text += m_text[i];
-								m_textBlocks.push_back(tb);
-								tb.clear();
-								break;
-							}
-						}
-					case STRING:
 						tb.text += m_text[i];
-					default:
-						if(tb.type == WORD) {
+						
+						// in a string, so everything is a word, number, or whitespace
+						if(string) {
+							break;
+						}
+						
+						// detect comments
+						if(!multiComment) {
 							
-							// detect comments
-							if(!multiComment) {
+							// check ahead for multi line comment begin
+							if(i <= m_text.size()-multiLineCommentBegin.length() &&
+							   m_text.substr(i, multiLineCommentBegin.length()) == multiLineCommentBegin) {
 								
-								// check beginning of word for multi line comment begin
-								if(tb.text.length() >= multiLineCommentBegin.length() &&
-								   tb.text.substr(0, multiLineCommentBegin.length()) == multiLineCommentBegin) {
-									
-									if(singleComment) {
-										// already pushed comment begin
-										singleComment = false;
-									}
-									else {
-										// push comment begin
-										TextBlock commentBlock;
-										commentBlock.type = COMMENT_BEGIN;
-										m_textBlocks.push_back(commentBlock);
-									}
-									
-									multiComment = true;
-									continue;
+								if(singleComment) {
+									// already pushed comment begin
+									singleComment = false;
 								}
-								
-								// check beginning of word for single line comment
-								else if(!singleComment && tb.text.length() >= singleLineComment.length()) {
-									if(tb.text.substr(0, singleLineComment.length()) == singleLineComment) {
-										
-										// push comment begin
-										TextBlock commentBlock;
-										commentBlock.type = COMMENT_BEGIN;
-										m_textBlocks.push_back(commentBlock);
-										
-										singleComment = true;
-										continue;
-									}
-								}
-							}
-							else { // check end of word for multi line comment end
-								if(tb.text.length() >= multiLineCommentEnd.length() &&
-								   tb.text.substr(tb.text.length()-multiLineCommentEnd.length(),
-								                  multiLineCommentEnd.length()) == multiLineCommentEnd) {
-									
-									// push latest block
-									m_textBlocks.push_back(tb);
-									tb.clear();
-									
-									// push comment end
+								else {
+									// push comment begin
 									TextBlock commentBlock;
-									commentBlock.type = COMMENT_END;
+									commentBlock.type = COMMENT_BEGIN;
+									m_textBlocks.push_back(commentBlock);
+								}
+								
+								multiComment = true;
+								continue;
+							}
+							else if(!singleComment) {
+							
+								// check ahead for single line comment
+								if(i <= m_text.size()-singleLineComment.length() &&
+								   m_text.substr(i, singleLineComment.length()) == singleLineComment) {
+									
+									// push comment begin
+									TextBlock commentBlock;
+									commentBlock.type = COMMENT_BEGIN;
 									m_textBlocks.push_back(commentBlock);
 									
-									multiComment = false;
+									singleComment = true;
 									continue;
+								}
+								
+								// check for open/close characters
+								if(m_settings->getWideOpenChars().find(m_text[i], 0) != wstring::npos ||
+								   m_settings->getWideCloseChars().find(m_text[i], 0) != wstring::npos) {
+									if(tb.type != UNKNOWN && tb.text.length() > 1) {
+										tb.text = tb.text.substr(0, tb.text.length()-1);
+										m_textBlocks.push_back(tb);
+										tb.clear();
+									}
+									tb.type = MATCHING_CHAR;
+									tb.text = m_text[i];
+									m_textBlocks.push_back(tb);
+									tb.clear();
+									break;
+								}
+								
+								// check for single mathematical characters
+								if(m_colorScheme->getWideMathChars().find(m_text[i], 0) != wstring::npos) {
+									if(tb.type != UNKNOWN && tb.text.length() > 1) {
+										tb.text = tb.text.substr(0, tb.text.length()-1);
+										m_textBlocks.push_back(tb);
+										tb.clear();
+									}
+									tb.type = MATH_CHAR;
+									tb.text = m_text[i];
+									m_textBlocks.push_back(tb);
+									tb.clear();
+									break;
+								}
+								
+								// check for single punctuation characters
+								if(m_colorScheme->getWidePunctuationChars().find(m_text[i], 0) != wstring::npos) {
+									if(tb.type != UNKNOWN && tb.text.length() > 1) {
+										tb.text = tb.text.substr(0, tb.text.length()-1);
+										m_textBlocks.push_back(tb);
+										tb.clear();
+									}
+									tb.type = PUNCTUATION_CHAR;
+									tb.text = m_text[i];
+									m_textBlocks.push_back(tb);
+									tb.clear();
+									break;
 								}
 							}
 						}
+						else { // check for multi line comment end
+							if(tb.text.length() >= multiLineCommentEnd.length() &&
+								   tb.text.substr(tb.text.length()-multiLineCommentEnd.length(),
+								                  multiLineCommentEnd.length()) == multiLineCommentEnd) {
+								// push latest block
+								m_textBlocks.push_back(tb);
+								tb.clear();
+								
+								// push comment end
+								TextBlock commentBlock;
+								commentBlock.type = COMMENT_END;
+								m_textBlocks.push_back(commentBlock);
+								
+								multiComment = false;
+								continue;
+							}
+						}
+						break;
+						
+					default: // already handled
 						break;
 				}
 				break;

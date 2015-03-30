@@ -40,7 +40,6 @@ void ofApp::setup() {
 	// syntax highlighter colors
 	colorScheme.setStringColor(ofColor::yellow);
 	colorScheme.setNumberColor(ofColor::orangeRed);
-	colorScheme.setMatchingCharsColor(ofColor::lightBlue); // ()[]{}<> by default
 	colorScheme.setCommentColor(ofColor::gray);
 	
 	// open test file
@@ -112,6 +111,10 @@ void ofApp::keyPressed(int key) {
 				ofLogNotice() << "current line: " << editor.getCurrentLine() <<	" pos: " << editor.getCurrentLinePos();
 				editor.setCurrentLinePos(5, 2);
 				ofLogNotice() << "current line: " << editor.getCurrentLine() <<	" pos: " << editor.getCurrentLinePos();
+				break;
+			case 'p':
+				ofLogNotice() << "printing current syntax";
+				editor.printSyntax();
 				break;
 		}
 	}

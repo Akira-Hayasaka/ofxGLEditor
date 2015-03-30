@@ -46,11 +46,6 @@ class ofxEditorColorScheme {
 		void setNumberColor(ofColor color);
 		ofColor& getNumberColor();
 	
-		/// matching characters coloring (aka ()[]{}<>),
-		/// set characters in ofxEditorSettings
-		void setMatchingCharsColor(ofColor color);
-		ofColor& getMatchingCharsColor();
-	
 		/// single & multi line comment coloring
 		void setCommentColor(ofColor color);
 		ofColor& getCommentColor();
@@ -79,17 +74,33 @@ class ofxEditorColorScheme {
 		void clearWordColor(const wstring &word);
 		void clearWordColor(const string &word);
 		void clearAllWordColors();
+	
+		/// common mathematical chars between highlighted text blocks when parsing
+		/// default: "+-*/!|&~", string should not be empty
+		void setMathChars(wstring chars);
+		void setMathChars(string chars);
+		wstring& getWideMathChars();
+		string getMathChars();
+	
+		/// common punctuation chars between hilighted text blocks when parsing
+		/// default: ";:,?", string should not be empty
+		void setPunctuationChars(wstring chars);
+		void setPunctuationChars(string chars);
+		wstring& getWidePunctuationChars();
+		string getPunctuationChars();
 		
 	protected:
 	
 		ofColor textColor;
 		ofColor stringColor;
 		ofColor numberColor;
-		ofColor matchingCharsColor;
 		ofColor commentColor;
 		map<wstring,ofColor> wordColors;
 	
 		wstring singleLineComment;
 		wstring multiLineCommentBegin;
 		wstring multiLineCommentEnd;
+	
+		wstring mathChars;
+		wstring punctuationChars;
 };

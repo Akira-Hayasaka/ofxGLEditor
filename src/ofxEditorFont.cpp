@@ -187,12 +187,12 @@ void ofxEditorFont::stashError(void* uptr, int error, int val) {
 				fonsExpandAtlas(context, width*2, height*2);
 			}
 			else {
-				ofLogError("ofxEditorFont") << "couldn't expand altas more than " << ATLAS_MAX_SIZE;
+				ofLogError("ofxEditorFont") << "couldn't expand atlas more than " << ATLAS_MAX_SIZE;
 			}
 			break;
 		}
 		case FONS_SCRATCH_FULL:
-			ofLogError("ofxEditorFont") << "scratch full, tried to allocate " << val << "has" << FONS_SCRATCH_BUF_SIZE;
+			ofLogError("ofxEditorFont") << "scratch full, tried to allocate " << val << " has " << FONS_SCRATCH_BUF_SIZE;
 			break;
 		case FONS_STATES_OVERFLOW:
 			ofLogError("ofxEditorFont") << "state overflow";
