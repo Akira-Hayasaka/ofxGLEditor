@@ -106,6 +106,7 @@ void ofxRepl::keyPressed(int key) {
 					m_highlightEnd = m_text.size();
 					m_position = m_text.size();
 				}
+				keepCursorVisible();
 				return;
 			case 'c': case 3: // clear
 				if(ofGetKeyPressed(OF_KEY_SHIFT)) {
@@ -118,6 +119,7 @@ void ofxRepl::keyPressed(int key) {
 				if(m_position < m_promptPos) {
 					m_position = m_text.length();
 					m_selection = NONE;
+					keepCursorVisible();
 				}
 				break;
 			case 'x': case 24: // convert cut into copy
@@ -138,6 +140,7 @@ void ofxRepl::keyPressed(int key) {
 	// any text input moves cursor to end of the prompt line
 	if(key < OF_KEY_MODIFIER && m_position < m_promptPos && !copying) {
 		m_position = m_text.length();
+		keepCursorVisible();
 	}
 	
 	// prompt line history etc
@@ -161,8 +164,6 @@ void ofxRepl::keyPressed(int key) {
 				return;
 		}
 	}
-		
-	keepCursorVisible();
 
 	if(key == OF_KEY_RETURN) {
 		m_position = m_text.length();
@@ -353,12 +354,17 @@ void ofxRepl::historyShow(wstring what) {
 
 //--------------------------------------------------------------
 void ofxRepl::keepCursorVisible() {
+
+	// count num lines from visible top to current pos
 	unsigned int curVisLine = 0;
-	for(int i = m_topTextPosition; i < m_position; i++) {
-		if(m_text[i] == '\n') {
-			curVisLine++;
-		}
+	size_t step = 0;
+	for(unsigned int i = m_topTextPosition;
+	    i < m_position && (step = m_text.find('\n', i)) != wstring::npos;
+		i = step+1) {
+		curVisLine++;
 	}
+	
+	// move top down until pos is on a visible line
 	while(curVisLine >= m_visibleLines) {
 		if(m_text[m_topTextPosition++] == '\n') {
 			curVisLine--;

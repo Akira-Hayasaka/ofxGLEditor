@@ -693,11 +693,8 @@ void ofxEditor::keyPressed(int key) {
 				break;
 				
 			case OF_KEY_PAGE_UP:
-				for(unsigned int i = 0; i < m_visibleLines+1; i++) {
-					int start = lineStart(m_position);
-					if(start > 0) {
-						m_position = start-1;
-					}
+				for(unsigned int i = 0; i <= m_visibleLines; i++) {
+					m_position = lineStart(m_position-1);
 				}
 				if(m_position < m_topTextPosition) {
 					m_topTextPosition = lineStart(m_position);
@@ -705,16 +702,47 @@ void ofxEditor::keyPressed(int key) {
 				m_flash = HALF_FLASH_RATE; // show cursor after moving
 				break;
 				
-			case OF_KEY_PAGE_DOWN:
-				for(unsigned int i = 0; i < m_visibleLines+1; i++) {
+			case OF_KEY_PAGE_DOWN: {
+				
+				int onePageLen = m_visibleLines;
+				int twoPageLen = onePageLen*2;
+				
+				// count number of lines to the end of the buffer
+				int numLines = 0;
+				unsigned int i = m_position;
+				size_t step = 0;
+				while((step = m_text.find(L'\n', i)) != wstring::npos){
+					numLines++;
+					i = step+1;
+				}
+			
+				// choose num to move based on if we're close to the end
+				if(numLines >= twoPageLen-1) { // at least 2 pages from the end
+					numLines = onePageLen;
+				}
+				else if(numLines >= onePageLen) { // within one page
+					numLines -= onePageLen-1;
+				}
+				else { // within the last page
+					numLines = 0;
+					m_position = lineStart(m_text.size());
+				}
+				
+				// move position line by line
+				for(unsigned int i = 0; i < onePageLen && m_position < m_text.size(); i++) {
 					m_position = lineEnd(m_position)+1;
 				}
-				if(m_position >= m_bottomTextPosition) {
-					m_topTextPosition = lineStart(m_position);
+				
+				// move top position down by num lines
+				while(numLines > 0) {
+					if(m_text[m_topTextPosition++] == '\n') {
+						numLines--;
+					}
 				}
 				m_flash = HALF_FLASH_RATE; // show cursor after moving
 				break;
-				
+			}
+			
 			case OF_KEY_SHIFT:
 				if(!m_shiftState) {
 					m_shiftState = true;
@@ -1090,6 +1118,49 @@ bool ofxEditor::getLineNumbers() {
 void ofxEditor::setAutoFocus(bool focus) {
 	m_autoFocus = focus;
 	updateVisibleSize();
+	
+	// count number of currently visible lines
+	unsigned int visLines = 0;
+	size_t step = 0;
+	for(unsigned int i = m_topTextPosition;
+		i < m_bottomTextPosition && (step = m_text.find(L'\n', i)) != wstring::npos;
+		i = step+1) {
+		visLines++;
+	}
+	if(visLines == 0) {
+		return;
+	}
+	
+	// move top line up so visible lines matches overall
+	if(m_autoFocus) {
+		if(visLines < m_visibleLines) {
+			visLines = m_visibleLines-visLines-1; // -1 account for vert padding
+			// move top up
+			while(m_topTextPosition > 0 && visLines > 0) {
+				if(m_text[m_topTextPosition--] == '\n') {
+					visLines--;
+				}
+			}
+		}
+	}
+	else { // move top line down so cursor is visible
+		unsigned int cursorLines = 0;
+		
+		// count num lines from top to cursor
+		for(unsigned int i = m_topTextPosition;
+			i < m_position && (step = m_text.find('\n', i)) != wstring::npos;
+			i = step+1) {
+			cursorLines++;
+		}
+
+		// move top down
+		while(cursorLines > 0 && visLines >= m_visibleLines) {
+			if(m_text[m_topTextPosition++] == '\n') {
+				cursorLines--;
+				visLines--;
+			}
+		}
+	}
 }
 	
 //--------------------------------------------------------------
