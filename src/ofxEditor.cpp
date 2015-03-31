@@ -1120,7 +1120,7 @@ void ofxEditor::setAutoFocus(bool focus) {
 	updateVisibleSize();
 	
 	// count number of currently visible lines
-	unsigned int visLines = 0;
+	int visLines = 0;
 	size_t step = 0;
 	for(unsigned int i = m_topTextPosition;
 		i < m_bottomTextPosition && (step = m_text.find(L'\n', i)) != wstring::npos;
@@ -1141,10 +1141,11 @@ void ofxEditor::setAutoFocus(bool focus) {
 					visLines--;
 				}
 			}
+			m_topTextPosition = lineStart(m_topTextPosition);
 		}
 	}
 	else { // move top line down so cursor is visible
-		unsigned int cursorLines = 0;
+		int cursorLines = 0;
 		
 		// count num lines from top to cursor
 		for(unsigned int i = m_topTextPosition;

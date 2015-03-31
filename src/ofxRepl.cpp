@@ -356,7 +356,7 @@ void ofxRepl::historyShow(wstring what) {
 void ofxRepl::keepCursorVisible() {
 
 	// count num lines from visible top to current pos
-	unsigned int curVisLine = 0;
+	int curVisLine = 0;
 	size_t step = 0;
 	for(unsigned int i = m_topTextPosition;
 	    i < m_position && (step = m_text.find('\n', i)) != wstring::npos;
