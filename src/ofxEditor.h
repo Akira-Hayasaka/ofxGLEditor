@@ -190,6 +190,9 @@ class ofxEditor {
 	
 		/// animate the cursor so it's easy to find
 		void blowupCursor();
+
+		/// flash text selection from start position to end position
+		void flashSelection(unsigned int start, unsigned int end);
 	
 		/// returns true if text is currently selected
 		bool isSelection();
@@ -316,6 +319,11 @@ class ofxEditor {
 		float m_flash;        //< cursor flash animation time
 		bool m_blowupCursor;  //< blow up the cursor?
 		float m_blowup;       //< how much the cursor is being blown up
+
+		bool m_flashSelection;      //< is selection flash on?
+		float m_flashSelTime;       //< flash animation time
+		unsigned int m_flashStart;  //< flash start pos
+		unsigned int m_flashEnd;    //< flash end pos
 	
 		// auto focus
 		bool m_autoFocus;       //< enable auto focus scaling?
@@ -375,6 +383,9 @@ class ofxEditor {
 	
 		/// draw a selection char block rectangle at pos
 		void drawSelectionCharBlock(int c, int x, int y);
+
+		/// flash over char block rectangle at pos
+		void drawFlashCharBlock(int c, int x, int y);
 	
 		/// draw the cursor at pos
 		void drawCursor(int x, int y);
