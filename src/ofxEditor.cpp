@@ -811,14 +811,17 @@ void ofxEditor::keyPressed(int key) {
 				break;
 				
 			case OF_KEY_DEL:
-				if(m_selection) {
-					m_selection = NONE;
-					m_highlightStart = 0;
-					m_highlightEnd = 0;
-					clearText();
-				}
-				else {
-					m_text.erase(m_position, 1);
+				if(!m_text.empty()) {
+					if(m_selection != NONE) {
+						m_text.erase(m_highlightStart, m_highlightEnd-m_highlightStart);
+						if(m_position >= m_highlightEnd) {
+							m_position -= m_highlightEnd-m_highlightStart;
+						}						
+						m_selection = NONE;
+					}
+					else if(m_position < m_text.size()) {
+						m_text.erase(m_position, 1);
+					}
 					textBufferUpdated();
 				}
 				break;
@@ -832,12 +835,12 @@ void ofxEditor::keyPressed(int key) {
 						}						
 						m_selection = NONE;
 					}
-					else if(m_position != 0) {
+					else if(m_position > 0) {
 						m_text.erase(m_position-1, 1);
 						m_position--;
 					}
+					textBufferUpdated();
 				}
-				textBufferUpdated();
 				break;
 				
 			case OF_KEY_TAB:
