@@ -21,26 +21,26 @@
 #include "Unicode.h"
 #include "ofLog.h"
 
+// COLOR SCHEME
+
 //--------------------------------------------------------------
 ofxEditorColorScheme::ofxEditorColorScheme() {
 	clear();
 }
 
 //--------------------------------------------------------------
-ofxEditorColorScheme::~ofxEditorColorScheme() {
-	clearAllWordColors();
+void ofxEditorColorScheme::clear() {
+	clear(ofColor(255));
 }
 
 //--------------------------------------------------------------
-void ofxEditorColorScheme::clear() {
-	textColor.set(255);
-	stringColor.set(255);
-	numberColor.set(255);
-	commentColor.set(255);
-	clearAllWordColors();
-	
-	mathChars = L"+-*/!|&~";
-	punctuationChars = L";:,?";
+void ofxEditorColorScheme::clear(ofColor color) {
+	textColor = color;
+	stringColor = color;
+	numberColor = color;
+	commentColor = color;
+	keywordColor = color;
+	typenameColor = color;
 }
 
 //--------------------------------------------------------------
@@ -84,150 +84,41 @@ ofColor& ofxEditorColorScheme::getCommentColor() {
 }
 
 //--------------------------------------------------------------
-void ofxEditorColorScheme::setSingleLineComment(const wstring &begin) {
-	singleLineComment = begin;
+void ofxEditorColorScheme::setPreprocessorColor(ofColor color) {
+	preprocessorColor = color;
 }
 
 //--------------------------------------------------------------
-void ofxEditorColorScheme::setSingleLineComment(const string &begin) {
-	singleLineComment = string_to_wstring(begin);
+ofColor& ofxEditorColorScheme::getPreprocessorColor() {
+	return preprocessorColor;
 }
 
 //--------------------------------------------------------------
-wstring& ofxEditorColorScheme::getWideSingleLineComment() {
-	return singleLineComment;
+void ofxEditorColorScheme::setKeywordColor(ofColor color) {
+	keywordColor = color;
 }
 
 //--------------------------------------------------------------
-string ofxEditorColorScheme::getSingleLineComment() {
-	return wstring_to_string(singleLineComment);
+ofColor& ofxEditorColorScheme::getKeywordColor() {
+	return keywordColor;
 }
 
 //--------------------------------------------------------------
-void ofxEditorColorScheme::setMultiLineComment(const wstring &begin, const wstring &end) {
-	multiLineCommentBegin = begin;
-	multiLineCommentEnd = end;
+void ofxEditorColorScheme::setTypenameColor(ofColor color) {
+	typenameColor = color;
 }
 
 //--------------------------------------------------------------
-void ofxEditorColorScheme::setMultiLineComment(const string &begin, const string &end) {
-	multiLineCommentBegin = string_to_wstring(begin);
-	multiLineCommentEnd = string_to_wstring(end);
+ofColor& ofxEditorColorScheme::getTypenameColor() {
+	return typenameColor;
 }
 
 //--------------------------------------------------------------
-wstring& ofxEditorColorScheme::getWideMultiLineCommentBegin() {
-	return multiLineCommentBegin;
+void ofxEditorColorScheme::setFunctionColor(ofColor color) {
+	functionColor = color;
 }
 
 //--------------------------------------------------------------
-string ofxEditorColorScheme::getMultiLineCommentBegin() {
-	return wstring_to_string(multiLineCommentBegin);
-}
-
-//--------------------------------------------------------------
-wstring& ofxEditorColorScheme::getWideMultiLineCommentEnd() {
-	return multiLineCommentEnd;
-}
-
-//--------------------------------------------------------------
-string ofxEditorColorScheme::getMultiLineCommentEnd() {
-	return wstring_to_string(multiLineCommentEnd);
-}
-
-//--------------------------------------------------------------
-void ofxEditorColorScheme::setWordColor(const wstring &word, ofColor color) {
-	map<wstring,ofColor>::iterator iter = wordColors.find(word);
-	if(iter != wordColors.end()) { // already exists
-		ofColor &c = (*iter).second;
-		c.set(color);
-	}
-	else { // doesn't exist
-		wordColors.insert(pair<wstring,ofColor>(word, color));
-	}
-}
-
-//--------------------------------------------------------------
-void ofxEditorColorScheme::setWordColor(const string &word, ofColor color) {
-	setWordColor(string_to_wstring(word), color);
-}
-
-//--------------------------------------------------------------
-ofColor& ofxEditorColorScheme::getWordColor(const wstring &word) {
-	map<wstring,ofColor>::iterator iter = wordColors.find(word);
-	if(iter != wordColors.end()) {
-		return (*iter).second;
-	}
-	return textColor;
-}
-
-//--------------------------------------------------------------
-ofColor& ofxEditorColorScheme::getWordColor(const string &word) {
-	return getWordColor(string_to_wstring(word));
-}
-
-//--------------------------------------------------------------
-void ofxEditorColorScheme::clearWordColor(const wstring &word) {
-	map<wstring,ofColor>::iterator iter = wordColors.find(word);
-	if(iter != wordColors.end()) {
-		wordColors.erase(iter);
-	}
-}
-
-//--------------------------------------------------------------
-void ofxEditorColorScheme::clearWordColor(const string &word) {
-	clearWordColor(string_to_wstring(word));
-}
-
-//--------------------------------------------------------------
-void ofxEditorColorScheme::clearAllWordColors() {
-	wordColors.clear();
-}
-
-//--------------------------------------------------------------
-void ofxEditorColorScheme::setMathChars(wstring chars) {
-	if(chars.length() == 0) {
-		ofLogWarning("ofxEditorSettings") << "empty math string";
-		return;
-	}
-	mathChars = chars;
-}
-
-//--------------------------------------------------------------
-void ofxEditorColorScheme::setMathChars(string chars) {
-	setMathChars(string_to_wstring(chars));
-}
-
-//--------------------------------------------------------------
-wstring& ofxEditorColorScheme::getWideMathChars() {
-	return mathChars;
-}
-
-//--------------------------------------------------------------
-string ofxEditorColorScheme::getMathChars() {
-	return wstring_to_string(mathChars);
-}
-
-//--------------------------------------------------------------
-void ofxEditorColorScheme::setPunctuationChars(wstring chars) {
-	if(chars.length() == 0) {
-		ofLogWarning("ofxEditorSettings") << "empty punctuation string";
-		return;
-	}
-	punctuationChars = chars;
-}
-
-//--------------------------------------------------------------
-void ofxEditorColorScheme::setPunctuationChars(string chars) {
-	setPunctuationChars(string_to_wstring(chars));
-}
-
-//--------------------------------------------------------------
-wstring& ofxEditorColorScheme::getWidePunctuationChars() {
-	return punctuationChars;
-}
-
-//--------------------------------------------------------------
-string ofxEditorColorScheme::getPunctuationChars() {
-	return wstring_to_string(punctuationChars);
+ofColor& ofxEditorColorScheme::getFunctionColor() {
+	return functionColor;
 }
