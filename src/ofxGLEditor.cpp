@@ -623,7 +623,7 @@ void ofxGLEditor::setLangSyntax(const string& lang, int editor) {
 	editor = getEditorIndex(editor);
 	if(editor == -1) {
 		ofLogError("ofxGLEditor") << "cannot set syntax from unknown editor " << editor;
-		return 0;
+		return;
 	}
 	return m_editors[editor]->setLangSyntax(lang);
 }
@@ -633,7 +633,7 @@ void ofxGLEditor::clearSyntax(int editor) {
 	editor = getEditorIndex(editor);
 	if(editor == -1) {
 		ofLogError("ofxGLEditor") << "cannot clear syntax from unknown editor " << editor;
-		return 0;
+		return;
 	}
 	return m_editors[editor]->clearSyntax();
 }
@@ -643,7 +643,7 @@ ofxEditorSyntax* ofxGLEditor::getSyntax(int editor) {
 	editor = getEditorIndex(editor);
 	if(editor == -1) {
 		ofLogError("ofxGLEditor") << "cannot get syntax from unknown editor " << editor;
-		return 0;
+		return;
 	}
 	return m_editors[editor]->getSyntax();
 }
