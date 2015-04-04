@@ -27,13 +27,6 @@ example-output/obj
 *.vcxproj.user
 
 # ignore example files for now
-editorExample/Makefile
-editorExample/Project.xcconfig
-editorExample/addons.make
-editorExample/config.make
-editorExample/editorExample.xcodeproj
-editorExample/openFrameworks-Info.plist
-
 editorSyntaxExample/Makefile
 editorSyntaxExample/Project.xcconfig
 editorSyntaxExample/addons.make
@@ -44,9 +37,26 @@ editorSyntaxExample/config.make
 editorSyntaxExample/editorSyntaxExample.xcodeproj
 editorSyntaxExample/openFrameworks-Info.plist
 
+glEditorExample/Makefile
+glEditorExample/Project.xcconfig
+glEditorExample/addons.make
+glEditorExample/config.make
+glEditorExample/editorExample.xcodeproj
+glEditorExample/openFrameworks-Info.plist
+glEditorExample/glEditorExampe.xcodeproj
+
+glslExample/Makefile
+glslExample/Project.xcconfig
+glslExample/addons.make
+glslExample/config.make
+glslExample/livecodingExample.xcodeproj
+glslExample/openFrameworks-Info.plist
+glslExample/glslExample.xcodeproj
+
 livecodingExample/Makefile
 livecodingExample/Project.xcconfig
 livecodingExample/addons.make
 livecodingExample/config.make
 livecodingExample/livecodingExample.xcodeproj
 livecodingExample/openFrameworks-Info.plist
+livecodingExample/livecodingExample.xcodeproj
