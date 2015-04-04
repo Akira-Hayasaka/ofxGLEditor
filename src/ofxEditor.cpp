@@ -1294,7 +1294,22 @@ void ofxEditor::blowupCursor() {
 }
 
 //--------------------------------------------------------------
-void ofxEditor::flashSelection(unsigned int start, unsigned int end) {
+void ofxEditor::flashSelection() {
+	if(!m_selection) return;
+	m_flashSelection = true;
+	m_flashSelTime = 0;
+	m_flashStart = m_highlightStart;
+	m_flashEnd = m_highlightEnd;
+}
+
+//--------------------------------------------------------------
+void ofxEditor::flashText(unsigned int start, unsigned int end) {
+	if(end == start) return;
+	if(end < start) {
+		unsigned int e = end;
+		end = start;
+		start = e;
+	}
 	m_flashSelection = true;
 	m_flashSelTime = 0;
 	m_flashStart = start;

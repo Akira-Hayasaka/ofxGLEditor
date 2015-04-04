@@ -28,6 +28,7 @@ ofxGLEditor::ofxGLEditor() {
 	bModifierPressed = false;
 	bHideEditor = false;
 	bShowFileDialog = false;
+	bFlashEvalSelection = false;
 }
 
 //--------------------------------------------------------------
@@ -122,6 +123,9 @@ void ofxGLEditor::keyPressed(int key) {
 			
 			case 'e': case 5:
 				if(m_currentEditor != 0) {
+					if(bFlashEvalSelection && m_editors[m_currentEditor]->isSelection()) {
+						m_editors[m_currentEditor]->flashSelection();
+					}
 					string script = getText();
 					if(m_listener) {
 						m_listener->executeScriptEvent(m_currentEditor);
@@ -579,6 +583,16 @@ void ofxGLEditor::setAutoFocus(bool focus) {
 //--------------------------------------------------------------
 bool ofxGLEditor::getAutoFocus() {
 	return m_editors[1]->getAutoFocus();
+}
+
+//--------------------------------------------------------------
+void ofxGLEditor::setFlashEvalSelection(bool flash) {
+	bFlashEvalSelection = flash;
+}
+	
+//--------------------------------------------------------------
+bool ofxGLEditor::getFlashEvalSelection() {
+	return bFlashEvalSelection;
 }
 
 // COLOR SCHEME

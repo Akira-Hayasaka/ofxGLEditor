@@ -230,6 +230,12 @@ class ofxGLEditor {
 		/// get auto focus value
 		bool getAutoFocus();
 	
+		/// enable/disable flashing selection on eval
+		void setFlashEvalSelection(bool flash=true);
+	
+		/// get flashing selection on eval value
+		bool getFlashEvalSelection();
+	
 	/// \section Color Scheme
 	
 		/// set color scheme and highlight syntax
@@ -317,4 +323,6 @@ class ofxGLEditor {
 		
 		bool bHideEditor;     //< hide the editor?
 		bool bShowFileDialog; //< show the file dialog right now?
+	
+		bool bFlashEvalSelection; //< flash selection on eval?
 };

@@ -216,8 +216,11 @@ class ofxEditor {
 		/// animate the cursor so it's easy to find
 		void blowupCursor();
 
-		/// flash text selection from start position to end position
-		void flashSelection(unsigned int start, unsigned int end);
+		/// flash current text selection
+		void flashSelection();
+
+		/// flash text from start position to end position
+		void flashText(unsigned int start, unsigned int end);
 	
 		/// returns true if text is currently selected
 		bool isSelection();
