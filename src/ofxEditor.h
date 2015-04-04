@@ -150,6 +150,8 @@ class ofxEditor {
 		///
 		///   editor.getSettings().getAlpha(0.5);
 		///   editor.getSettings().getTabWidth(8);
+		///   editor.getSettings().setLangSyntax("Lua", &luaSyntax);
+		///   editor.getSettings().setFileExtLang("Lua", "lua");
 		///   ... etc
 		///
 		ofxEditorSettings& getSettings();
@@ -165,6 +167,29 @@ class ofxEditor {
 	
 		/// get the current color scheme, returns NULL if not set
 		ofxEditorColorScheme* getColorScheme();
+	
+	/// \section Language Syntax
+	
+		/// set language syntax for this editor
+		/// note: pointer is never deleted
+		void setSyntax(ofxEditorSyntax *syntax);
+	
+		/// set language syntax for this editor based on language string
+		/// aka "C++", "Lua", "GLSL", etc from the available syntaxes in the
+		/// current settings
+		void setLangSyntax(const string& lang);
+	
+		/// set language syntax for this editor based on file extension string
+		/// from the available syntaxes in the current settings
+		///
+		/// note: file extensions do not include the period, ex: "lua" not ".lua"
+		void setFileExtSyntax(const string& ext);
+	
+		/// clear the current language syntax
+		void clearSyntax();
+	
+		/// get the current language syntax, returns NULL if not set
+		ofxEditorSyntax* getSyntax();
 	
 	/// \section Display Settings
 	
@@ -308,6 +333,7 @@ class ofxEditor {
 		string m_UTF8Char; //< used to build multibyte UTF8 input char
 		
 		ofxEditorColorScheme *m_colorScheme; //< optional syntax color scheme
+		ofxEditorSyntax *m_syntax; //< optional lang syntax
 		bool m_lineWrapping; //< enable line wrapping in this editor?
 		bool m_lineNumbers;  //< enable line numbers?
 		unsigned int m_lineNumWidth; //< line number block width in chars 
@@ -327,18 +353,20 @@ class ofxEditor {
 		/// syntax parser TextBlock types
 		enum TextBlockType {
 			UNKNOWN,
-			WORD,             //< basic text
-			STRING_BEGIN,     //< tag only, no text
-			STRING_END,       //< tag only, no text
-			NUMBER,           //< number including .
-			SPACE,            //< whitespace
-			TAB,              //< whitespace
-			ENDLINE,          //< whitespace
-			MATCHING_CHAR,    //< open/close chars in settings aka []{}()<>
-			MATH_CHAR,        //< common mathematical chars aka =+-*/!|&~
-			PUNCTUATION_CHAR, //< standard punctuation chars aka ;:,?
-			COMMENT_BEGIN,    //< tag only, no text
-			COMMENT_END       //< tag only, no text
+			WORD,               //< basic text
+			STRING_BEGIN,       //< tag only, no text
+			STRING_END,         //< tag only, no text
+			NUMBER,             //< number including .
+			SPACE,              //< whitespace
+			TAB,                //< whitespace
+			ENDLINE,            //< whitespace
+			MATCHING_CHAR,      //< open/close chars in settings aka []{}()<>
+			MATH_CHAR,          //< common mathematical chars aka =+-*/!|&~
+			PUNCTUATION_CHAR,   //< standard punctuation chars aka ;:,?
+			COMMENT_BEGIN,      //< tag only, no text
+			COMMENT_END,        //< tag only, no text
+			PREPROCESSOR_BEGIN, //< tag only, no text
+			PREPROCESSOR_END,   //< tag only, no text
 		};
 		
 		/// syntax parser custom class to represent a contextual block of text
@@ -348,9 +376,9 @@ class ofxEditor {
 				TextBlockType type; //< block type
 				wstring text; //< block text string
 				
-				TextBlock() {
-					clear();
-				}
+				TextBlock() {clear();}
+				TextBlock(TextBlockType type) : type(type) {}
+				TextBlock(TextBlockType type, wstring text) : type(type), text(text) {}
 				
 				TextBlock(const TextBlock &from) {
 					type = from.type;

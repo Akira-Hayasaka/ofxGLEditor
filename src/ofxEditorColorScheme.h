@@ -29,12 +29,16 @@ class ofxEditorColorScheme {
 	public:
 	
 		ofxEditorColorScheme();
-		virtual ~ofxEditorColorScheme();
 		
 		/// clear all colors to white
 		void clear();
-		
-		/// default text color
+	
+		/// clear all colors to a given color
+		void clear(ofColor color);
+	
+	/// \section General
+	
+		/// default plain text color
 		void setTextColor(ofColor color);
 		ofColor& getTextColor();
 		
@@ -46,61 +50,36 @@ class ofxEditorColorScheme {
 		void setNumberColor(ofColor color);
 		ofColor& getNumberColor();
 	
+	/// \section Language Syntax Specific
+	
 		/// single & multi line comment coloring
 		void setCommentColor(ofColor color);
 		ofColor& getCommentColor();
 	
-		/// set the beginning string to match for a single line comment,
-		/// blank by default
-		void setSingleLineComment(const wstring &begin);
-		void setSingleLineComment(const string &begin);
-		wstring& getWideSingleLineComment();
-		string getSingleLineComment();
+		/// preprocessor coloring (aka # to endline)
+		void setPreprocessorColor(ofColor color);
+		ofColor& getPreprocessorColor();
 	
-		/// set the beginning and ending strings to match for a multi line comment,
-		/// blank by default
-		void setMultiLineComment(const wstring &begin, const wstring &end);
-		void setMultiLineComment(const string &begin, const string &end);
-		wstring& getWideMultiLineCommentBegin();
-		string getMultiLineCommentBegin();
-		wstring& getWideMultiLineCommentEnd();
-		string getMultiLineCommentEnd();
-		
-		/// colors for specfic keywords
-		void setWordColor(const wstring &word, ofColor color);
-		void setWordColor(const string &word, ofColor color);
-		ofColor& getWordColor(const wstring &word);
-		ofColor& getWordColor(const string &word);
-		void clearWordColor(const wstring &word);
-		void clearWordColor(const string &word);
-		void clearAllWordColors();
+		/// keyword coloring (aka class, void, public, etc)
+		void setKeywordColor(ofColor color);
+		ofColor& getKeywordColor();
 	
-		/// common mathematical chars between highlighted text blocks when parsing
-		/// default: "+-*/!|&~", string should not be empty
-		void setMathChars(wstring chars);
-		void setMathChars(string chars);
-		wstring& getWideMathChars();
-		string getMathChars();
+		/// typename coloring (aka int, float, etc)
+		void setTypenameColor(ofColor color);
+		ofColor& getTypenameColor();
 	
-		/// common punctuation chars between hilighted text blocks when parsing
-		/// default: ";:,?", string should not be empty
-		void setPunctuationChars(wstring chars);
-		void setPunctuationChars(string chars);
-		wstring& getWidePunctuationChars();
-		string getPunctuationChars();
-		
+		/// function name coloring (aka sin(), abs(), etc)
+		void setFunctionColor(ofColor color);
+		ofColor& getFunctionColor();
+	
 	protected:
 	
 		ofColor textColor;
 		ofColor stringColor;
 		ofColor numberColor;
 		ofColor commentColor;
-		map<wstring,ofColor> wordColors;
-	
-		wstring singleLineComment;
-		wstring multiLineCommentBegin;
-		wstring multiLineCommentEnd;
-	
-		wstring mathChars;
-		wstring punctuationChars;
+		ofColor preprocessorColor;
+		ofColor keywordColor;
+		ofColor typenameColor;
+		ofColor functionColor;
 };

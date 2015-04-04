@@ -59,7 +59,7 @@ class ofxGLEditor {
 		///
 		/// set enableRepl = false if you don't need the Read-eval-print loop console
 		///
-		/// Note: make sure to laod the global editor font with ofxEditor::loadFont()
+		/// Note: make sure to load the global editor font with ofxEditor::loadFont()
 		/// WARNING: the editor will crash your app if a font is not loaded!
 		void setup(ofxGLEditorListener *listener, bool enableRepl=true);
 		
@@ -206,6 +206,8 @@ class ofxGLEditor {
 		///   editor.getSettings().getTextColor(ofColor::gray);
 		///   editor.getSettings().getAlpha(0.5);
 		///   editor.getSettings().getTabWidth(8);
+		///   editor.getSettings().setLangSyntax("Lua", &luaSyntax);
+		///   editor.getSettings().setFileExtLang("Lua", "lua");
 		///   ... etc
 		///
 		ofxEditorSettings& getSettings();
@@ -227,6 +229,52 @@ class ofxGLEditor {
 	
 		/// get auto focus value
 		bool getAutoFocus();
+	
+	/// \section Color Scheme
+	
+		/// set color scheme and highlight syntax
+		/// note: pointer is never deleted
+		void setColorScheme(ofxEditorColorScheme *colorScheme);
+	
+		/// clear the current color scheme
+		/// set editor to 0 for the current editor
+		void clearColorScheme();
+	
+		/// get the current color scheme, returns NULL if not set
+		ofxEditorColorScheme* getColorScheme();
+	
+	/// \section Language Syntax
+	
+		/// set language syntax manually for an editor based on language string
+		/// aka "C++", "Lua", "GLSL", etc from the available syntaxes in the
+		/// current settings
+		///
+		/// create syntax(es), add to settings, & set; example:
+		///
+		/// ofxEditorSyntax *luaSyntax = new ofxEditorSyntax();
+		/// luaSyntax->setSingleLineComment("--");
+		/// luaSyntax->setMultiLineComment("--[[", "]]");
+		/// editor.getSettings().setLangSyntax("Lua", luaSyntax);
+		/// editor.setLangSyntax("Lua");
+		/// // don't forget to delete the luaSyntax object when you're done
+		///
+		/// optionally set file extensions so syntax is chosen automatically based
+		/// on filename when opening or saving, example:
+		///
+		/// editor.getSettings().setFileExtLang("lua", "Lua"); // "lua not ".lua"
+		///
+		/// note: syntax does not apply to REPL or FileDialog
+		///
+		/// set editor to 0 for the current editor
+		void setLangSyntax(const string& lang, int editor=0);
+	
+		/// clear the current language syntax for an editor
+		/// set editor to 0 for the current editor
+		void clearSyntax(int editor=0);
+	
+		/// get the current language syntax for an editor, returns NULL if not set
+		/// set editor to 0 for the current editor
+		ofxEditorSyntax* getSyntax(int editor=0);
 		
 	/// \section Util
 		

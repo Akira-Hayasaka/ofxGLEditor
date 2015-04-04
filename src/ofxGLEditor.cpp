@@ -571,7 +571,7 @@ bool ofxGLEditor::getLineNumbers() {
 
 //--------------------------------------------------------------
 void ofxGLEditor::setAutoFocus(bool focus) {
-	for(int i = 0; i < s_numEditors; ++i) {
+	for(int i = 0; i < s_numEditors; ++i) { // include repl
 		m_editors[i]->setAutoFocus(focus);
 	}
 }
@@ -579,6 +579,59 @@ void ofxGLEditor::setAutoFocus(bool focus) {
 //--------------------------------------------------------------
 bool ofxGLEditor::getAutoFocus() {
 	return m_editors[1]->getAutoFocus();
+}
+
+// COLOR SCHEME
+
+//--------------------------------------------------------------
+void ofxGLEditor::setColorScheme(ofxEditorColorScheme *colorScheme) {
+	for(int i = 1; i < s_numEditors; ++i) { // no repl
+		m_editors[i]->setColorScheme(colorScheme);
+	}
+}
+
+//--------------------------------------------------------------
+void ofxGLEditor::clearColorScheme() {
+	for(int i = 1; i < s_numEditors; ++i) { // no repl
+		m_editors[i]->clearColorScheme();
+	}
+}
+
+//--------------------------------------------------------------
+ofxEditorColorScheme* ofxGLEditor::getColorScheme() {
+	return m_editors[1]->getColorScheme();
+}
+
+// LANG SYNTAX
+
+//--------------------------------------------------------------
+void ofxGLEditor::setLangSyntax(const string& lang, int editor) {
+	editor = getEditorIndex(editor);
+	if(editor == -1) {
+		ofLogError("ofxGLEditor") << "cannot set syntax from unknown editor " << editor;
+		return 0;
+	}
+	return m_editors[editor]->setLangSyntax(lang);
+}
+
+//--------------------------------------------------------------
+void ofxGLEditor::clearSyntax(int editor) {
+	editor = getEditorIndex(editor);
+	if(editor == -1) {
+		ofLogError("ofxGLEditor") << "cannot clear syntax from unknown editor " << editor;
+		return 0;
+	}
+	return m_editors[editor]->clearSyntax();
+}
+
+//--------------------------------------------------------------
+ofxEditorSyntax* ofxGLEditor::getSyntax(int editor) {
+	editor = getEditorIndex(editor);
+	if(editor == -1) {
+		ofLogError("ofxGLEditor") << "cannot get syntax from unknown editor " << editor;
+		return 0;
+	}
+	return m_editors[editor]->getSyntax();
 }
 
 // PRIVATE

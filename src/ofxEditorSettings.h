@@ -20,7 +20,8 @@
 #pragma once
 
 #include "ofColor.h"
-#include "ofConstants.h"
+#include "ofTypes.h"
+#include "ofxEditorSyntax.h"
 
 /// internal editor settings which can be shared between instances
 class ofxEditorSettings {
@@ -28,6 +29,11 @@ class ofxEditorSettings {
 	public:
 
 		ofxEditorSettings();
+		ofxEditorSettings(const ofxEditorSettings &from);
+		ofxEditorSettings& operator=(const ofxEditorSettings &from);
+		void copy(const ofxEditorSettings &from); //< copy data from another object
+	
+	/// \section Tabs
 	
 		/// set the displayed tab width, must be at least 1, default: 4
 		void setTabWidth(unsigned int numSpaces);
@@ -37,11 +43,15 @@ class ofxEditorSettings {
 		/// *cannot* be undone
 		void setConvertTabs(bool convert=true);
 		bool getConvertTabs();
-		
+	
+	/// \section Alpha
+	
 		/// set overall text alpha, clamped to 0.1 - 1.0, default: 1.0
 		void setAlpha(float alpha);
 		float getAlpha();
-		
+	
+	/// \section Color
+	
 		/// text color, default: white
 		/// overridden by color scheme if a scheme is set
 		void setTextColor(ofColor color);
@@ -67,6 +77,8 @@ class ofxEditorSettings {
 		void setLineNumberColor(ofColor color);
 		ofColor& getLineNumberColor();
 	
+	/// \section Matching Characters
+	
 		/// highlight matching open/close chars?, default: true
 		void setHighlightMatchingChars(bool highlight=true);
 		bool getHighlightMatchingChars();
@@ -80,6 +92,39 @@ class ofxEditorSettings {
 		string getOpenChars();
 		wstring& getWideCloseChars();
 		string getCloseChars();
+	
+	/// \section Language Syntax
+	
+		/// set syntax for a language string aka "C++", "Lua", "GLSL", etc
+		/// note: pointer is never deleted
+		void setLangSyntax(const string &lang, ofxEditorSyntax *syntax);
+	
+		/// get the syntax for a language string, returns NULL if not found
+		ofxEditorSyntax* getLangSyntax(const string &lang);
+	
+		/// clear the syntax for a language string
+		void clearLangSyntax(const string &lang);
+	
+		/// clears all language syntaxes
+		void clearAllSyntaxes();
+	
+		/// set language string aka "C++", "Lua", "GLSL", etc for a file extension
+		///
+		/// note: file extensions do not include the period, ex: "lua" not ".lua"
+		void setFileExtLang(const string &ext, const string &lang);
+	
+		/// get language string for a file extension, returns "" if not found
+		string getFileExtLang(const string &ext);
+	
+		/// clear language string for a file extension
+		void clearFileExtLang(const string &ext);
+	
+		/// clear all file extension language strings
+		void clearAllFileExts();
+	
+		/// get the syntax for a file extension based on it's language string,
+		/// returns NULL if not found
+		ofxEditorSyntax* getFileExtSyntax(const string &ext);
 	
 	protected:
 	
@@ -97,4 +142,7 @@ class ofxEditorSettings {
 		bool highlightMatchingChars; //< highlight matching open/close chars?
 		wstring openChars;  //< open chars (parens, brackets, etc) for matching highlight
 		wstring closeChars; //< close chars (parens, bracket, etc) for matching highlight
+	
+		map<string,ofxEditorSyntax*> langs; //< available syntaxes by lang string
+		map<string,string> fileExts; //< lang string for file extension
 };

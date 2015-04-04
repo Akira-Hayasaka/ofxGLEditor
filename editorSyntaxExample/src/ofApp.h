@@ -34,5 +34,6 @@ class ofApp : public ofBaseApp {
 		
 		ofxEditor editor;
 		ofxEditorColorScheme colorScheme;
-		bool debug; //< show grid and fps?
+		ofxEditorSyntax luaSyntax;
+		bool debug; //< show fps?
 };

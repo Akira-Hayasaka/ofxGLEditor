@@ -96,6 +96,7 @@ ofxEditor::ofxEditor() {
 	m_UTF8Char = "";
 	
 	m_colorScheme = NULL;
+	m_syntax = NULL;
 	m_lineWrapping = false;
 	m_lineNumbers = false;
 	m_lineNumWidth = 0;
@@ -139,6 +140,7 @@ ofxEditor::ofxEditor(ofxEditorSettings &sharedSettings) {
 	m_UTF8Char = "";
 	
 	m_colorScheme = NULL;
+	m_syntax = NULL;
 	m_lineWrapping = false;
 	m_lineNumbers = false;
 	m_lineNumWidth = 0;
@@ -314,6 +316,7 @@ void ofxEditor::draw() {
 			
 			bool string = false;
 			bool comment = false;
+			bool preprocessor = false;
 			for(list<TextBlock>::iterator iter = m_textBlocks.begin();
 			    iter != m_textBlocks.end() && m_displayedLineCount < m_visibleLines; iter++) {
 			
@@ -338,7 +341,31 @@ void ofxEditor::draw() {
 						continue; // skip
 						
 					case WORD:
-						if(!string && !comment) s_font->setColor(m_colorScheme->getWordColor(tb.text), m_settings->getAlpha());
+						if(string) break;
+						if(preprocessor) {
+							s_font->setColor(m_colorScheme->getPreprocessorColor(), m_settings->getAlpha());
+						}
+						else if(!comment) {
+							if(m_syntax) {
+								switch(m_syntax->getWordType(tb.text)) {
+									case ofxEditorSyntax::KEYWORD:
+										s_font->setColor(m_colorScheme->getKeywordColor(), m_settings->getAlpha());
+										break;
+									case ofxEditorSyntax::TYPENAME:
+										s_font->setColor(m_colorScheme->getTypenameColor(), m_settings->getAlpha());
+										break;
+									case ofxEditorSyntax::FUNCTION:
+										s_font->setColor(m_colorScheme->getFunctionColor(), m_settings->getAlpha());
+										break;
+									default:
+										s_font->setColor(m_colorScheme->getTextColor(), m_settings->getAlpha());
+										break;
+								}
+							}
+							else {
+								s_font->setColor(m_colorScheme->getTextColor(), m_settings->getAlpha());
+							}
+						}
 						break;
 						
 					case STRING_BEGIN:
@@ -348,15 +375,24 @@ void ofxEditor::draw() {
 						
 					case STRING_END:
 						string = false;
-						s_font->setColor(m_colorScheme->getTextColor(), m_settings->getAlpha());
+						if(preprocessor) {
+							s_font->setColor(m_colorScheme->getPreprocessorColor(), m_settings->getAlpha());
+						}
+						else {
+							s_font->setColor(m_colorScheme->getTextColor(), m_settings->getAlpha());
+						}
 						continue; // nothing to draw
 						
 					case NUMBER:
-						if(!string && !comment) s_font->setColor(m_colorScheme->getNumberColor(), m_settings->getAlpha());
+						if(!string && !comment) {
+							s_font->setColor(m_colorScheme->getNumberColor(), m_settings->getAlpha());
+						}
 						break;
 					
 					case MATCHING_CHAR: case MATH_CHAR: case PUNCTUATION_CHAR:
-						if(!comment) s_font->setColor(m_colorScheme->getTextColor(), m_settings->getAlpha());
+						if(!comment) {
+							s_font->setColor(m_colorScheme->getTextColor(), m_settings->getAlpha());
+						}
 						break;
 					
 					case COMMENT_BEGIN:
@@ -368,9 +404,24 @@ void ofxEditor::draw() {
 						comment = false;
 						s_font->setColor(m_colorScheme->getTextColor(), m_settings->getAlpha());
 						continue; // nothing to draw
+						
+					case PREPROCESSOR_BEGIN:
+						preprocessor = true;
+						s_font->setColor(m_colorScheme->getPreprocessorColor(), m_settings->getAlpha());
+						continue; // nothing to draw
+						
+					case PREPROCESSOR_END:
+						preprocessor = false;
+						s_font->setColor(m_colorScheme->getTextColor(), m_settings->getAlpha());
+						continue; // nothing to draw
 					
-					case SPACE: case TAB: case ENDLINE: // whitespace
-						if(!string && !comment) s_font->setColor(m_colorScheme->getTextColor(), m_settings->getAlpha()); // for fonts with whitespace glyphs
+					case SPACE: case TAB: case ENDLINE: // for fonts with whitespace glyphs
+						if(preprocessor) {
+							s_font->setColor(m_colorScheme->getPreprocessorColor(), m_settings->getAlpha());
+						}
+						else if(!string && !comment) {
+							s_font->setColor(m_colorScheme->getTextColor(), m_settings->getAlpha());
+						}
 						break;
 				}
 				
@@ -950,6 +1001,7 @@ bool ofxEditor::openFile(string filename) {
 			<< ofFilePath::getFileName(filename) << "\"";
 		return false;
 	}
+	setFileExtSyntax(ofFilePath::getFileExt(filename));
 	setText(file.readToBuffer().getText());
 	file.close();
 	return true;
@@ -959,12 +1011,17 @@ bool ofxEditor::openFile(string filename) {
 bool ofxEditor::saveFile(string filename) {
 	ofFile file;
 	if(!file.open(ofToDataPath(filename), ofFile::WriteOnly)) {
-		ofLogError() << "ofxGLEditor: couldn't open \""
-			<< ofFilePath::getFileName(filename) << "\" for saving";
+		ofLogError() << "ofxGLEditor: couldn't save \""
+			<< ofFilePath::getFileName(filename) << "\"";
 		return false;
 	}
 	file << getText();
 	file.close();
+	ofxEditorSyntax *syntax = m_settings->getFileExtSyntax(ofFilePath::getFileExt(filename));
+	if(m_syntax != syntax) {
+		m_syntax = syntax;
+		if(m_colorScheme) parseTextBlocks();
+	}
 	return true;
 }
 
@@ -986,7 +1043,6 @@ string ofxEditor::getText() {
 
 //--------------------------------------------------------------
 void ofxEditor::setText(const wstring& text) {
-	
 	if(m_text != L"") {
 		m_position = lineStart(m_position);
 		int line = getCurrentLine();
@@ -996,7 +1052,6 @@ void ofxEditor::setText(const wstring& text) {
 	else {
 		m_text = text;
 	}
-		
 	if(m_settings->getConvertTabs()) {
 		processTabs();
 	}
@@ -1081,6 +1136,33 @@ void ofxEditor::clearColorScheme() {
 //--------------------------------------------------------------
 ofxEditorColorScheme* ofxEditor::getColorScheme() {
 	return m_colorScheme;
+}
+
+// LANG SYNTAX
+
+//--------------------------------------------------------------
+void ofxEditor::setSyntax(ofxEditorSyntax *syntax) {
+	m_syntax = syntax;
+}
+
+//--------------------------------------------------------------
+void ofxEditor::setLangSyntax(const string& lang) {
+	m_syntax = m_settings->getLangSyntax(lang);
+}
+
+//--------------------------------------------------------------
+void ofxEditor::setFileExtSyntax(const string& ext) {
+	m_syntax = m_settings->getFileExtSyntax(ext);
+}
+
+//--------------------------------------------------------------
+void ofxEditor::clearSyntax() {
+	m_syntax = NULL;
+}
+
+//--------------------------------------------------------------
+ofxEditorSyntax* ofxEditor::getSyntax() {
+	return m_syntax;
 }
 
 // DISPLAY SETTINGS
@@ -1309,19 +1391,21 @@ void ofxEditor::printSyntax() {
 		TextBlock &tb = (*iter);
 		string type;
 		switch(tb.type) {
-			case UNKNOWN:          type += "UNKNOWN"; break;
-			case WORD:             type += "WORD"; break;
-			case STRING_BEGIN:     ofLogNotice() << "STRING_BEGIN"; continue;
-			case STRING_END:       ofLogNotice() << "STRING_END"; continue;
-			case NUMBER:           type += "NUMBER"; break;
-			case SPACE:            type += "SPACE"; break;
-			case TAB:              type += "TAB"; break;
-			case ENDLINE:          ofLogNotice() << "ENDLINE"; continue;
-			case MATCHING_CHAR:    type += "MATCHING_CHAR"; break;
-			case MATH_CHAR:        type += "MATH_CHAR"; break;
-			case PUNCTUATION_CHAR: type += "PUNCTUATION_CHAR"; break;
-			case COMMENT_BEGIN:    ofLogNotice() << "COMMENT_BEGIN"; continue;
-			case COMMENT_END:      ofLogNotice() << "COMMENT_END"; continue;
+			case UNKNOWN:            type += "UNKNOWN"; break;
+			case WORD:               type += "WORD"; break;
+			case STRING_BEGIN:       ofLogNotice() << "STRING_BEGIN"; continue;
+			case STRING_END:         ofLogNotice() << "STRING_END"; continue;
+			case NUMBER:             type += "NUMBER"; break;
+			case SPACE:              type += "SPACE"; break;
+			case TAB:                type += "TAB"; break;
+			case ENDLINE:            ofLogNotice() << "ENDLINE"; continue;
+			case MATCHING_CHAR:      type += "MATCHING_CHAR"; break;
+			case MATH_CHAR:          type += "MATH_CHAR"; break;
+			case PUNCTUATION_CHAR:   type += "PUNCTUATION_CHAR"; break;
+			case COMMENT_BEGIN:      ofLogNotice() << "COMMENT_BEGIN"; continue;
+			case COMMENT_END:        ofLogNotice() << "COMMENT_END"; continue;
+			case PREPROCESSOR_BEGIN: ofLogNotice() << "PREPROCESSOR_BEGIN"; continue;
+			case PREPROCESSOR_END:   ofLogNotice() << "PREPROCESSOR_END"; continue;
 		}
 		ofLogNotice() << type << ": \"" << wstring_to_string(tb.text) << "\"";
 	}
@@ -1666,11 +1750,9 @@ void ofxEditor::parseTextBlocks() {
 	m_numLines = 0;
 	
 	int string = false;
+	bool preprocessor = false;
 	bool singleComment = false;
 	bool multiComment = false;
-	wstring &singleLineComment = m_colorScheme->getWideSingleLineComment();
-	wstring &multiLineCommentBegin = m_colorScheme->getWideMultiLineCommentBegin();
-	wstring &multiLineCommentEnd = m_colorScheme->getWideMultiLineCommentEnd();
 	
 	TextBlock tb;
 	for(int i = 0; i < m_text.length(); ++i) {
@@ -1694,10 +1776,12 @@ void ofxEditor::parseTextBlocks() {
 					m_textBlocks.push_back(tb);
 					tb.clear();
 				}
+				if(preprocessor) {
+					m_textBlocks.push_back(TextBlock(PREPROCESSOR_END));
+					preprocessor = false;
+				}
 				if(singleComment) {
-					TextBlock commentBlock;
-					commentBlock.type = COMMENT_END;
-					m_textBlocks.push_back(commentBlock);
+					m_textBlocks.push_back(TextBlock(COMMENT_END));
 					singleComment = false;
 				}
 				tb.type = ENDLINE;
@@ -1736,34 +1820,22 @@ void ofxEditor::parseTextBlocks() {
 					tb.text += m_text[i];
 					m_textBlocks.push_back(tb);
 					tb.clear();
-					
-					// push string end
-					TextBlock stringBlock;
-					stringBlock.type = STRING_END;
-					m_textBlocks.push_back(stringBlock);
-					
+					m_textBlocks.push_back(TextBlock(STRING_END));
 					string = false;
 				}
 				else if(string) { // wrong char, keep going
 					tb.text += m_text[i];
 				}
 				else { // opening string char
-					
 					if(tb.type != UNKNOWN) {
 						m_textBlocks.push_back(tb);
 						tb.clear();
 					}
-					
 					if(tb.type == UNKNOWN) {
 						tb.type = WORD;
 					}
 					tb.text += m_text[i];
-					
-					// push string begin
-					TextBlock stringBlock;
-					stringBlock.type = STRING_BEGIN;
-					m_textBlocks.push_back(stringBlock);
-					
+					m_textBlocks.push_back(TextBlock(STRING_BEGIN));
 					string = m_text[i];
 				}
 				break;
@@ -1814,39 +1886,68 @@ void ofxEditor::parseTextBlocks() {
 							break;
 						}
 						
+						// no syntax, don't bother parsing comments, etc
+						if(!m_syntax) {
+						
+							// check for open/close characters
+							if(m_settings->getWideOpenChars().find(m_text[i], 0) != wstring::npos ||
+							   m_settings->getWideCloseChars().find(m_text[i], 0) != wstring::npos) {
+								if(tb.type != UNKNOWN && tb.text.length() > 1) {
+									tb.text = tb.text.substr(0, tb.text.length()-1);
+									m_textBlocks.push_back(tb);
+									tb.clear();
+								}
+								tb.type = MATCHING_CHAR;
+								tb.text = m_text[i];
+								m_textBlocks.push_back(tb);
+								tb.clear();
+							}
+							break;
+						}
+						
 						// detect comments
 						if(!multiComment) {
 							
 							// check ahead for multi line comment begin
-							if(i <= m_text.size()-multiLineCommentBegin.length() &&
-							   m_text.substr(i, multiLineCommentBegin.length()) == multiLineCommentBegin) {
-								
-								if(singleComment) {
-									// already pushed comment begin
+							if(i <= m_text.size()-m_syntax->getWideMultiLineCommentBegin().length() &&
+							   m_text.substr(i, m_syntax->getWideMultiLineCommentBegin().length()) == m_syntax->getWideMultiLineCommentBegin()) {
+								if(singleComment) { // already pushed comment begin
 									singleComment = false;
 								}
 								else {
-									// push comment begin
-									TextBlock commentBlock;
-									commentBlock.type = COMMENT_BEGIN;
-									m_textBlocks.push_back(commentBlock);
+									if(preprocessor) {
+										m_textBlocks.push_back(TextBlock(PREPROCESSOR_END));
+										preprocessor = false;
+									}
+									m_textBlocks.push_back(TextBlock(COMMENT_BEGIN));
 								}
-								
 								multiComment = true;
 								continue;
 							}
-							else if(!singleComment) {
+							else if(!singleComment && !m_syntax->getWideSingleLineComment().empty()) {
 							
 								// check ahead for single line comment
-								if(i <= m_text.size()-singleLineComment.length() &&
-								   m_text.substr(i, singleLineComment.length()) == singleLineComment) {
-									
-									// push comment begin
-									TextBlock commentBlock;
-									commentBlock.type = COMMENT_BEGIN;
-									m_textBlocks.push_back(commentBlock);
-									
+								if(i <= m_text.size()-m_syntax->getWideSingleLineComment().length() &&
+								   m_text.substr(i, m_syntax->getWideSingleLineComment().length()) == m_syntax->getWideSingleLineComment()) {
+									if(preprocessor) {
+										m_textBlocks.push_back(TextBlock(PREPROCESSOR_END));
+										preprocessor = false;
+									}
+									m_textBlocks.push_back(TextBlock(COMMENT_BEGIN));
 									singleComment = true;
+									continue;
+								}
+								
+								// don't check for special chars on a preprocessor line
+								if(preprocessor) {
+									break;
+								}
+								
+								// check ahead for preprocessor begin
+								if(i <= m_text.size()-m_syntax->getWidePreprocessor().length() &&
+								   m_text.substr(i, m_syntax->getWidePreprocessor().length()) == m_syntax->getWidePreprocessor()) {
+									m_textBlocks.push_back(TextBlock(PREPROCESSOR_BEGIN));
+									preprocessor = true;
 									continue;
 								}
 								
@@ -1866,7 +1967,7 @@ void ofxEditor::parseTextBlocks() {
 								}
 								
 								// check for single mathematical characters
-								if(m_colorScheme->getWideMathChars().find(m_text[i], 0) != wstring::npos) {
+								if(m_syntax->getWideMathChars().find(m_text[i], 0) != wstring::npos) {
 									if(tb.type != UNKNOWN && tb.text.length() > 1) {
 										tb.text = tb.text.substr(0, tb.text.length()-1);
 										m_textBlocks.push_back(tb);
@@ -1880,7 +1981,7 @@ void ofxEditor::parseTextBlocks() {
 								}
 								
 								// check for single punctuation characters
-								if(m_colorScheme->getWidePunctuationChars().find(m_text[i], 0) != wstring::npos) {
+								if(m_syntax->getWidePunctuationChars().find(m_text[i], 0) != wstring::npos) {
 									if(tb.type != UNKNOWN && tb.text.length() > 1) {
 										tb.text = tb.text.substr(0, tb.text.length()-1);
 										m_textBlocks.push_back(tb);
@@ -1895,18 +1996,12 @@ void ofxEditor::parseTextBlocks() {
 							}
 						}
 						else { // check for multi line comment end
-							if(tb.text.length() >= multiLineCommentEnd.length() &&
-								   tb.text.substr(tb.text.length()-multiLineCommentEnd.length(),
-								                  multiLineCommentEnd.length()) == multiLineCommentEnd) {
-								// push latest block
-								m_textBlocks.push_back(tb);
+							if(tb.text.length() >= m_syntax->getWideMultiLineCommentEnd().length() &&
+								   tb.text.substr(tb.text.length()-m_syntax->getWideMultiLineCommentEnd().length(),
+								                  m_syntax->getWideMultiLineCommentEnd().length()) == m_syntax->getWideMultiLineCommentEnd()) {
+								m_textBlocks.push_back(tb); // push latest block
 								tb.clear();
-								
-								// push comment end
-								TextBlock commentBlock;
-								commentBlock.type = COMMENT_END;
-								m_textBlocks.push_back(commentBlock);
-								
+								m_textBlocks.push_back(TextBlock(COMMENT_END)); // push comment end
 								multiComment = false;
 								continue;
 							}
@@ -1923,6 +2018,11 @@ void ofxEditor::parseTextBlocks() {
 	// catch any unfinished blocks at the end
 	if(tb.type != UNKNOWN) {
 		m_textBlocks.push_back(tb);
+	}
+	
+	// close preprocessor started on last line
+	if(preprocessor) {
+		m_textBlocks.push_back(TextBlock(PREPROCESSOR_END));
 	}
 	
 	// catch any unfinished comments, unfinished multiline comments are a

@@ -42,6 +42,48 @@ ofxEditorSettings::ofxEditorSettings() {
 }
 
 //--------------------------------------------------------------
+ofxEditorSettings::ofxEditorSettings(const ofxEditorSettings &from) {
+	copy(from);
+}
+
+//--------------------------------------------------------------
+ofxEditorSettings& ofxEditorSettings::operator=(const ofxEditorSettings &from) {
+	copy(from);
+	return *this;
+}
+
+//--------------------------------------------------------------
+void ofxEditorSettings::copy(const ofxEditorSettings &from) {
+	
+	tabWidth = from.tabWidth;
+	convertTabs = from.convertTabs;
+	
+	alpha = from.alpha;
+	textColor = from.textColor;
+	textShadowColor = from.textShadowColor;
+	cursorColor = from.cursorColor;
+	selectionColor = from.selectionColor;
+	matchingCharsColor = from.matchingCharsColor;
+	lineNumberColor = from.lineNumberColor;
+	
+	highlightMatchingChars = from.highlightMatchingChars;
+	openChars = from.openChars;
+	closeChars = from.closeChars;
+	
+	// make deep copies
+	clearAllSyntaxes();
+	clearAllFileExts();
+	for(map<string,ofxEditorSyntax*>::const_iterator iter = from.langs.begin();
+	    iter == from.langs.end(); ++iter) {
+		langs[(*iter).first] = (*iter).second;
+	}
+	for(map<string,string>::const_iterator iter = from.fileExts.begin();
+	    iter == from.fileExts.end(); ++iter) {
+		fileExts[(*iter).first] = (*iter).second;
+	}
+}
+
+//--------------------------------------------------------------
 void ofxEditorSettings::setTabWidth(unsigned int numSpaces) {
 	tabWidth = numSpaces < 1 ? 1 : numSpaces;
 }
@@ -174,4 +216,69 @@ wstring& ofxEditorSettings::getWideCloseChars() {
 //--------------------------------------------------------------
 string ofxEditorSettings::getCloseChars() {
 	return wstring_to_string(closeChars);
+}
+
+//--------------------------------------------------------------
+void ofxEditorSettings::setLangSyntax(const string &lang, ofxEditorSyntax *syntax) {
+	if(!syntax) return;
+	langs[lang] = syntax;
+}
+
+//--------------------------------------------------------------
+ofxEditorSyntax* ofxEditorSettings::getLangSyntax(const string &lang) {
+	map<string,ofxEditorSyntax*>::iterator iter = langs.find(lang);
+	if(iter != langs.end()) {
+		return (*iter).second;
+	}
+	return NULL;
+}
+
+//--------------------------------------------------------------
+void ofxEditorSettings::clearLangSyntax(const string &lang) {
+	map<string,ofxEditorSyntax*>::iterator iter = langs.find(lang);
+	if(iter != langs.end()) {
+		langs.erase(iter);
+	}
+}
+
+//--------------------------------------------------------------
+void ofxEditorSettings::clearAllSyntaxes() {
+	langs.clear();
+}
+
+//--------------------------------------------------------------
+void ofxEditorSettings::setFileExtLang(const string &ext, const string &lang) {
+	fileExts[ext] = lang;
+}
+
+//--------------------------------------------------------------
+string ofxEditorSettings::getFileExtLang(const string &ext) {
+	map<string,string>::iterator iter = fileExts.find(ext);
+	if(iter != fileExts.end()) {
+		return (*iter).second;
+	}
+	return "";
+}
+
+//--------------------------------------------------------------
+void ofxEditorSettings::clearFileExtLang(const string &lang) {
+	map<string,string>::iterator iter = fileExts.begin();
+	while(iter != fileExts.end()) {
+		if((*iter).second == lang) {
+			fileExts.erase(iter++);
+		}
+		else {
+			iter++;
+		}
+	}
+}
+
+//--------------------------------------------------------------
+void ofxEditorSettings::clearAllFileExts() {
+	fileExts.clear();
+}
+
+//--------------------------------------------------------------
+ofxEditorSyntax* ofxEditorSettings::getFileExtSyntax(const string &ext) {
+	return getLangSyntax(getFileExtLang(ext));
 }
