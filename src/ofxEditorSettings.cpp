@@ -38,7 +38,7 @@ ofxEditorSettings::ofxEditorSettings() {
 	lineNumberColor = ofColor(127);
 
 	highlightMatchingChars = true;
-	openChars = L"([<{";
+	openChars = L"([<{+*/-"; // Added in + * / - for syntax highlighting
 	closeChars = L")]>}";
 }
 

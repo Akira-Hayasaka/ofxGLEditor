@@ -31,7 +31,7 @@ editorExample/Makefile
 editorExample/Project.xcconfig
 editorExample/addons.make
 editorExample/config.make
-editorExample/editorExample.xcodeproj
+editorExample/ofxGLEditor_example.xcodeproj
 editorExample/openFrameworks-Info.plist
 
 editorSyntaxExample/Makefile
@@ -41,12 +41,19 @@ editorSyntaxExample/bin/data/hello4.txt
 editorSyntaxExample/bin/data/test.txt
 editorSyntaxExample/bin/data/test2.txt
 editorSyntaxExample/config.make
-editorSyntaxExample/editorSyntaxExample.xcodeproj
+editorSyntaxExample/ofxGLEditor_example.xcodeproj
 editorSyntaxExample/openFrameworks-Info.plist
 
-livecodingExample/Makefile
-livecodingExample/Project.xcconfig
-livecodingExample/addons.make
-livecodingExample/config.make
-livecodingExample/livecodingExample.xcodeproj
-livecodingExample/openFrameworks-Info.plist
+liveCodingExample/Makefile
+liveCodingExample/Project.xcconfig
+liveCodingExample/addons.make
+liveCodingExample/config.make
+liveCodingExample/ofxGLEditor_example.xcodeproj
+liveCodingExample/openFrameworks-Info.plist
+
+editorGLSLSyntaxExample/Makefile
+editorGLSLSyntaxExample/Project.xcconfig
+editorGLSLSyntaxExample/addons.make
+editorGLSLSyntaxExample/config.make
+editorGLSLSyntaxExample/ofxGLEditor_example.xcodeproj
+editorGLSLSyntaxExample/openFrameworks-Info.plist
