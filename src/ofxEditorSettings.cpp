@@ -33,6 +33,7 @@ ofxEditorSettings::ofxEditorSettings() {
 	textShadowColor = ofColor(0);
 	cursorColor = ofColor(255, 255, 0, 200);
 	selectionColor = ofColor(0, 255, 0, 127);
+	flashColor = ofColor(0, 255, 0, 127);
 	matchingCharsColor = ofColor(0, 127, 255, 127);
 	lineNumberColor = ofColor(127);
 
@@ -151,6 +152,16 @@ void ofxEditorSettings::setSelectionColor(ofColor color) {
 //--------------------------------------------------------------
 ofColor& ofxEditorSettings::getSelectionColor() {
 	return selectionColor;
+}
+
+//--------------------------------------------------------------
+void ofxEditorSettings::setFlashColor(ofColor color) {
+	flashColor = color;
+}
+
+//--------------------------------------------------------------
+ofColor& ofxEditorSettings::getFlashColor() {
+	return flashColor;
 }
 
 //--------------------------------------------------------------

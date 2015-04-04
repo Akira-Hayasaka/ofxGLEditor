@@ -39,6 +39,9 @@
 // max time in secs for cursor to "blow up"
 #define BLOWUP_FLASHES 1.8
 
+// max time in secs for selection to "flash"
+#define SELECTION_FLASH_DURATION 1
+
 // max cursor blow up size in chars
 #define CURSOR_MAX_WIDTH 40
 #define CURSOR_MAX_HEIGHT 40
@@ -105,6 +108,8 @@ ofxEditor::ofxEditor() {
 	m_flash = 0;
 	m_blowupCursor = false;
 	m_blowup = 0;
+	m_flashSelection = false;
+	m_flashSelTime = 0;
 	
 	m_autoFocus = false;
 	m_posX = m_posY = 0;
@@ -149,6 +154,8 @@ ofxEditor::ofxEditor(ofxEditorSettings &sharedSettings) {
 	m_flash = 0;
 	m_blowupCursor = false;
 	m_blowup = 0;
+	m_flashSelection = false;
+	m_flashSelTime = 0;
 	
 	m_autoFocus = false;
 	m_posX = m_posY = 0;
@@ -265,6 +272,15 @@ void ofxEditor::draw() {
 			m_posX = -(currentLineWidth-m_visibleWidth);
 		}
 		m_desiredXPos = offsetToCurrentLineStart();
+	}
+
+	// update flash animation counter
+	if (m_flashSelection) {
+		// set this to zero when starting
+		m_flashSelTime += m_delta;
+		if (m_flashSelTime >= SELECTION_FLASH_DURATION) {
+			m_flashSelection = false;
+		}
 	}
 
 	ofPushStyle();
@@ -448,6 +464,11 @@ void ofxEditor::draw() {
 					if(m_selection != NONE && textPos >= m_highlightStart && textPos < m_highlightEnd) {
 						drawSelectionCharBlock(tb.text[i], x, y);
 					}
+
+					// draw flash
+					if (m_flashSelection && textPos >= m_flashStart && textPos < m_flashEnd) {
+						drawFlashCharBlock(tb.text[i], x, y);
+					}
 					
 					// draw cursor
 					if(textPos == m_position) {
@@ -514,6 +535,11 @@ void ofxEditor::draw() {
 				// draw selection
 				if(m_selection != NONE && i >= m_highlightStart && i < m_highlightEnd) {
 					drawSelectionCharBlock(m_text[i], x, y);
+				}
+
+				// draw flash
+				if (m_flashSelection && i >= m_flashStart && i < m_flashEnd) {
+					drawFlashCharBlock(m_text[i], x, y);
 				}
 				
 				// draw cursor
@@ -1268,6 +1294,14 @@ void ofxEditor::blowupCursor() {
 }
 
 //--------------------------------------------------------------
+void ofxEditor::flashSelection(unsigned int start, unsigned int end) {
+	m_flashSelection = true;
+	m_flashSelTime = 0;
+	m_flashStart = start;
+	m_flashEnd = end;
+}
+
+//--------------------------------------------------------------
 bool ofxEditor::isSelection() {
 	return m_selection != NONE;
 }
@@ -1342,6 +1376,8 @@ void ofxEditor::setCurrentLinePos(unsigned int line, unsigned int character) {
 void ofxEditor::reset() {
 	m_blowupCursor = false;
 	m_blowup = 0.0f;
+	m_flashSelection = false;
+	m_flashSelTime = 0.0f;
 	m_position = 0;
 	setCurrentLine(0);
 	m_shiftState = false;
@@ -1446,6 +1482,15 @@ void ofxEditor::drawSelectionCharBlock(int c, int x, int y) {
 	ofSetColor(
 		m_settings->getSelectionColor().r, m_settings->getSelectionColor().g,
 		m_settings->getSelectionColor().b, m_settings->getSelectionColor().a * m_settings->getAlpha());
+	ofRect(x, y-s_charHeight, characterWidth(c), s_charHeight);
+}
+
+//--------------------------------------------------------------
+void ofxEditor::drawFlashCharBlock(int c, int x, int y) {
+	float cur_alpha = (SELECTION_FLASH_DURATION - m_flashSelTime) / SELECTION_FLASH_DURATION;
+
+	ofColor &color = m_settings->getFlashColor();
+	ofSetColor(color.r, color.g, color.b, cur_alpha * color.a * m_settings->getAlpha());
 	ofRect(x, y-s_charHeight, characterWidth(c), s_charHeight);
 }
 

@@ -68,6 +68,10 @@ class ofxEditorSettings {
 		/// selection color, default: green w/ alpha
 		void setSelectionColor(ofColor color);
 		ofColor& getSelectionColor();
+
+		/// flash color, default: green w/ alpha
+		void setFlashColor(ofColor color);
+		ofColor& getFlashColor();
 	
 		/// matching chars highlight color, default: blue w/ alpha
 		void setMatchingCharsColor(ofColor color);
@@ -136,6 +140,7 @@ class ofxEditorSettings {
 		ofColor textShadowColor;	//< text offset shadow color
 		ofColor cursorColor;	    //< text pos cursor color
 		ofColor selectionColor;     //< char selection highlight color
+		ofColor flashColor;         //< flash selection highlight color
 		ofColor matchingCharsColor; //< matching chars highlight color
 		ofColor lineNumberColor;    //< line number color
 
