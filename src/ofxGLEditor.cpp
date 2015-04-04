@@ -619,23 +619,25 @@ ofxEditorColorScheme* ofxGLEditor::getColorScheme() {
 // LANG SYNTAX
 
 //--------------------------------------------------------------
-void ofxGLEditor::setLangSyntax(const string& lang, int editor) {
+bool ofxGLEditor::setLangSyntax(const string& lang, int editor) {
 	editor = getEditorIndex(editor);
 	if(editor == -1) {
 		ofLogError("ofxGLEditor") << "cannot set syntax from unknown editor " << editor;
-		return 0;
+		return false;
 	}
-	return m_editors[editor]->setLangSyntax(lang);
+	m_editors[editor]->setLangSyntax(lang);
+	return true;
 }
 
 //--------------------------------------------------------------
-void ofxGLEditor::clearSyntax(int editor) {
+bool ofxGLEditor::clearSyntax(int editor) {
 	editor = getEditorIndex(editor);
 	if(editor == -1) {
 		ofLogError("ofxGLEditor") << "cannot clear syntax from unknown editor " << editor;
-		return 0;
+		return false;
 	}
-	return m_editors[editor]->clearSyntax();
+	m_editors[editor]->clearSyntax();
+	return true;
 }
 
 //--------------------------------------------------------------
@@ -643,7 +645,7 @@ ofxEditorSyntax* ofxGLEditor::getSyntax(int editor) {
 	editor = getEditorIndex(editor);
 	if(editor == -1) {
 		ofLogError("ofxGLEditor") << "cannot get syntax from unknown editor " << editor;
-		return 0;
+		return NULL;
 	}
 	return m_editors[editor]->getSyntax();
 }
