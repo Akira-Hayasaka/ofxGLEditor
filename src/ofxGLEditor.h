@@ -272,11 +272,11 @@ class ofxGLEditor {
 		/// note: syntax does not apply to REPL or FileDialog
 		///
 		/// set editor to 0 for the current editor
-		void setLangSyntax(const string& lang, int editor=0);
+		bool setLangSyntax(const string& lang, int editor=0);
 	
 		/// clear the current language syntax for an editor
 		/// set editor to 0 for the current editor
-		void clearSyntax(int editor=0);
+		bool clearSyntax(int editor=0);
 	
 		/// get the current language syntax for an editor, returns NULL if not set
 		/// set editor to 0 for the current editor
