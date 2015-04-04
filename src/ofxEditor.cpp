@@ -696,7 +696,12 @@ void ofxEditor::keyPressed(int key) {
 				break;
 			
 			case OF_KEY_END:
-				m_position = lineEnd(m_position);
+				if(lineEnd(m_position) < m_text.size()-1) { // if we're not on the last line
+					m_position = lineEnd(m_position);
+				}
+				else { // last line, go to end of buffer
+					m_position = m_text.size();
+				}
 				m_desiredXPos = offsetToCurrentLineStart()+1;
 				m_flash = HALF_FLASH_RATE; // show cursor after moving
 				break;
@@ -726,7 +731,7 @@ void ofxEditor::keyPressed(int key) {
 				break;
 				
 			case OF_KEY_DOWN:
-				if(lineEnd(m_position) < m_text.size()) { // if we're not on the last line
+				if(lineEnd(m_position) < m_text.size()-1) { // if we're not on the last line
 					
 					int nextLineLen = nextLineLength(m_position);
 					if(nextLineLen < m_desiredXPos) {
