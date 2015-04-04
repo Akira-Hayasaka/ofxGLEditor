@@ -34,7 +34,6 @@ void ofApp::setup() {
 	luaSyntax.setWord("function", ofxEditorSyntax::KEYWORD);
 	luaSyntax.setWord("end", ofxEditorSyntax::KEYWORD);
 	luaSyntax.setWord("print", ofxEditorSyntax::FUNCTION);
-	luaSyntax.setPreprocessor("#");
 	luaSyntax.setSingleLineComment("--");
 	luaSyntax.setMultiLineComment("--[[", "]]");
 	editor.getSettings().setLangSyntax("Lua", &luaSyntax);
@@ -43,7 +42,6 @@ void ofApp::setup() {
 	colorScheme.setStringColor(ofColor::yellow);
 	colorScheme.setNumberColor(ofColor::orangeRed);
 	colorScheme.setCommentColor(ofColor::gray);
-	colorScheme.setPreprocessorColor(ofColor::purple);
 	colorScheme.setKeywordColor(ofColor::fuchsia);
 	colorScheme.setTypenameColor(ofColor::red);
 	colorScheme.setFunctionColor(ofColor::green);
