@@ -15,28 +15,31 @@ void ofApp::setup() {
 	// make sure to load editor font before anything else!
     ofxEditor::loadFont("fonts/PrintChar21.ttf", 24);
 	
-	// setup color scheme and glsl syntax
-	syntaxHighlight.setup();
-	editor.setColorScheme(&syntaxHighlight.colorScheme);
-	editor.getSettings().setLangSyntax("GLSL", &syntaxHighlight.syntax);
-	editor.getSettings().setFileExtLang("frag", "GLSL");
-	editor.getSettings().setFileExtLang("vert", "GLSL");
+	// setup color scheme via xml file
+	colorScheme.loadFile("colorScheme.xml");
+	editor.setColorScheme(&colorScheme);
 	
+	// setup GLSL syntax via xml file
+	syntax.loadFile("glslSyntax.xml"); // lang: GLSL, file exts: frag & vert
+	editor.getSettings().addSyntax(&syntax);
+	editor.getSettings().printSyntaxes();
+	
+	// other settings
 	editor.setLineNumbers(true);
 	editor.setAutoFocus(true);
 	
-	// open test file, sets syntax based on filename
-	shaderFileName = "EmptyShader.frag";
-	editor.openFile(shaderFileName);
+	// open file, sets syntax based on file extension
+	shaderName = "shader";
+	editor.openFile(shaderName+".frag");
 	ofLogNotice() << "num chars: " << editor.getNumCharacters() << " num lines: " << editor.getNumLines();
 
-    bToggleVisable = true;
+    bToggleVisible = true;
 	debug = false;
     
     /// shader stuff
     width = ofGetWidth();
     height = ofGetHeight();
-    shader.load("", shaderFileName);
+    shader.load(shaderName);
 
     fbo.allocate(width, height, GL_RGBA);
     fbo.begin();
@@ -48,7 +51,7 @@ void ofApp::setup() {
 void ofApp::draw() {
     
     fbo.begin();
-		ofClear(0,0,0,0);
+		ofClear(0, 0, 0, 0);
         shader.begin();
         shader.setUniform1f("iGlobalTime", ofGetElapsedTimef());
         shader.setUniform3f("iResolution", width, height, 1);
@@ -57,9 +60,9 @@ void ofApp::draw() {
         ofRect(0, 0, width, height);
         shader.end();
     fbo.end();
-    fbo.draw(0,0,ofGetWidth(),ofGetHeight());
+    fbo.draw(0, 0, ofGetWidth(), ofGetHeight());
 
-    if(bToggleVisable){
+    if(bToggleVisible){
         editor.draw();
     }
 	
@@ -71,15 +74,17 @@ void ofApp::draw() {
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key) {
-
 	bool modifierPressed = ofxEditor::getSuperAsModifier() ? ofGetKeyPressed(OF_KEY_SUPER) : ofGetKeyPressed(OF_KEY_CONTROL);
 	if(modifierPressed) {
 		switch(key) {
             case 't':
-                bToggleVisable = !bToggleVisable;
-            case 's':
-                editor.saveFile(shaderFileName);
-                shader.load("", shaderFileName);
+                bToggleVisible = !bToggleVisible;
+            case 's': // save file
+                editor.saveFile(shaderName+".frag");
+                break;
+			case 'e': // evaluate aka save & reload shader
+                editor.saveFile(shaderName+".frag");
+                shader.load(shaderName);
                 break;
 			case 'd':
 				debug = !debug;

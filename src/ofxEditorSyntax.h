@@ -20,6 +20,7 @@
 #pragma once
 
 #include "ofConstants.h"
+#include <set>
 #include <map>
 
 /// language-specific syntax words and characters
@@ -28,12 +29,94 @@ class ofxEditorSyntax {
 	public:
 	
 		ofxEditorSyntax();
+		ofxEditorSyntax(const string& xmlFile); //< load from an xml file
 		ofxEditorSyntax(const ofxEditorSyntax &from);
 		ofxEditorSyntax& operator=(const ofxEditorSyntax &from);
 		void copy(const ofxEditorSyntax &from); //< copy data from another object
 	
+		/// load syntax from an xml file
+		///
+		/// root tag must be "syntax", available tags are: lang, files, text, string,
+		/// singlecomment, multicomment, preprocessor, math, punctuation, words
+		///
+		/// short GLSL example:
+		/// <syntax>
+		///
+		///   <!-- syntax language string (optional) -->
+		///   <lang>GLSL</lang>
+		///
+		///   <!-- associated file extensions (minus .) -->
+		///   <files>
+		///     <ext>frag</ext>
+		///     <ext>vert</ext>
+		///   <files>
+		///
+		///   <!-- single line comment begin -->
+		///	  <singlecomment>//</singlecomment>
+		///
+		///   <!-- multi line comment begin and end -->
+		///   <multicomment>
+		///     <begin>/*</begin>
+		///     <end>*/</end>
+		///   </multicomment>
+		///
+		///   <!-- preprocessor begin -->
+		///   <preprocessor>#</preprocessor>
+		///
+		///   <!--
+		///        mathematical characters,
+		///        note "&amp;" since "&" needs to be escaped
+		///   -->
+		///   <math>+-*/!|&amp;~</math>
+		///
+		///   <!-- punctuation characters -->
+		///   <punctuation>;:,?</punctuation>
+		///
+		///   <!-- parse 0x123 as a number? either "true" or "false" -->
+		///   <hexliteral>true</hexliteral>
+		///
+		///   <!-- syntax type for specific words -->
+		///   <words>
+		///     <keyword>void</keyword>
+		///     <typename>int</typename>
+		///     <function>gl_FragCoord</function>
+		///   </words>
+		///
+		/// </syntax>
+		///
+		/// returns false on read or parse error
+		bool loadFile(const string& xmlFile);
+	
 		/// clear everything to defaults
 		void clear();
+	
+	/// \section Meta
+	
+		/// set the language string for this syntax aka "GLSL", "Lua", etc
+		void setLang(const string &lang);
+	
+		/// get language string, returns "" if not set
+		const string& getLang();
+	
+		/// clear language string to ""
+		void clearLang();
+	
+		/// add file extension associated to this syntax
+		/// note: file extensions do not include the period, ex: "lua" not ".lua"
+		void addFileExt(const string &ext);
+		void addFileExt(const vector<string> &exts);
+	
+		/// is a given file extension associated with this syntax
+		bool hasFileExt(const string &ext);
+	
+		/// get file extensions
+		const set<string>& getFileExts();
+	
+		/// clear language string for a file extension
+		void clearFileExt(const string &ext);
+	
+		/// clear all file extension language strings
+		void clearAllFileExts();
 
 	/// \section Comments
 
@@ -41,16 +124,16 @@ class ofxEditorSyntax {
 		/// blank by default
 		void setSingleLineComment(const wstring &begin);
 		void setSingleLineComment(const string &begin);
-		wstring& getWideSingleLineComment();
+		const wstring& getWideSingleLineComment();
 		string getSingleLineComment();
 	
 		/// set the beginning and ending strings to match for a multi line comment,
 		/// blank by default
 		void setMultiLineComment(const wstring &begin, const wstring &end);
 		void setMultiLineComment(const string &begin, const string &end);
-		wstring& getWideMultiLineCommentBegin();
+		const wstring& getWideMultiLineCommentBegin();
 		string getMultiLineCommentBegin();
-		wstring& getWideMultiLineCommentEnd();
+		const wstring& getWideMultiLineCommentEnd();
 		string getMultiLineCommentEnd();
 	
 	/// \section Preprocessor
@@ -59,7 +142,7 @@ class ofxEditorSyntax {
 		/// blank by default
 		void setPreprocessor(const wstring &begin);
 		void setPreprocessor(const string &begin);
-		wstring& getWidePreprocessor();
+		const wstring& getWidePreprocessor();
 		string getPreprocessor();
 	
 	/// \section Words
@@ -71,11 +154,11 @@ class ofxEditorSyntax {
 			FUNCTION  //< function names (aka sin(), abs(), etc)
 		};
 	
-		/// set word type directly
+		/// set type for a given word
 		void setWord(const wstring &word, WordType type);
 		void setWord(const string &word, WordType type);
 	
-		/// set
+		/// set type for a vector of words
 		void setWords(const vector<wstring> &words, WordType type);
 		void setWords(const vector<string> &words, WordType type);
 	
@@ -95,28 +178,36 @@ class ofxEditorSyntax {
 	
 	/// \section Parsing Chars
 	
-		/// common mathematical chars between highlighted text blocks when parsing
-		/// default: "+-*/!|&~", string should not be empty
-		void setMathChars(const wstring &chars);
-		void setMathChars(const string &chars);
-		wstring& getWideMathChars();
-		string getMathChars();
+		/// parse "0x123" as a number? default: truenot all languages support this
+		void setHexLiteral(bool hex);
+		bool getHexLiteral();
+	
+		/// common math & comparison operator chars between highlighted text blocks when parsing
+		/// default: "=+-*/!|&^~", string should not be empty
+		void setOperatorChars(const wstring &chars);
+		void setOperatorChars(const string &chars);
+		const wstring& getWideOperatorChars();
+		string getOperatorChars();
 	
 		/// common punctuation chars between highlighted text blocks when parsing
 		/// default: ";:,?", string should not be empty
 		void setPunctuationChars(const wstring &chars);
 		void setPunctuationChars(const string &chars);
-		wstring& getWidePunctuationChars();
+		const wstring& getWidePunctuationChars();
 		string getPunctuationChars();
 	
 	protected:
 	
-		wstring singleLineComment;
-		wstring multiLineCommentBegin;
-		wstring multiLineCommentEnd;
+		string lang; //< langauge string aka "GLSL", "Lua", etc
+		set<string> fileExts; //< associated file extensions (minus .)
 	
-		wstring preprocessor;
-		map<wstring,WordType> words;
-		wstring mathChars;
-		wstring punctuationChars;
+		wstring singleLineComment; //< single line comment begin
+		wstring multiLineCommentBegin; //< multi line comment begin
+		wstring multiLineCommentEnd; //< multi line comment end
+	
+		wstring preprocessor; //< preprocessor begin
+		map<wstring,WordType> words; //< synatx types for specific words
+		bool hexLiteral; //< parse hex literals (0x123) as numbers?
+		wstring operatorChars; //< common operator chars
+		wstring punctuationChars; //< punctuation chars
 };

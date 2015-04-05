@@ -30,15 +30,19 @@ void ofApp::setup() {
 	// make sure to load editor font before anything else!
 	ofxEditor::loadFont("fonts/PrintChar21.ttf", 24);
 	
-	// sample lua syntax
+	// sample lua syntax ste programmatically (instead of loaded from xml)
+	luaSyntax.setLang("Lua");
+	luaSyntax.addFileExt("lua"); // associate .lua with Lua
+	luaSyntax.setSingleLineComment("--");
+	luaSyntax.setMultiLineComment("--[[", "]]");
 	luaSyntax.setWord("function", ofxEditorSyntax::KEYWORD);
 	luaSyntax.setWord("end", ofxEditorSyntax::KEYWORD);
 	luaSyntax.setWord("print", ofxEditorSyntax::FUNCTION);
-	luaSyntax.setSingleLineComment("--");
-	luaSyntax.setMultiLineComment("--[[", "]]");
-	editor.getSettings().setLangSyntax("Lua", &luaSyntax);
+	editor.getSettings().addSyntax(&luaSyntax);
+	editor.getSettings().printSyntaxes(); // print availabel syntaxes
+	//editor.setLangSyntax("Lua"); // set editor syntax manually
 	
-	// syntax highlighter colors
+	// syntax highlighter colors set programmatically (instead of loaded from xml)
 	colorScheme.setStringColor(ofColor::yellow);
 	colorScheme.setNumberColor(ofColor::orangeRed);
 	colorScheme.setCommentColor(ofColor::gray);
@@ -47,11 +51,7 @@ void ofApp::setup() {
 	colorScheme.setFunctionColor(ofColor::green);
 	editor.setColorScheme(&colorScheme);
 	
-	// use Lua syntax
-	//editor.setLangSyntax("Lua"); // set it manually
-	editor.getSettings().setFileExtLang("lua", "Lua"); // associate .lua with Lua
-	
-	// open test file, will set syntax based on file extension if set
+	// open test file, will set syntax based on file extension
 	editor.openFile("test.lua");
 	ofLogNotice() << "num chars: " << editor.getNumCharacters() << " num lines: " << editor.getNumLines();
 	

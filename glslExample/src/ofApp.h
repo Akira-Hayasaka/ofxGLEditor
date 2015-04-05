@@ -5,9 +5,24 @@
 
 #include "ofMain.h"
 #include "ofxEditor.h"
-#include "SyntaxHighlight.h"
 
-// syntax example using a single text editor instance
+// a live glsl pixel shader editor example using a single ofxEditor
+//
+// app key commands:
+//    MOD -> CTRL or Super (Windows Key, Mac CMD)
+//
+// MOD + s: save pixel shader
+// MOD + e: save & evaluate pixel shader
+// MOD + l: toggle line wrapping
+// MOD + n: toggle line numbers
+// MOD + f: toggle fullscreen
+// MOD + t: show/hide editor
+// MOD + z: toggle auto focus
+// MOD + w: toggle text shadow
+// MOD + d: toggle debug
+//
+// see ofxEditor.h for editor key commands
+//
 class ofApp : public ofBaseApp {
 
 	public:
@@ -18,14 +33,15 @@ class ofApp : public ofBaseApp {
 		void windowResized(int w, int h);
 		
 		ofxEditor editor;
-		SyntaxHighlight syntaxHighlight;
+		ofxEditorColorScheme colorScheme;
+		ofxEditorSyntax syntax;
 		bool debug; //< show fps?
     
         ofShader shader;
         ofFbo fbo;
     
     private:
-        string shaderFileName;
+        string shaderName;
         int width, height;
-        bool bToggleVisable;
+        bool bToggleVisible;
 };

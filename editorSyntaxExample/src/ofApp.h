@@ -23,6 +23,23 @@
 #include "ofxEditor.h"
 
 // syntax example using a single text editor instance
+//
+// app key commands:
+//    MOD -> CTRL or Super (Windows Key, Mac CMD)
+//
+// MOD + s: toggle syntax highlighting
+// MOD + d: toggle debug framerate display
+// MOD + f: toggle fullscreen
+// MOD + l: toggle line wrapping
+// MOD + n: toggle line numbers
+// MOD + z: toggle auto focus zooming
+// MOD + w: toggle text shadow
+// MOD + 1: set line position (debugging)
+// MOD + 2: set line position again (debugging)
+// MOD + p: print current syntax parser text blocks (debugging)
+//
+// see ofxGLEditor.h for editor key commands
+//
 class ofApp : public ofBaseApp {
 
 	public:

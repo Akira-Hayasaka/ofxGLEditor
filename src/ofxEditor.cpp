@@ -21,10 +21,11 @@
  * Copyright (C) Dave Griffiths
  */
 #include "ofxEditor.h"
+#include "ofxEditorFont.h"
+#include "ofMath.h"
 
 // string conversion, this will be replaced when OF has internal unicode support
 #include "Unicode.h"
-#include "ofxEditorFont.h"
 
 // GLFW needed for clipboard support
 #if !defined(TARGET_NODISPLAY) && !defined(TARGET_OF_IOS) && \
@@ -61,7 +62,7 @@ wstring ofxEditor::s_copyBuffer;
 float ofxEditor::s_time = 0;
 
 float ofxEditor::s_autoFocusError = 10;
-float ofxEditor::s_autoFocusScaleDrift = 0.9;
+float ofxEditor::s_autoFocusSpeed = 1.0;
 float ofxEditor::s_autoFocusMinScale = 0.5;
 float ofxEditor::s_autoFocusMaxScale = 5.0;
 
@@ -191,7 +192,7 @@ bool ofxEditor::loadFont(const string &font, int size) {
 		s_zeroWidth = s_font->characterWidth('0');
 		s_charHeight = s_font->stringHeight("#Iqg"); // catch tall/chars which may hang down
 		s_cursorWidth = MAX(floor(s_charWidth*0.3), 6);
-		s_autoFocusError = MAX(floor(s_charHeight*0.5), 12); // make sure the error space is proportional to the glyph size
+		s_autoFocusError = MAX(floor(s_charHeight*0.5), 16); // make sure the error space is proportional to the glyph size
 	}
 }
 
@@ -248,6 +249,16 @@ void ofxEditor::setAutoFocusMaxScale(float max) {
 //--------------------------------------------------------------
 float ofxEditor::getAutoFocusMaxScale() {
 	return s_autoFocusMaxScale;
+}
+
+//--------------------------------------------------------------
+void ofxEditor::setAutoFocusSpeed(float speed) {
+	s_autoFocusSpeed = ofClamp(speed, 0.1, 2.0);
+}
+
+//--------------------------------------------------------------
+float ofxEditor::getAutoFocusSpeed() {
+	return s_autoFocusSpeed;
 }
 
 // MAIN
@@ -405,7 +416,7 @@ void ofxEditor::draw() {
 						}
 						break;
 					
-					case MATCHING_CHAR: case MATH_CHAR: case PUNCTUATION_CHAR:
+					case MATCHING_CHAR: case OPERATOR_CHAR: case PUNCTUATION_CHAR:
 						if(!comment) {
 							s_font->setColor(m_colorScheme->getTextColor(), m_settings->getAlpha());
 						}
@@ -603,18 +614,18 @@ void ofxEditor::draw() {
 			float boxheight = (m_BBMaxY-m_BBMinY) * m_scale;
 			
 			if(boxwidth > m_width + s_autoFocusError) {
-				m_scale *= 1-s_autoFocusScaleDrift * m_delta; // shrink
+				m_scale *= (float)(1.0f-s_autoFocusSpeed * m_delta); // shrink
 			}
 			else if(boxwidth < m_width - s_autoFocusError &&
 			        boxheight < m_height - s_autoFocusError) {
-				m_scale *= 1+s_autoFocusScaleDrift * m_delta; // grow
+				m_scale *= (float)(1.0f+s_autoFocusSpeed * m_delta); // grow
 			}
 			else if(boxheight > m_height + s_autoFocusError) {
-				m_scale *= 1-s_autoFocusScaleDrift * m_delta; // shrink
+				m_scale *= (float)(1.0f-s_autoFocusSpeed * m_delta); // shrink
 			}
 			else if(boxwidth < m_width - s_autoFocusError &&
 					boxheight < m_height - s_autoFocusError) {
-				m_scale *= 1+s_autoFocusScaleDrift * m_delta; // grow
+				m_scale *= (float)(1.0f+s_autoFocusSpeed * m_delta); // grow
 			}
 			m_scale = ofClamp(m_scale, s_autoFocusMinScale, s_autoFocusMaxScale);
 			
@@ -1051,7 +1062,7 @@ bool ofxEditor::saveFile(string filename) {
 	}
 	file << getText();
 	file.close();
-	ofxEditorSyntax *syntax = m_settings->getFileExtSyntax(ofFilePath::getFileExt(filename));
+	ofxEditorSyntax *syntax = m_settings->getSyntaxForFileExt(ofFilePath::getFileExt(filename));
 	if(m_syntax != syntax) {
 		m_syntax = syntax;
 		if(m_colorScheme) parseTextBlocks();
@@ -1181,12 +1192,12 @@ void ofxEditor::setSyntax(ofxEditorSyntax *syntax) {
 
 //--------------------------------------------------------------
 void ofxEditor::setLangSyntax(const string& lang) {
-	m_syntax = m_settings->getLangSyntax(lang);
+	m_syntax = m_settings->getSyntax(lang);
 }
 
 //--------------------------------------------------------------
 void ofxEditor::setFileExtSyntax(const string& ext) {
-	m_syntax = m_settings->getFileExtSyntax(ext);
+	m_syntax = m_settings->getSyntaxForFileExt(ext);
 }
 
 //--------------------------------------------------------------
@@ -1459,7 +1470,7 @@ void ofxEditor::printSyntax() {
 			case TAB:                type += "TAB"; break;
 			case ENDLINE:            ofLogNotice() << "ENDLINE"; continue;
 			case MATCHING_CHAR:      type += "MATCHING_CHAR"; break;
-			case MATH_CHAR:          type += "MATH_CHAR"; break;
+			case OPERATOR_CHAR:      type += "OPERATOR_CHAR"; break;
 			case PUNCTUATION_CHAR:   type += "PUNCTUATION_CHAR"; break;
 			case COMMENT_BEGIN:      ofLogNotice() << "COMMENT_BEGIN"; continue;
 			case COMMENT_END:        ofLogNotice() << "COMMENT_END"; continue;
@@ -1877,7 +1888,7 @@ void ofxEditor::parseTextBlocks() {
 				if(string == m_text[i]) { // same as the opening string char?
 				
 					// don't terminate an escaping slash
-					if(tb.text.length() > 1 && tb.text[tb.text.size()-1] == '\\') {
+					if(tb.text.length() > 0 && tb.text[tb.text.size()-1] == '\\') {
 						tb.text += m_text[i];
 						break;
 					}
@@ -1942,6 +1953,21 @@ void ofxEditor::parseTextBlocks() {
 			default: // everything else
 				switch(tb.type) {
 					case NUMBER:
+						// catch hex literal aka 0x001F
+						if(m_syntax && m_syntax->getHexLiteral()) {
+							// started?
+							if((tb.text.substr(0, 2) == L"0x") &&
+							   ((m_text[i] >= 'a' && m_text[i] <= 'f') ||
+							   (m_text[i] >= 'A' && m_text[i] <= 'F'))) {
+								tb.text += m_text[i];
+								break;
+							}
+							// starting?
+							if(tb.text.size() == 1 && tb.text[0] == '0' && m_text[i] == 'x') {
+								tb.text += m_text[i];
+								break;
+							}
+						}
 						m_textBlocks.push_back(tb);
 						tb.clear();
 					case UNKNOWN:
@@ -2034,14 +2060,14 @@ void ofxEditor::parseTextBlocks() {
 									break;
 								}
 								
-								// check for single mathematical characters
-								if(m_syntax->getWideMathChars().find(m_text[i], 0) != wstring::npos) {
+								// check for single operator characters
+								if(m_syntax->getWideOperatorChars().find(m_text[i], 0) != wstring::npos) {
 									if(tb.type != UNKNOWN && tb.text.length() > 1) {
 										tb.text = tb.text.substr(0, tb.text.length()-1);
 										m_textBlocks.push_back(tb);
 										tb.clear();
 									}
-									tb.type = MATH_CHAR;
+									tb.type = OPERATOR_CHAR;
 									tb.text = m_text[i];
 									m_textBlocks.push_back(tb);
 									tb.clear();

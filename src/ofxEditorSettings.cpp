@@ -73,14 +73,9 @@ void ofxEditorSettings::copy(const ofxEditorSettings &from) {
 	
 	// make deep copies
 	clearAllSyntaxes();
-	clearAllFileExts();
 	for(map<string,ofxEditorSyntax*>::const_iterator iter = from.langs.begin();
 	    iter == from.langs.end(); ++iter) {
 		langs[(*iter).first] = (*iter).second;
-	}
-	for(map<string,string>::const_iterator iter = from.fileExts.begin();
-	    iter == from.fileExts.end(); ++iter) {
-		fileExts[(*iter).first] = (*iter).second;
 	}
 }
 
@@ -230,13 +225,27 @@ string ofxEditorSettings::getCloseChars() {
 }
 
 //--------------------------------------------------------------
-void ofxEditorSettings::setLangSyntax(const string &lang, ofxEditorSyntax *syntax) {
+void ofxEditorSettings::addSyntax(ofxEditorSyntax *syntax) {
 	if(!syntax) return;
+	if(syntax->getLang() == "") {
+		ofLogWarning("ofxEditorSettings") << "cannot add syntax with empty lang string";
+		return;
+	}
+	langs[syntax->getLang()] = syntax;
+}
+
+//--------------------------------------------------------------
+void ofxEditorSettings::addSyntax(const string &lang, ofxEditorSyntax *syntax) {
+	if(!syntax) return;
+	if(lang == "") {
+		ofLogWarning("ofxEditorSettings") << "cannot add syntax with empty lang string";
+		return;
+	}
 	langs[lang] = syntax;
 }
 
 //--------------------------------------------------------------
-ofxEditorSyntax* ofxEditorSettings::getLangSyntax(const string &lang) {
+ofxEditorSyntax* ofxEditorSettings::getSyntax(const string &lang) {
 	map<string,ofxEditorSyntax*>::iterator iter = langs.find(lang);
 	if(iter != langs.end()) {
 		return (*iter).second;
@@ -245,7 +254,7 @@ ofxEditorSyntax* ofxEditorSettings::getLangSyntax(const string &lang) {
 }
 
 //--------------------------------------------------------------
-void ofxEditorSettings::clearLangSyntax(const string &lang) {
+void ofxEditorSettings::clearSyntax(const string &lang) {
 	map<string,ofxEditorSyntax*>::iterator iter = langs.find(lang);
 	if(iter != langs.end()) {
 		langs.erase(iter);
@@ -258,38 +267,35 @@ void ofxEditorSettings::clearAllSyntaxes() {
 }
 
 //--------------------------------------------------------------
-void ofxEditorSettings::setFileExtLang(const string &ext, const string &lang) {
-	fileExts[ext] = lang;
-}
-
-//--------------------------------------------------------------
-string ofxEditorSettings::getFileExtLang(const string &ext) {
-	map<string,string>::iterator iter = fileExts.find(ext);
-	if(iter != fileExts.end()) {
-		return (*iter).second;
-	}
-	return "";
-}
-
-//--------------------------------------------------------------
-void ofxEditorSettings::clearFileExtLang(const string &lang) {
-	map<string,string>::iterator iter = fileExts.begin();
-	while(iter != fileExts.end()) {
-		if((*iter).second == lang) {
-			fileExts.erase(iter++);
-		}
-		else {
-			iter++;
+ofxEditorSyntax* ofxEditorSettings::getSyntaxForFileExt(const string &ext) {
+	map<string,ofxEditorSyntax*>::iterator iter;
+	for(iter = langs.begin(); iter != langs.end(); ++iter) {
+		if((*iter).second->hasFileExt(ext)) {
+			return (*iter).second;
 		}
 	}
+	return NULL;
 }
 
 //--------------------------------------------------------------
-void ofxEditorSettings::clearAllFileExts() {
-	fileExts.clear();
-}
-
-//--------------------------------------------------------------
-ofxEditorSyntax* ofxEditorSettings::getFileExtSyntax(const string &ext) {
-	return getLangSyntax(getFileExtLang(ext));
+void ofxEditorSettings::printSyntaxes() {
+	ofLogNotice("ofxEditorSettings") << "syntaxes: " << (langs.empty() ? "none" : "");
+	map<string,ofxEditorSyntax*>::iterator iter;
+	for(iter = langs.begin(); iter != langs.end(); ++iter) {
+		string line = "  " + (*iter).second->getLang();
+		const set<string> &fileExts = (*iter).second->getFileExts();
+		if(!fileExts.empty()) {
+			line += " (";
+			int count = 0;
+			for(set<string>::const_iterator i = fileExts.begin(); i != fileExts.end(); ++i) {
+				line += (*i);
+				count++;
+				if(count < fileExts.size()) {
+					line += ", ";
+				}
+			}
+			line += ")";
+		}
+		ofLogNotice("ofxEditorSettings") << line;
+	}
 }

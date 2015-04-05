@@ -99,36 +99,29 @@ class ofxEditorSettings {
 	
 	/// \section Language Syntax
 	
-		/// set syntax for a language string aka "C++", "Lua", "GLSL", etc
+		/// add language syntax, make sure syntax language is set
 		/// note: pointer is never deleted
-		void setLangSyntax(const string &lang, ofxEditorSyntax *syntax);
+		void addSyntax(ofxEditorSyntax *syntax);
+	
+		/// set syntax for a given language string aka "GLSL", "Lua", "C++", etc
+		/// overrides syntax getLang() value
+		/// note: pointer is never deleted
+		void addSyntax(const string &lang, ofxEditorSyntax *syntax);
 	
 		/// get the syntax for a language string, returns NULL if not found
-		ofxEditorSyntax* getLangSyntax(const string &lang);
-	
+		ofxEditorSyntax* getSyntax(const string &lang);
+
 		/// clear the syntax for a language string
-		void clearLangSyntax(const string &lang);
+		void clearSyntax(const string &lang);
 	
 		/// clears all language syntaxes
 		void clearAllSyntaxes();
 	
-		/// set language string aka "C++", "Lua", "GLSL", etc for a file extension
-		///
-		/// note: file extensions do not include the period, ex: "lua" not ".lua"
-		void setFileExtLang(const string &ext, const string &lang);
+		/// get the syntax for a file extension, returns NULL if not found
+		ofxEditorSyntax* getSyntaxForFileExt(const string &ext);
 	
-		/// get language string for a file extension, returns "" if not found
-		string getFileExtLang(const string &ext);
-	
-		/// clear language string for a file extension
-		void clearFileExtLang(const string &ext);
-	
-		/// clear all file extension language strings
-		void clearAllFileExts();
-	
-		/// get the syntax for a file extension based on it's language string,
-		/// returns NULL if not found
-		ofxEditorSyntax* getFileExtSyntax(const string &ext);
+		/// print the available syntax languages and assoicated file extensions
+		void printSyntaxes();
 	
 	protected:
 	
@@ -149,5 +142,4 @@ class ofxEditorSettings {
 		wstring closeChars; //< close chars (parens, bracket, etc) for matching highlight
 	
 		map<string,ofxEditorSyntax*> langs; //< available syntaxes by lang string
-		map<string,string> fileExts; //< lang string for file extension
 };

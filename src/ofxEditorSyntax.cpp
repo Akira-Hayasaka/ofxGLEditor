@@ -20,10 +20,18 @@
 #include "ofxEditorSyntax.h"
 #include "Unicode.h"
 #include "ofLog.h"
+#include "ofXml.h"
 
 //--------------------------------------------------------------
 ofxEditorSyntax::ofxEditorSyntax() {
 	clear();
+}
+
+//--------------------------------------------------------------
+ofxEditorSyntax::ofxEditorSyntax(const string& xmlFile) {
+	if(!loadFile(xmlFile)) {
+		clear();
+	}
 }
 
 //--------------------------------------------------------------
@@ -40,29 +48,164 @@ ofxEditorSyntax& ofxEditorSyntax::operator=(const ofxEditorSyntax &from) {
 //--------------------------------------------------------------
 void ofxEditorSyntax::copy(const ofxEditorSyntax &from) {
 	
+	lang = from.lang;
 	singleLineComment = from.singleLineComment;
 	multiLineCommentBegin = from.multiLineCommentBegin;
 	multiLineCommentEnd = from.multiLineCommentEnd;
 	preprocessor = from.preprocessor;
-	mathChars = from.mathChars;
+	hexLiteral = from.hexLiteral;
+	operatorChars = from.operatorChars;
 	punctuationChars = from.punctuationChars;
 
 	// make deep copies
-	words.clear();
+	clearAllFileExts();
+	clearAllWords();
 	for(map<wstring,WordType>::const_iterator iter = from.words.begin(); iter != from.words.end(); ++iter) {
 		words[(*iter).first] = (*iter).second;
+	}
+	for(set<string>::const_iterator iter = from.fileExts.begin(); iter != from.fileExts.end(); ++iter) {
+		fileExts.insert((*iter));
 	}
 }
 
 //--------------------------------------------------------------
+bool ofxEditorSyntax::loadFile(const string& xmlFile) {
+	string path = ofToDataPath(xmlFile);
+	ofXml xml;
+	if(!xml.load(path)) {
+		ofLogError("ofxEditorSyntax") << "couldn't load \""
+			<< ofFilePath::getFileName(xmlFile) << "\"";
+		return false;
+	}
+	xml.setToParent();
+	if(!xml.exists("syntax")) {
+		ofLogWarning("ofxEditorSyntax") << "root xml tag not \"syntax\", ignoring";
+		return false;
+	}
+	xml.setTo("syntax");
+	int numTags = xml.getNumChildren();
+	clear();
+	for(int i = 0; i < numTags; ++i) {
+		xml.setToChild(i);
+		if(xml.getName() == "lang") {setLang(xml.getValue());}
+		else if(xml.getName() == "files") {
+			int numExts = xml.getNumChildren();
+			for(int e = 0; e < numExts; ++e) {
+				xml.setToChild(e);
+				if(xml.getName() == "ext") {addFileExt(xml.getValue());}
+				else {
+					ofLogWarning("ofxEditorSyntax") << "ignoring unknown files xml tag \"" << xml.getName() << "\"";
+				}
+				xml.setToParent();
+			}
+		}
+		else if(xml.getName() == "singlecomment") {singleLineComment = string_to_wstring(xml.getValue());}
+		else if(xml.getName() == "multicomment")  {
+			if(xml.exists("begin")) {multiLineCommentBegin = string_to_wstring(xml.getValue("begin"));}
+			if(xml.exists("end")) {multiLineCommentBegin = string_to_wstring(xml.getValue("end"));}
+		}
+		else if(xml.getName() == "preprocessor") {preprocessor = string_to_wstring(xml.getValue());}
+		else if(xml.getName() == "hexliteral") {
+			string b = xml.getValue();
+			if(b == "true")       {setHexLiteral(true);}
+			else if(b == "false") {setHexLiteral(false);}
+			else {
+				ofLogWarning("ofxEditorSyntax") << "ignoring unknown xml bool string \"" << b << "\"";
+			}
+		}
+		else if(xml.getName() == "operator")     {operatorChars = string_to_wstring(xml.getValue());}
+		else if(xml.getName() == "punctuation")  {punctuationChars = string_to_wstring(xml.getValue());}
+		else if(xml.getName() == "words")  {
+			int numWords = xml.getNumChildren();
+			for(int w = 0; w < numWords; ++w) {
+				xml.setToChild(w);
+				if(xml.getName() == "keyword")       {setWord(xml.getValue(), KEYWORD);}
+				else if(xml.getName() == "typename") {setWord(xml.getValue(), TYPENAME);}
+				else if(xml.getName() == "function") {setWord(xml.getValue(), FUNCTION);}
+				else {
+					ofLogWarning("ofxEditorSyntax") << "ignoring unknown words xml tag \"" << xml.getName() << "\"";
+				}
+				xml.setToParent();
+			}
+		}
+		else {
+			ofLogWarning("ofxEditorSyntax") << "ignoring unknown xml tag \"" << xml.getName() << "\"";
+		}
+		xml.setToParent();
+	}
+	xml.clear();
+	
+	return true;
+}
+
+//--------------------------------------------------------------
 void ofxEditorSyntax::clear() {
-	clearAllWords();
+	lang = "";
+	clearAllFileExts();
 	singleLineComment = L"";
 	multiLineCommentBegin = L"";
 	multiLineCommentEnd = L"";
 	preprocessor = L"#";
-	mathChars = L"+-*/!|&~";
+	hexLiteral = true;
+	operatorChars = L"=+-*/!|&~^";
 	punctuationChars = L";:,?";
+	clearAllWords();
+}
+
+// META
+
+//--------------------------------------------------------------
+void ofxEditorSyntax::setLang(const string &lang) {
+	this->lang = lang;
+}
+
+//--------------------------------------------------------------
+const string& ofxEditorSyntax::getLang() {
+	return lang;
+}
+
+//--------------------------------------------------------------
+void ofxEditorSyntax::clearLang() {
+	lang = "";
+}
+
+//--------------------------------------------------------------
+void ofxEditorSyntax::addFileExt(const string &ext) {
+	if(ext == "") return;
+	if(ext[0] == '.') { // be helpful here
+		ofLogWarning("ofxEditorSyntax") << "dropping initial . from file extension: \"" << ext << "\"";
+		fileExts.insert(ext.substr(1, ext.size()-1));
+	}
+	else {
+		fileExts.insert(ext);
+	}
+}
+
+//--------------------------------------------------------------
+void ofxEditorSyntax::addFileExt(const vector<string> &exts) {
+	for(int i = 0; i < exts.size(); ++i) {
+		addFileExt(exts[i]);
+	}
+}
+
+//--------------------------------------------------------------
+bool ofxEditorSyntax::hasFileExt(const string &ext) {
+	return (fileExts.find(ext) != fileExts.end());
+}
+
+//--------------------------------------------------------------
+const set<string>& ofxEditorSyntax::getFileExts() {
+	return fileExts;
+}
+
+//--------------------------------------------------------------
+void ofxEditorSyntax::clearFileExt(const string &ext) {
+	fileExts.erase(ext);
+}
+
+//--------------------------------------------------------------
+void ofxEditorSyntax::clearAllFileExts() {
+	fileExts.clear();
 }
 
 // COMMENTS
@@ -78,7 +221,7 @@ void ofxEditorSyntax::setSingleLineComment(const string &begin) {
 }
 
 //--------------------------------------------------------------
-wstring& ofxEditorSyntax::getWideSingleLineComment() {
+const wstring& ofxEditorSyntax::getWideSingleLineComment() {
 	return singleLineComment;
 }
 
@@ -100,7 +243,7 @@ void ofxEditorSyntax::setMultiLineComment(const string &begin, const string &end
 }
 
 //--------------------------------------------------------------
-wstring& ofxEditorSyntax::getWideMultiLineCommentBegin() {
+const wstring& ofxEditorSyntax::getWideMultiLineCommentBegin() {
 	return multiLineCommentBegin;
 }
 
@@ -110,7 +253,7 @@ string ofxEditorSyntax::getMultiLineCommentBegin() {
 }
 
 //--------------------------------------------------------------
-wstring& ofxEditorSyntax::getWideMultiLineCommentEnd() {
+const wstring& ofxEditorSyntax::getWideMultiLineCommentEnd() {
 	return multiLineCommentEnd;
 }
 
@@ -132,7 +275,7 @@ void ofxEditorSyntax::setPreprocessor(const string &begin) {
 }
 
 //--------------------------------------------------------------
-wstring& ofxEditorSyntax::getWidePreprocessor() {
+const wstring& ofxEditorSyntax::getWidePreprocessor() {
 	return preprocessor;
 }
 
@@ -145,6 +288,7 @@ string ofxEditorSyntax::getPreprocessor() {
 
 //--------------------------------------------------------------
 void ofxEditorSyntax::setWord(const wstring &word, WordType type) {
+	if(word == L"") return;
 	words[word] = type;
 }
 
@@ -212,28 +356,40 @@ void ofxEditorSyntax::clearAllWords() {
 	words.clear();
 }
 
+// PARSING CHARS
+
 //--------------------------------------------------------------
-void ofxEditorSyntax::setMathChars(const wstring &chars) {
+void ofxEditorSyntax::setHexLiteral(bool hex) {
+	hexLiteral = hex;
+}
+
+//--------------------------------------------------------------
+bool ofxEditorSyntax::getHexLiteral() {
+	return hexLiteral;
+}
+
+//--------------------------------------------------------------
+void ofxEditorSyntax::setOperatorChars(const wstring &chars) {
 	if(chars.length() == 0) {
-		ofLogWarning("ofxEditorSyntax") << "empty math string";
+		ofLogWarning("ofxEditorSyntax") << "empty operator string";
 		return;
 	}
-	mathChars = chars;
+	operatorChars = chars;
 }
 
 //--------------------------------------------------------------
-void ofxEditorSyntax::setMathChars(const string &chars) {
-	setMathChars(string_to_wstring(chars));
+void ofxEditorSyntax::setOperatorChars(const string &chars) {
+	setOperatorChars(string_to_wstring(chars));
 }
 
 //--------------------------------------------------------------
-wstring& ofxEditorSyntax::getWideMathChars() {
-	return mathChars;
+const wstring& ofxEditorSyntax::getWideOperatorChars() {
+	return operatorChars;
 }
 
 //--------------------------------------------------------------
-string ofxEditorSyntax::getMathChars() {
-	return wstring_to_string(mathChars);
+string ofxEditorSyntax::getOperatorChars() {
+	return wstring_to_string(operatorChars);
 }
 
 //--------------------------------------------------------------
@@ -251,7 +407,7 @@ void ofxEditorSyntax::setPunctuationChars(const string &chars) {
 }
 
 //--------------------------------------------------------------
-wstring& ofxEditorSyntax::getWidePunctuationChars() {
+const wstring& ofxEditorSyntax::getWidePunctuationChars() {
 	return punctuationChars;
 }
 

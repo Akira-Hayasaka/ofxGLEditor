@@ -17,5 +17,8 @@ end
 -- mix of numbers and text
 1ab23cd45
 
+-- a hex literal number
+0x0123456789abcdefABCDEF
+
 -- a very long line that should scroll or wrap
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.

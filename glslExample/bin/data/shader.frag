@@ -14,8 +14,7 @@ void main(void)
 	float pct =  bounceInOut(abs(fract(iGlobalTime*0.1)*2.0-01.) );
 
     vec3 color = vec3(uv,0.5+0.5*cos(uv.y*iGlobalTime* (backInOut(abs(sin(iGlobalTime*0.04)))*0.088)));
-
-//    float r = 0.12 + 0.3* cos(atan(q.y, q.y) * 2600.0 + (sin(iGlobalTime*0.375)*8000.0) * q.x + 0.1);
+	
 	float r = 0.175*sin(atan(q.y)*iGlobalTime) + .40 * q.y;
     vec3 color2 = color*vec3(r*8.0);
 

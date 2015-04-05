@@ -82,8 +82,15 @@ class ofxEditor {
 		/// set the maximum auto focus zoom scale, default: 5.0
 		static void setAutoFocusMaxScale(float max);
 	
-		/// get the maximum auto focs zoom scale
+		/// get the maximum auto focus zoom scale
 		static float getAutoFocusMaxScale();
+	
+		/// set the auto focus scaling speed, default: 1.0
+		/// clamped to 0.1 - 2.0, anything > ~1.2 may be glitchy depending on framerate
+		static void setAutoFocusSpeed(float speed);
+	
+		/// get the auto focus scaling speed
+		static float getAutoFocusSpeed();
 	
 	/// \section Main
 		
@@ -296,7 +303,7 @@ class ofxEditor {
 	
 		// auto focus
 		static float s_autoFocusError; //< scale snapping amount
-		static float s_autoFocusScaleDrift; //< scale shrink/grow modifier (aka speed)
+		static float s_autoFocusSpeed; //< scale speed (shrink/grow modifier)
 		static float s_autoFocusMinScale;   //< minimum allowed scaling
 		static float s_autoFocusMaxScale;   //< maximum allowed scaling
 	
@@ -372,7 +379,7 @@ class ofxEditor {
 			TAB,                //< whitespace
 			ENDLINE,            //< whitespace
 			MATCHING_CHAR,      //< open/close chars in settings aka []{}()<>
-			MATH_CHAR,          //< common mathematical chars aka =+-*/!|&~
+			OPERATOR_CHAR,      //< common operator chars aka =+-*/!|&~^
 			PUNCTUATION_CHAR,   //< standard punctuation chars aka ;:,?
 			COMMENT_BEGIN,      //< tag only, no text
 			COMMENT_END,        //< tag only, no text

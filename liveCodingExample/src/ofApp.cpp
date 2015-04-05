@@ -1,3 +1,22 @@
+/*
+ * Copyright (C) 2015 Dan Wilcox <danomatika@gmail.com>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * See https://github.com/Akira-Hayasaka/ofxGLEditor for more info.
+ */
 #include "ofApp.h"
 
 //--------------------------------------------------------------
@@ -6,7 +25,7 @@ void ofApp::setup() {
 	ofSetVerticalSync(true);
 	ofSetLogLevel("ofxLua", OF_LOG_VERBOSE);
 		
-	// scripts to run
+	// script to run
 	script = "scripts/liveCodingExample.lua";
 	
 	// init the lua state
@@ -20,41 +39,15 @@ void ofApp::setup() {
 	hideEditor = false;
     
     // sample lua syntax
-	// lau 5.1 keywords from http://www.lua.org/manual/5.1/manual.html
-    colorScheme.setWordColor("and", ofColor::fuchsia);
-    colorScheme.setWordColor("end", ofColor::fuchsia);
-	colorScheme.setWordColor("in", ofColor::fuchsia);
-	colorScheme.setWordColor("repeat", ofColor::fuchsia);
-	colorScheme.setWordColor("break", ofColor::fuchsia);
-	colorScheme.setWordColor("false", ofColor::fuchsia);
-	colorScheme.setWordColor("local", ofColor::fuchsia);
-	colorScheme.setWordColor("return", ofColor::fuchsia);
-	colorScheme.setWordColor("do", ofColor::fuchsia);
-	colorScheme.setWordColor("for", ofColor::fuchsia);
-	colorScheme.setWordColor("nil", ofColor::fuchsia);
-	colorScheme.setWordColor("then", ofColor::fuchsia);
-	colorScheme.setWordColor("else", ofColor::fuchsia);
-	colorScheme.setWordColor("function", ofColor::fuchsia);
-	colorScheme.setWordColor("not", ofColor::fuchsia);
-	colorScheme.setWordColor("true", ofColor::fuchsia);
-	colorScheme.setWordColor("elseif", ofColor::fuchsia);
-	colorScheme.setWordColor("if", ofColor::fuchsia);
-	colorScheme.setWordColor("or", ofColor::fuchsia);
-	colorScheme.setWordColor("until", ofColor::fuchsia);
-	colorScheme.setWordColor("while", ofColor::fuchsia);
-    colorScheme.setSingleLineComment("--");
-    colorScheme.setMultiLineComment("--[[", "]]");
+	syntax.loadFile("luaSyntax.xml");
+	editor.getSettings().addSyntax(&syntax);
     
     // syntax highlighter colors
-    colorScheme.setStringColor(ofColor::yellow);
-    colorScheme.setNumberColor(ofColor::orangeRed);
-    colorScheme.setCommentColor(ofColor::gray);
+    colorScheme.loadFile("colorScheme.xml");
     editor.setColorScheme(&colorScheme);
     
-    // open script file into editor
-    ofFile testFile;
-    testFile.open(script, ofFile::ReadOnly);
-    editor.setText(testFile.readToBuffer().getText());
+    // open script file into editor, sets Lua syntax based on .lua file extension
+    editor.openFile(script);
 
 	// execute script from editor
 	lua.doString(editor.getText());

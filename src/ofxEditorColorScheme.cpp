@@ -20,12 +20,58 @@
 #include "ofxEditorColorScheme.h"
 #include "Unicode.h"
 #include "ofLog.h"
+#include "ofUtils.h"
+#include "ofXml.h"
 
 // COLOR SCHEME
 
 //--------------------------------------------------------------
 ofxEditorColorScheme::ofxEditorColorScheme() {
 	clear();
+}
+
+//--------------------------------------------------------------
+ofxEditorColorScheme::ofxEditorColorScheme(const string& xmlFile) {
+	if(!loadFile(xmlFile)) {
+		clear();
+	}
+}
+
+//--------------------------------------------------------------
+bool ofxEditorColorScheme::loadFile(const string& xmlFile) {
+	string path = ofToDataPath(xmlFile);
+	ofXml xml;
+	if(!xml.load(path)) {
+		ofLogError() << "ofxEditorColorScheme: couldn't load \""
+			<< ofFilePath::getFileName(xmlFile) << "\"";
+		return false;
+	}
+	xml.setToParent();
+	if(!xml.exists("colorscheme")) {
+		ofLogWarning() << "ofxEditorColorScheme: root xml tag not \"colorscheme\", ignoring";
+		return false;
+	}
+	xml.setTo("colorscheme");
+	int numTags = xml.getNumChildren();
+	clear();
+	for(int i = 0; i < numTags; ++i) {
+		xml.setToChild(i);
+		if(xml.getName() == "text")    {setColorFromXml(xml, textColor);}
+		else if(xml.getName() == "string")  {setColorFromXml(xml, stringColor);}
+		else if(xml.getName() == "number")  {setColorFromXml(xml, numberColor);}
+		else if(xml.getName() == "comment") {setColorFromXml(xml, commentColor);}
+		else if(xml.getName() == "preprocessor") {setColorFromXml(xml, preprocessorColor);}
+		else if(xml.getName() == "keyword")  {setColorFromXml(xml, keywordColor);}
+		else if(xml.getName() == "typename") {setColorFromXml(xml, typenameColor);}
+		else if(xml.getName() == "function") {setColorFromXml(xml, functionColor);}
+		else {
+			ofLogWarning() << "ofxEditorColorScheme: ignoring unknown xml tag \"" << xml.getName() << "\"";
+		}
+		xml.setToParent();
+	}
+	xml.clear();
+	
+	return true;
 }
 
 //--------------------------------------------------------------
@@ -39,8 +85,10 @@ void ofxEditorColorScheme::clear(ofColor color) {
 	stringColor = color;
 	numberColor = color;
 	commentColor = color;
+	preprocessorColor = color;
 	keywordColor = color;
 	typenameColor = color;
+	functionColor = color;
 }
 
 //--------------------------------------------------------------
@@ -121,4 +169,16 @@ void ofxEditorColorScheme::setFunctionColor(ofColor color) {
 //--------------------------------------------------------------
 ofColor& ofxEditorColorScheme::getFunctionColor() {
 	return functionColor;
+}
+
+// PROTECTED
+
+//--------------------------------------------------------------
+void ofxEditorColorScheme::setColorFromXml(ofXml &xml, ofColor &color) {
+	if(xml.exists("gray")) {color.set(xml.getIntValue("gray"));}
+	if(xml.exists("hex")) {color.setHex(ofHexToInt(xml.getValue("hex")));}
+	if(xml.exists("r")) {color.r = xml.getIntValue("r");}
+	if(xml.exists("g")) {color.g = xml.getIntValue("g");}
+	if(xml.exists("b")) {color.b = xml.getIntValue("b");}
+	if(xml.exists("a")) {color.a = xml.getIntValue("a");}
 }

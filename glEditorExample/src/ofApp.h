@@ -23,6 +23,17 @@
 #include "ofxGLEditor.h"
 
 // inherit ofxMultiEventListener to receive open, save, excute, and eval events
+//
+// app key commands:
+//    MOD -> CTRL or Super (Windows Key, Mac CMD)
+//
+// MOD + f: toggle fullscreen
+// MOD + l: toggle line wrapping
+// MOD + n: toggle line numbers
+// MOD + z: toggle auto focus zooming
+//
+// see ofxGLEditor.h for editor key commands
+//
 class ofApp : public ofBaseApp, public ofxGLEditorListener {
 
 	public:
