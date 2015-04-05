@@ -643,7 +643,7 @@ ofxEditorSyntax* ofxGLEditor::getSyntax(int editor) {
 	editor = getEditorIndex(editor);
 	if(editor == -1) {
 		ofLogError("ofxGLEditor") << "cannot get syntax from unknown editor " << editor;
-		return;
+		return NULL;
 	}
 	return m_editors[editor]->getSyntax();
 }
