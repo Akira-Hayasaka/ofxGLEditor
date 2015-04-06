@@ -264,7 +264,7 @@ bool ofxGLEditor::openFile(string filename, int editor) {
 		<< "\" into editor " << editor;
 	bool ret = m_editors[editor]->openFile(filename);
 	if(ret) {
-		m_saveFiles[editor] = ofFilePath::getFileName(filename);
+		m_saveFiles[editor] = ofToDataPath(filename);
 	}
 	return ret;
 }
@@ -289,7 +289,7 @@ bool ofxGLEditor::saveFile(string filename, int editor) {
 		<< " to \"" << ofFilePath::getFileName(filename) << "\"";
 	bool ret = m_editors[editor]->saveFile(filename);
 	if(ret) {
-		m_saveFiles[editor] = ofFilePath::getFileName(filename);
+		m_saveFiles[editor] = ofToDataPath(filename);
 	}
 	return ret;
 }
@@ -399,7 +399,7 @@ void ofxGLEditor::setEditorFilename(int editor, string filename) {
 	ofLogVerbose("ofxGLEditor") << "setting filename for editor " << editor
 		<< " to \"" << ofFilePath::getFileName(filename) << "\"";
 
-	m_saveFiles[editor] = filename;
+	m_saveFiles[editor] = ofToDataPath(filename);
 }
 	
 //--------------------------------------------------------------

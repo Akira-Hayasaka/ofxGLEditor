@@ -1042,7 +1042,7 @@ void ofxEditor::resize(int width, int height) {
 bool ofxEditor::openFile(string filename) {
 	ofFile file;
 	if(!file.open(ofToDataPath(filename), ofFile::ReadOnly)) {
-		ofLogError() << "ofxEditor: couldn't load \""
+		ofLogError("ofxEditor") << "couldn't load \""
 			<< ofFilePath::getFileName(filename) << "\"";
 		return false;
 	}
@@ -1056,7 +1056,7 @@ bool ofxEditor::openFile(string filename) {
 bool ofxEditor::saveFile(string filename) {
 	ofFile file;
 	if(!file.open(ofToDataPath(filename), ofFile::WriteOnly)) {
-		ofLogError() << "ofxGLEditor: couldn't save \""
+		ofLogError("ofxEditor") << "couldn't save \""
 			<< ofFilePath::getFileName(filename) << "\"";
 		return false;
 	}
@@ -1463,21 +1463,21 @@ void ofxEditor::printSyntax() {
 		switch(tb.type) {
 			case UNKNOWN:            type += "UNKNOWN"; break;
 			case WORD:               type += "WORD"; break;
-			case STRING_BEGIN:       ofLogNotice() << "STRING_BEGIN"; continue;
-			case STRING_END:         ofLogNotice() << "STRING_END"; continue;
+			case STRING_BEGIN:       ofLogNotice("ofxEditor") << "STRING_BEGIN"; continue;
+			case STRING_END:         ofLogNotice("ofxEditor") << "STRING_END"; continue;
 			case NUMBER:             type += "NUMBER"; break;
 			case SPACE:              type += "SPACE"; break;
 			case TAB:                type += "TAB"; break;
-			case ENDLINE:            ofLogNotice() << "ENDLINE"; continue;
+			case ENDLINE:            ofLogNotice("ofxEditor") << "ENDLINE"; continue;
 			case MATCHING_CHAR:      type += "MATCHING_CHAR"; break;
 			case OPERATOR_CHAR:      type += "OPERATOR_CHAR"; break;
 			case PUNCTUATION_CHAR:   type += "PUNCTUATION_CHAR"; break;
-			case COMMENT_BEGIN:      ofLogNotice() << "COMMENT_BEGIN"; continue;
-			case COMMENT_END:        ofLogNotice() << "COMMENT_END"; continue;
-			case PREPROCESSOR_BEGIN: ofLogNotice() << "PREPROCESSOR_BEGIN"; continue;
-			case PREPROCESSOR_END:   ofLogNotice() << "PREPROCESSOR_END"; continue;
+			case COMMENT_BEGIN:      ofLogNotice("ofxEditor") << "COMMENT_BEGIN"; continue;
+			case COMMENT_END:        ofLogNotice("ofxEditor") << "COMMENT_END"; continue;
+			case PREPROCESSOR_BEGIN: ofLogNotice("ofxEditor") << "PREPROCESSOR_BEGIN"; continue;
+			case PREPROCESSOR_END:   ofLogNotice("ofxEditor") << "PREPROCESSOR_END"; continue;
 		}
-		ofLogNotice() << type << ": \"" << wstring_to_string(tb.text) << "\"";
+		ofLogNotice("ofxEditor") << type << ": \"" << wstring_to_string(tb.text) << "\"";
 	}
 }
 

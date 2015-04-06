@@ -42,13 +42,13 @@ bool ofxEditorColorScheme::loadFile(const string& xmlFile) {
 	string path = ofToDataPath(xmlFile);
 	ofXml xml;
 	if(!xml.load(path)) {
-		ofLogError() << "ofxEditorColorScheme: couldn't load \""
+		ofLogError("ofxEditorColorScheme") << "couldn't load \""
 			<< ofFilePath::getFileName(xmlFile) << "\"";
 		return false;
 	}
 	xml.setToParent();
 	if(!xml.exists("colorscheme")) {
-		ofLogWarning() << "ofxEditorColorScheme: root xml tag not \"colorscheme\", ignoring";
+		ofLogWarning("ofxEditorColorScheme") << "root xml tag not \"colorscheme\", ignoring";
 		return false;
 	}
 	xml.setTo("colorscheme");
@@ -65,7 +65,7 @@ bool ofxEditorColorScheme::loadFile(const string& xmlFile) {
 		else if(xml.getName() == "typename") {setColorFromXml(xml, typenameColor);}
 		else if(xml.getName() == "function") {setColorFromXml(xml, functionColor);}
 		else {
-			ofLogWarning() << "ofxEditorColorScheme: ignoring unknown xml tag \"" << xml.getName() << "\"";
+			ofLogWarning("ofxEditorColorScheme") << "ignoring unknown xml tag \"" << xml.getName() << "\"";
 		}
 		xml.setToParent();
 	}
