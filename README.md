@@ -24,7 +24,7 @@ Description
 Sample Lua syntax highlighting:  
 ![image](https://github.com/Akira-Hayasaka/ofxGLEditor/raw/master/doc/syntax_highlighting.png)
 
-ofxEditor provides a rewrite of the [Fluxus live coding environment](http://www.pawfal.org/fluxus)'s OpenGL-based text editor for OpenFrameworks including simple syntax highlighting, a file browser, and a Read-Eval-Print Loop console. The ofxMultiEditor provides all of the above including 9 editor buffers, so it should be easy to use this as a basis for live coding, scripting, parameter tweaking, etc
+ofxEditor provides a rewrite of the [Fluxus live coding environment](http://www.pawfal.org/fluxus)'s OpenGL-based text editor for OpenFrameworks including simple syntax highlighting, a file browser, and a Read-Eval-Print Loop console. The ofxGLEditor provides all of the above including 9 editor buffers, so it should be easy to use this as a basis for live coding, scripting, parameter tweaking, etc. Further, ofxEditorSyntax & ofxEditorColorScheme provide simple language specific syntax highlighting.
 
 [See a video of the livecodingExample which demonstrates the basic ofxEditor class with syntax highlighting using ofxLua.](https://vimeo.com/116370247)
 
@@ -71,11 +71,15 @@ Point the ProjectGenerator to `addons/ofxGLEditor`, change the project name to t
 
 #### glslExample
 
-This is a simple GLSL fragment (pixel) shader editor including GLSL syntax highlighting. The shader is reloaded whenever it is saved.
+This is a simple GLSL fragment (pixel) shader editor including GLSL syntax highlighting. The shader is reloaded whenever it is saved or evaluated (MD key + e).
 
 #### liveCodingExample
 
 This is a simple livecoding example using ofxLua including lua keyword syntax highlighting. Also, you will need to select `ofxLua` from the addons list when you generate the project files for this example.
+
+### Syntaxes
+
+A growing set of language syntax xml files can be found in the `syntaxes` folder. Additions or updates are welcome. 
 
 ### Font
 
