@@ -43,7 +43,7 @@ glEditorExample/addons.make
 glEditorExample/config.make
 glEditorExample/editorExample.xcodeproj
 glEditorExample/openFrameworks-Info.plist
-glEditorExample/glEditorExampe.xcodeproj
+glEditorExample/glEditorExample.xcodeproj
 
 glslExample/Makefile
 glslExample/Project.xcconfig

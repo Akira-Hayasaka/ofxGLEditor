@@ -22,7 +22,7 @@
 #include "ofMain.h"
 #include "ofxGLEditor.h"
 
-// inherit ofxMultiEventListener to receive open, save, excute, and eval events
+// inherit ofxGLEventListener to receive open, save, excute, and eval events
 //
 // app key commands:
 //    MOD -> CTRL or Super (Windows Key, Mac CMD)
@@ -43,7 +43,7 @@ class ofApp : public ofBaseApp, public ofxGLEditorListener {
 		void keyPressed(int key);
 		void windowResized(int w, int h);
 	
-		/// ofxMultiEditor events
+		/// ofxGLEditor events
 		void saveFileEvent(int &whichEditor);
 		void openFileEvent(int &whichEditor);
 		void executeScriptEvent(int &whichEditor);

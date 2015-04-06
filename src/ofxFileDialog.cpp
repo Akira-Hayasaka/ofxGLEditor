@@ -397,6 +397,7 @@ void ofxFileDialog::keyPressedOpen(int key) {
 			if(m_directories.find(m_currentFile) != m_directories.end()) {
 				m_path += m_filenames[m_currentFile];
 				m_path += L"/";
+				m_path = string_to_wstring(ofFilePath::getAbsolutePath(wstring_to_string(m_path)));
 				refresh();
 			}
 			else {

@@ -1,0 +1,187 @@
+<!-- https://www.opengl.org/documentation/glsl -->
+<syntax>
+	<lang>GLSL</lang>
+	<files>
+		<ext>frag</ext>
+		<ext>vert</ext>
+        <ext>geom</ext>
+        <ext>comp</ext>
+        <ext>tesc</ext>
+        <ext>tese</ext>
+	</files>
+	<singlecomment>//</singlecomment>
+	<multicomment>
+		<begin>/*</begin>
+		<end>*/</end>
+	</multicomment>
+	<preprocessor>#</preprocessor>
+	<operator>+-*/!|&amp;^~</operator>
+	<punctuation>;:,?</punctuation>
+	<words>
+		
+		<keyword>void</keyword>
+		<keyword>uniform</keyword>
+		<keyword>const</keyword>
+		<keyword>in</keyword>
+		<keyword>out</keyword>
+		<keyword>inout</keyword>
+		
+		<!-- scalars -->
+		<typename>int</typename>
+		<typename>float</typename>
+		<typename>uint</typename>
+		<typename>bool</typename>
+		
+		<!-- vectors -->
+		<typename>vec2</typename>
+		<typename>vec3</typename>
+		<typename>vec4</typename>
+		<typename>ivec2</typename>
+		<typename>ivec3</typename>
+		<typename>ivec4</typename>
+		<typename>uvec2</typename>
+		<typename>uvec3</typename>
+		<typename>uvec4</typename>
+		<typename>bvec2</typename>
+		<typename>bvec3</typename>
+		<typename>bvec4</typename>
+
+		<!-- matrices -->
+		<typename>mat2</typename>
+		<typename>mat3</typename>
+		<typename>mat4</typename>
+
+		<!-- samplers -->
+		<typename>sampler1D</typename>
+		<typename>sampler2D</typename>
+		<typename>sampler3D</typename>
+		<typename>samplerCube</typename>
+		<typename>sampler2DRect</typename>
+		<typename>sampler1DShadow</typename>
+		<typename>sampler2DShadow</typename>
+		<typename>sampler2DRectShadow</typename>
+		<typename>sampler1DArray</typename>
+		<typename>sampler2DArray</typename>
+		<typename>sampler1DArrayShadow</typename>
+		<typename>sampler2DArrayShadow</typename>
+		<typename>isampler1D</typename>
+		<typename>isampler2D</typename>
+		<typename>isampler3D</typename>
+		<typename>isamplerCube</typename>
+		<typename>isampler2DRect</typename>
+		<typename>isampler2DArray</typename>
+		<typename>isamplerBuffer</typename>
+		<typename>usampler1D</typename>
+		<typename>usampler2D</typename>
+		<typename>usampler3D</typename>
+		<typename>usamplerCube</typename>
+		<typename>usampler2DRect</typename>
+		<typename>usampler1DArray</typename>
+		<typename>usampler2DArray</typename>
+
+		<!-- built in variables -->
+        <function>gl_FragCoord</function>
+        <function>gl_FragColor</function>
+        <function>gl_FragDepth</function>
+    
+    	<!--  angle and trigonometry -->
+        <function>radians</function>
+        <function>degrees</function>
+        <function>sin</function>
+        <function>cos</function>
+        <function>tan</function>
+        <function>asin</function>
+        <function>acos</function>
+        <function>atan</function>
+        <function>sinh</function>
+        <function>cosh</function>
+        <function>tanh</function>
+        <function>asinh</function>
+        <function>acosh</function>
+        <function>atanh</function>
+        
+    	<!-- exponential -->
+        <function>pow</function>
+        <function>exp</function>
+        <function>log</function>
+        <function>exp2</function>
+        <function>log2</function>
+        <function>sqrt</function>
+        <function>inversesqrt</function>
+        
+    	<!-- common math -->
+        <function>abs</function>
+        <function>sign</function>
+        <function>floor</function>
+        <function>trunc</function>
+        <function>round</function>
+        <function>roundEven</function>
+        <function>cell</function>
+        <function>fract</function>
+        <function>mod</function>
+        <function>min</function>
+        <function>maxclamp</function>
+        <function>mix</function>
+        <function>step</function>
+        <function>smoothstep</function>
+        <function>isnan</function>
+        <function>isinf</function>
+        
+    	<!-- geometric -->
+        <function>length</function>
+        <function>distance</function>
+        <function>dot</function>
+        <function>cross</function>
+        <function>normalize</function>
+        <function>faceforward</function>
+        <function>reflect</function>
+        <function>refract</function>
+        
+    	<!-- matrix -->
+        <function>matrixCompMult</function>
+        <function>transpose</function>
+        <function>inverse</function>
+        <function>outerProduct</function>
+
+    	<!-- vector relational -->
+        <function>lessThan</function>
+        <function>lessThanEqual</function>
+        <function>greaterThan</function>
+        <function>greaterThanEqual</function>
+        <function>equal</function>
+        <function>notEqual</function>
+        <function>any</function>
+        <function>all</function>
+        <function>not</function>
+        
+    	<!-- texture access -->
+        <function>texture2D</function>
+        <function>textureSize</function>
+        <function>texture</function>
+        <function>textureProj</function>
+        <function>textureLod</function>
+        <function>textureGrad</function>
+        <function>textureOffset</function>
+        <function>texelFetch</function>
+        <function>texelFetchOffset</function>
+        <function>textureProjLod</function>
+        <function>textureProjGrad</function>
+        <function>textureProjOffset</function>
+        <function>textureLodOffset</function>
+        <function>textureGradOffset</function>
+        <function>textureProjLodOffset</function>
+        <function>textureProjGradOffset</function>
+
+    	<!-- fragment processing -->
+        <function>dFdx</function>
+        <function>dFdy</function>
+        <function>fwidth</function>
+        
+    	<!-- noise -->
+        <function>noise1</function>
+        <function>noise2</function>
+        <function>noise3</function>
+        <function>noise4</function>
+
+	</words>
+</syntax>
