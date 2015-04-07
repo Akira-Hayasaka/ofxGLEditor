@@ -120,6 +120,13 @@ class ofxGLEditor {
 		/// returns true on success
 		bool saveFile(string filename, int editor=0);
 	
+		/// save the text in an editor to the current filename
+		///
+		/// set editor to 0 for the current editor or an editor index from 1- 9
+		///
+		/// returns true on success
+		bool saveFile(int editor=0);
+	
 		/// get the contents of an editor or contents of editor selection
 		///
 		/// set editor to 0 for the current editor

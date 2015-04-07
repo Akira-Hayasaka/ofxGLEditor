@@ -295,6 +295,15 @@ bool ofxGLEditor::saveFile(string filename, int editor) {
 }
 
 //--------------------------------------------------------------
+bool ofxGLEditor::saveFile(int editor) {
+	if(m_saveFiles[editor] == "") {
+		ofLogWarning("ofxGLEditor") << "ignore save, current filename not set";
+		return false;
+	}
+	return saveFile(m_saveFiles[editor], editor);
+}
+
+//--------------------------------------------------------------
 string ofxGLEditor::getText(int editor) {
     
 	editor = getEditorIndex(editor);

@@ -1049,6 +1049,7 @@ bool ofxEditor::openFile(string filename) {
 	setFileExtSyntax(ofFilePath::getFileExt(filename));
 	setText(file.readToBuffer().getText());
 	file.close();
+	m_position = 0;
 	return true;
 }
 		
@@ -1349,7 +1350,7 @@ unsigned int ofxEditor::getCurrentPos() {
 
 //--------------------------------------------------------------
 void ofxEditor::setCurrentPos(unsigned int pos) {
-	if(pos >= m_text.length()) {
+	if(pos > m_text.length()) {
 		ofLogWarning("ofxEditor") << "ignoring invalid position " << pos;
 		return;
 	}
