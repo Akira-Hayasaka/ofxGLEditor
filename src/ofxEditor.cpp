@@ -47,8 +47,14 @@
 #define CURSOR_MAX_WIDTH 40
 #define CURSOR_MAX_HEIGHT 40
 
+// timeout between chars when building an undo action
+#define UNDO_TIMEOUT 1000
+
 // uncomment to see the viewport and auto focus bounding boxes
 //#define DEBUG_AUTO_FOCUS
+
+// uncomment to print undo state on key input
+#define DEBUG_UNDO
 
 ofPtr<ofxEditorFont> ofxEditor::s_font;
 int ofxEditor::s_charWidth = 1;
@@ -65,6 +71,9 @@ float ofxEditor::s_autoFocusError = 10;
 float ofxEditor::s_autoFocusSpeed = 1.0;
 float ofxEditor::s_autoFocusMinScale = 0.5;
 float ofxEditor::s_autoFocusMaxScale = 5.0;
+
+bool ofxEditor::s_undo = true;
+unsigned int ofxEditor::s_undoMaxDepth = 10;
 
 // use CMD on OSX, CTRL for Windows & Linux by default
 #ifdef __APPLE__
@@ -117,6 +126,8 @@ ofxEditor::ofxEditor() {
 	m_scale = 1.0;
 	m_BBMinX = 0; m_BBMaxX = 0;
 	m_BBMinY = 0; m_BBMaxY = 0;
+	
+	m_undoPos = -1;
 }
 
 //--------------------------------------------------------------
@@ -163,6 +174,8 @@ ofxEditor::ofxEditor(ofxEditorSettings &sharedSettings) {
 	m_scale = 1.0;
 	m_BBMinX = 0; m_BBMaxX = 0;
 	m_BBMinY = 0; m_BBMaxY = 0;
+	
+	m_undoPos = -1;
 }
 
 //--------------------------------------------------------------
@@ -259,6 +272,26 @@ void ofxEditor::setAutoFocusSpeed(float speed) {
 //--------------------------------------------------------------
 float ofxEditor::getAutoFocusSpeed() {
 	return s_autoFocusSpeed;
+}
+
+//--------------------------------------------------------------
+void ofxEditor::setUndo(bool undo) {
+	s_undo = undo;
+}
+	
+//--------------------------------------------------------------
+bool ofxEditor::getUndo() {
+	return s_undo;
+}
+
+//--------------------------------------------------------------
+void ofxEditor::setUndoDepth(unsigned int depth) {
+	s_undoMaxDepth = depth;
+}
+
+//--------------------------------------------------------------
+unsigned int ofxEditor::getUndoDepth() {
+	return s_undoMaxDepth;
 }
 
 // MAIN
@@ -672,6 +705,9 @@ void ofxEditor::keyPressed(int key) {
 				
 			case 'a': case 10: // clear all text
 				if(ofGetKeyPressed(OF_KEY_SHIFT)) {
+					if(s_undo) {
+						updateUndo(DELETE, 0, L"", m_text);
+					}
 					clearText();
 				}
 				else { // select all
@@ -685,11 +721,8 @@ void ofxEditor::keyPressed(int key) {
 			case 'x': case 24: // cut
 				if(m_selection != NONE) {
 					copySelection();
-					m_text.erase(m_highlightStart, m_highlightEnd-m_highlightStart);
-					if(m_position >= m_highlightEnd) {
-						m_position -= m_highlightEnd-m_highlightStart;
-					}
-					m_selection = NONE;
+					eraseSelection();
+					textBufferUpdated();
 				}
 				break;
 			
@@ -702,8 +735,16 @@ void ofxEditor::keyPressed(int key) {
 				m_selection = NONE;
 				break;
 			
-			case 'b' : // show cursor location
+			case 'b' : case 2: // show cursor location
 				blowupCursor();
+				break;
+				
+			case 'z': case 26: // undo
+				undo();
+				break;
+				
+			case 'y': case 25: // redo
+				redo();
 				break;
 		}
 	}
@@ -850,13 +891,12 @@ void ofxEditor::keyPressed(int key) {
 			case OF_KEY_DEL:
 				if(!m_text.empty()) {
 					if(m_selection != NONE) {
-						m_text.erase(m_highlightStart, m_highlightEnd-m_highlightStart);
-						if(m_position >= m_highlightEnd) {
-							m_position -= m_highlightEnd-m_highlightStart;
-						}						
-						m_selection = NONE;
+						eraseSelection();
 					}
 					else if(m_position < m_text.size()) {
+						if(s_undo) {
+							updateUndo(DELETE, m_position, L"", m_text.substr(m_position, 1));
+						}
 						m_text.erase(m_position, 1);
 					}
 					textBufferUpdated();
@@ -866,13 +906,12 @@ void ofxEditor::keyPressed(int key) {
 			case OF_KEY_BACKSPACE:
 				if(!m_text.empty()) {
 					if(m_selection != NONE) {
-						m_text.erase(m_highlightStart, m_highlightEnd-m_highlightStart);
-						if(m_position >= m_highlightEnd) {
-							m_position -= m_highlightEnd-m_highlightStart;
-						}						
-						m_selection = NONE;
+						eraseSelection();
 					}
 					else if(m_position > 0) {
+						if(s_undo) {
+							updateUndo(BACKSPACE, m_position-1, L"", m_text.substr(m_position-1, 1));
+						}
 						m_text.erase(m_position-1, 1);
 						m_position--;
 					}
@@ -883,10 +922,16 @@ void ofxEditor::keyPressed(int key) {
 			case OF_KEY_TAB:
 				if(m_settings->getConvertTabs()) {
 					m_text.insert(m_position, wstring(m_settings->getTabWidth(), ' '));
+					if(s_undo) {
+						updateUndo(INSERT, m_position, m_text.substr(m_position, m_settings->getTabWidth()), L"");
+					}
 					m_position += m_settings->getTabWidth();
 				}
 				else {
 					m_text.insert(m_position, L"\t");
+					if(s_undo) {
+						updateUndo(INSERT, m_position, m_text.substr(m_position, 1), L"");
+					}
 					m_position++;
 				}
 				textBufferUpdated();
@@ -925,11 +970,7 @@ void ofxEditor::keyPressed(int key) {
 				}
 				
 				if(m_selection != NONE) {
-					m_text.erase(m_highlightStart, m_highlightEnd-m_highlightStart);
-					if(m_position >= m_highlightEnd) {
-						m_position -= m_highlightEnd-m_highlightStart;
-					}
-					m_selection = NONE;
+					eraseSelection(OVERWRITE);
 				}
 				
 				// ignore control chars
@@ -945,6 +986,9 @@ void ofxEditor::keyPressed(int key) {
 					m_UTF8Char.push_back(key);
 				}
 				m_text.insert(m_position, string_to_wstring(m_UTF8Char));
+				if(s_undo) {
+					updateUndo(INSERT, m_position, m_text.substr(m_position, 1), L"");
+				}
 				m_UTF8Char = "";
 				m_position++;
 				
@@ -1129,6 +1173,26 @@ void ofxEditor::insertText(const wstring& text) {
 //--------------------------------------------------------------
 void ofxEditor::insertText(const string& text) {
 	insertText(string_to_wstring(text));
+}
+
+//--------------------------------------------------------------
+void ofxEditor::deleteText(unsigned int numChars, bool forward) {
+	if(m_selection != NONE) {
+		m_text.erase(m_highlightStart, m_highlightEnd-m_highlightStart);
+		if(m_position >= m_highlightEnd) {
+			m_position -= m_highlightEnd-m_highlightStart;
+		}
+		m_selection = NONE;
+	}
+	else {
+		if(forward) {
+			m_text.erase(m_position, numChars);
+		}
+		else {
+			m_text.erase(m_position-numChars, numChars);
+		}
+	}
+	textBufferUpdated();
 }
 
 //--------------------------------------------------------------
@@ -1413,6 +1477,76 @@ void ofxEditor::reset() {
 	m_posX = m_posY = 0;
 }
 
+// UNDO
+	
+//--------------------------------------------------------------
+void ofxEditor::undo() {
+	if(!s_undo || m_undoActions.empty()) {
+		return;
+	}
+	if(m_undoPos > -1) {
+		UndoAction &a = m_undoActions[m_undoPos];
+		setCurrentPos(a.pos);
+		switch(a.type) {
+			case INSERT:
+				deleteText(a.insertText.size());
+				break;
+			case REPLACE: case OVERWRITE:
+				deleteText(a.insertText.size());
+				insertText(a.deleteText);
+				break;
+			case DELETE: case BACKSPACE:
+				insertText(a.deleteText);
+				break;
+		}
+		m_undoPos--;
+		#ifdef DEBUG_UNDO
+			printUndo();
+		#endif
+	}
+}
+
+//--------------------------------------------------------------
+void ofxEditor::redo() {
+	if(!s_undo || m_undoActions.empty()) {
+		return;
+	}
+	if(m_undoPos < (int)m_undoActions.size()-1) {
+		m_undoPos++;
+		UndoAction &a = m_undoActions[m_undoPos];
+		setCurrentPos(a.pos);
+		switch(a.type) {
+			case INSERT:
+				insertText(a.insertText);
+				break;
+			case REPLACE: case OVERWRITE:
+				deleteText(a.deleteText.size());
+				insertText(a.insertText);
+				break;
+			case DELETE:
+				deleteText(a.deleteText.size());
+			case BACKSPACE:
+				deleteText(a.deleteText.size(), false);
+				break;
+		}
+		#ifdef DEBUG_UNDO
+			printUndo();
+		#endif
+	}
+}
+
+//--------------------------------------------------------------
+void ofxEditor::clearUndo() {
+	if(!s_undo) {
+		return;
+	}
+	m_undoActions.clear();
+	m_undoPos = -1;
+	#ifdef DEBUG_UNDO
+		printUndo();
+	#endif
+}
+
 // UTILS
 
 //--------------------------------------------------------------
@@ -1480,6 +1614,38 @@ void ofxEditor::printSyntax() {
 		}
 		ofLogNotice("ofxEditor") << type << ": \"" << wstring_to_string(tb.text) << "\"";
 	}
+}
+
+void ofxEditor::printUndo() {
+	cout << endl << m_undoActions.size() << " undo actions" << endl;
+	for(int i = 0; i < m_undoActions.size(); ++i) {
+		cout << (i == m_undoPos ? "  * " : "    ");
+		UndoAction &a = m_undoActions[i];
+		switch(a.type) {
+			case INSERT:
+				cout << "INSERT " << a.pos << " \"" << wstring_to_string(a.insertText) << "\"" << endl;
+				break;
+			case REPLACE:
+				cout << "REPLACE " << a.pos
+				     << " \"" << wstring_to_string(a.insertText) << "\""
+					 << " \"" << wstring_to_string(a.deleteText) << "\""
+					 << endl;
+				break;
+			case OVERWRITE:
+				cout << "OVERWRITE " << a.pos
+				     << " \"" << wstring_to_string(a.insertText) << "\""
+					 << " \"" << wstring_to_string(a.deleteText) << "\""
+					 << endl;
+				break;
+			case DELETE:
+				cout << "DELETE " << a.pos << " \"" << wstring_to_string(a.deleteText) << "\"" << endl;
+				break;
+			case BACKSPACE:
+				cout << "BACKSPACE " << a.pos << " \"" << wstring_to_string(a.deleteText) << "\"" << endl;
+				break;
+		}
+	}
+	cout << endl;
 }
 
 // PROTECTED
@@ -1757,10 +1923,38 @@ void ofxEditor::pasteSelection() {
 		if(!text) {
 		 ofLogError("ofxEditor") << "pasting from clipboard failed";
 		}
+		if(s_undo) {
+			if(m_selection != NONE) {
+				updateUndo(REPLACE, m_highlightStart, string_to_wstring((string)text), m_text.substr(m_highlightStart, m_highlightEnd-m_highlightStart));
+			}
+			else {
+				updateUndo(INSERT, m_position, string_to_wstring((string)text), L"");
+			}
+		}
 		insertText((string) text);
 	#else
+		if(s_undo) {
+			if(m_selection != NONE) {
+				updateUndo(REPLACE, m_highlightStart, s_copyBuffer, m_text.substr(m_highlightStart, m_highlightEnd-m_highlightStart));
+			}
+			else {
+				updateUndo(INSERT, m_position, s_copyBuffer, L"");
+			}
+		}
 		insertText(s_copyBuffer);
 	#endif
+}
+
+//--------------------------------------------------------------
+void ofxEditor::eraseSelection(UndoActionType type) {
+	if(s_undo) {
+		updateUndo(type, m_highlightStart, L"", m_text.substr(m_highlightStart, m_highlightEnd-m_highlightStart));
+	}
+	m_text.erase(m_highlightStart, m_highlightEnd-m_highlightStart);
+	if(m_position >= m_highlightEnd) {
+		m_position -= m_highlightEnd-m_highlightStart;
+	}						
+	m_selection = NONE;
 }
 
 //--------------------------------------------------------------
@@ -1818,6 +2012,87 @@ void ofxEditor::updateVisibleSize() {
 		m_visibleWidth = m_width - s_charWidth;
 		m_visibleLines = m_height/s_charHeight;
 	}
+}
+
+//--------------------------------------------------------------
+void ofxEditor::updateUndo(UndoActionType type, unsigned int pos, const wstring &insertText, const wstring &deleteText) {
+	
+	// add if empty
+	if(m_undoActions.empty()) {
+		UndoAction a;
+		a.type = type;
+		a.pos = pos;
+		m_undoActions.push_back(a);
+		m_undoPos = 0;
+	}
+	else {
+		
+		// clear if all actions have been redone
+		if(m_undoPos < 0) {
+			m_undoActions.clear();
+		}
+		else {
+		
+			// pop oldest entries if at max depth
+			if(m_undoActions.size() > s_undoMaxDepth) {
+				int num = m_undoActions.size()-s_undoMaxDepth;
+				int end = m_undoActions.size()-1;
+				for(int i = 0; i < num; ++i) {
+					m_undoActions.erase(m_undoActions.begin()); // pop front
+					end--;
+					if(m_undoPos > end) { // keep pos at end
+						m_undoPos = end;
+					}
+				}
+			}
+			
+			// pop newest actions for new entries
+			if(m_undoPos < m_undoActions.size()-1) {
+				for(int i = m_undoActions.size()-1; i > m_undoPos; --i) {
+					m_undoActions.pop_back();
+				}
+			}
+		}
+	}
+	
+	UndoAction *action = &m_undoActions[m_undoPos];
+	
+	// add new entry if timeout reached, after a replace, or on new type ...
+	// .., except overwrites append insert text until timeout
+	if((ofGetElapsedTimeMillis() - action->timestamp > UNDO_TIMEOUT) ||
+		((action->type == REPLACE) || ((type != INSERT && action->type != OVERWRITE) && (action->type != type)))) {
+		UndoAction a;
+		a.type = type;
+		a.pos = pos;
+		m_undoActions.push_back(a);
+		m_undoPos++;
+		action = &m_undoActions[m_undoPos];
+	}
+	
+	switch(type) {
+		case INSERT:
+			action->insertText += insertText;
+			break;
+		case REPLACE:
+			action->insertText = insertText;
+			action->deleteText = deleteText;
+			break;
+		case OVERWRITE:
+			action->insertText = insertText;
+			action->deleteText = deleteText;
+			break;
+		case DELETE:
+			action->deleteText += deleteText;
+			break;
+		case BACKSPACE:
+			action->deleteText = deleteText + action->deleteText;
+			break;
+	}
+	action->timestamp = ofGetElapsedTimeMillis();
+	
+#ifdef DEBUG_UNDO
+	printUndo();
+#endif
 }
 
 // PRIVATE

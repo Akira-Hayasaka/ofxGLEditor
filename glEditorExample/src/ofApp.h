@@ -30,7 +30,7 @@
 // MOD + f: toggle fullscreen
 // MOD + l: toggle line wrapping
 // MOD + n: toggle line numbers
-// MOD + z: toggle auto focus zooming
+// MOD + k: toggle auto focus zooming
 //
 // see ofxGLEditor.h for editor key commands
 //

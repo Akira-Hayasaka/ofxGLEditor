@@ -32,7 +32,7 @@
 // MOD + f: toggle fullscreen
 // MOD + l: toggle line wrapping
 // MOD + n: toggle line numbers
-// MOD + z: toggle auto focus zooming
+// MOD + k: toggle auto focus zooming
 // MOD + w: toggle text shadow
 // MOD + 1: set line position (debugging)
 // MOD + 2: set line position again (debugging)

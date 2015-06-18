@@ -92,6 +92,19 @@ class ofxEditor {
 		/// get the auto focus scaling speed
 		static float getAutoFocusSpeed();
 	
+		/// enable/disable undo action saving (default: true)
+		static void setUndo(bool saveUndo=true);
+	
+		/// is undo enabled?
+		static bool getUndo();
+	
+		/// set the max number of undo actions to save (default: 10)
+		/// pops oldest actions if new depth is smaller than old depth
+		static void setUndoDepth(unsigned int depth);
+	
+		/// get the current max number of undo actions
+		static unsigned int getUndoDepth();
+	
 	/// \section Main
 		
 		/// draw the editor, pushes view and applies viewport
@@ -145,6 +158,10 @@ class ofxEditor {
 	
 		/// insert text at the current buffer position
 		virtual void insertText(const string& text);
+	
+		/// delete char(s) or selection at the current buffer position
+		/// set optional number of chars and direction (default: current char)
+		virtual void deleteText(unsigned int numChars=1, bool forward=true);
 	
 		/// clear text buffer contents
 		virtual void clearText();
@@ -264,6 +281,17 @@ class ofxEditor {
 		/// reset position & selection
 		void reset();
 	
+	/// \section Undo
+	
+		/// undo one action, clears newer redo actions
+		virtual void undo();
+	
+		/// redo one action
+		virtual void redo();
+	
+		/// clear undo actions
+		void clearUndo();
+	
 	/// \section Utils
 	
 		/// draw a wide char string using the current editor font
@@ -278,6 +306,9 @@ class ofxEditor {
 	
 		/// print the current syntax parser text blocks, useful for debugging
 		void printSyntax();
+	
+		/// print the current undo state, useful for debugging
+		void printUndo();
 	
 	protected:
 	
@@ -307,6 +338,10 @@ class ofxEditor {
 		static float s_autoFocusMinScale;   //< minimum allowed scaling
 		static float s_autoFocusMaxScale;   //< maximum allowed scaling
 	
+		// undo
+		static bool s_undo; //< save undo actions?
+		static unsigned int s_undoMaxDepth; //< maximum number of undo actions
+	
 	/// \section Member Variables
 
 		ofxEditorSettings *m_settings; //< editor settings object
@@ -335,7 +370,7 @@ class ofxEditor {
 		SelectionState m_selection; //< is text being selected and how
 		unsigned int m_highlightStart; //< highlight start pos in buffer
 		unsigned int m_highlightEnd;   //< highlight end pos in buffer
-		unsigned int m_selectAllStartPos; //< return pos when pressed lect after select all
+		unsigned int m_selectAllStartPos; //< return pos when pressed left after select all
 	
 		unsigned int m_topTextPosition;    //< top start pos in buffer for vert scrolling
 		unsigned int m_bottomTextPosition; //< bottom end pos in buffer for vert scrolling
@@ -410,6 +445,48 @@ class ofxEditor {
 		};
 		list<TextBlock> m_textBlocks; //< syntax parser text block linked list
 	
+	/// \section Undo Types
+	
+		/// undo action types
+		enum UndoActionType {
+			INSERT,       //< text inserted
+			REPLACE,      //< selection replaced via paste action
+			OVERWRITE,    //< selection replaced via key input
+			BACKSPACE,    //< text deleted to the left
+			DELETE        //< text deletetd to the right
+		};
+	
+		/// undo action state
+		class UndoAction {
+			public:
+			
+				UndoActionType type; //< action type
+				wstring insertText, deleteText; //< any added/removed text
+				unsigned int pos; //< text position
+				long timestamp; //< timestamp of last update
+			
+				UndoAction() {clear();}
+				
+				UndoAction(const UndoAction &from) {
+					type = from.type;
+					insertText = from.insertText;
+					deleteText = from.deleteText;
+					pos = from.pos;
+					timestamp = from.timestamp;
+				}
+			
+				void clear() {
+					type = INSERT;
+					insertText = L"";
+					deleteText = L"";
+					pos = 0;
+					timestamp = ofGetElapsedTimeMillis();
+				}
+			
+		};
+		vector<UndoAction> m_undoActions; //< current undo actions
+		int m_undoPos; //< current undo position, -1 denotes no undos left
+	
 	/// \section Helper Functions
 	
 		/// get the width of a given character,
@@ -472,6 +549,9 @@ class ofxEditor {
 		/// note: clipboard only supported when using a GLFW Window
 		void pasteSelection();
 	
+		/// erase the current highlight selection, updates undo
+		void eraseSelection(UndoActionType type=DELETE);
+	
 		/// update the animation timestamps
 		/// make sure to call this if you implement your own draw() function
 		void updateTimestamps();
@@ -491,6 +571,10 @@ class ofxEditor {
 	
 		/// update visible char size based on pixel size, char size, & auto focus
 		void updateVisibleSize();
+	
+		/// update undo state, creates of modifies actions using timeout
+		/// on new input, clears actions newer than current undo pos
+		void updateUndo(UndoActionType type, unsigned int pos, const wstring &insertText, const wstring &deleteText);
 	
 	private:
 	

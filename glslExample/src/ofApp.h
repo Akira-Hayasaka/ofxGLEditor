@@ -17,7 +17,7 @@
 // MOD + n: toggle line numbers
 // MOD + f: toggle fullscreen
 // MOD + t: show/hide editor
-// MOD + z: toggle auto focus
+// MOD + k: toggle auto focus
 // MOD + w: toggle text shadow
 // MOD + d: toggle debug
 //

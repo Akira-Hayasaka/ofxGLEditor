@@ -305,6 +305,7 @@ void ofxRepl::printPrompt() {
 	}
 	insertText(s_prompt);
 	m_promptPos = m_selectAllStartPos = m_position;
+	clearUndo(); // only allow undo actions on the current command line
 }
 
 //--------------------------------------------------------------

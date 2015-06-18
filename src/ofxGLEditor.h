@@ -91,6 +91,9 @@ class ofxGLEditor {
 		/// MOD + d: save as dialog, saves in current path (default: data path)
 		/// MOD + o: open a file via a file browser, starts in current path
 		///
+		/// MOD + z: undo last key input action
+		/// MOD + y: redo last key input action
+		///
 		/// MOD + -: decrease current editor alpha
 		/// MOD + =: increase current editor alpha
 		///
@@ -160,7 +163,8 @@ class ofxGLEditor {
 		/// set the filename of the editor by index, from 1 - 9
 		void setEditorFilename(int editor, string filename);
 		
-		/// get the filename of the current editor (default: empty string "")
+		/// get the filename of the current editor,
+		/// eturns empty string "" on error
 		string getEditorFilename(int editor);
 	
 		/// returns true if text is currently selected in an editor

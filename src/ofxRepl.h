@@ -61,6 +61,8 @@ class ofxRepl : public ofxEditor {
 		/// UP & DOWN: step through command history
 		/// RETURN: eval current command
 		///
+		/// Undo works for the current command line
+		///
 		void keyPressed(int key);
 		
 		/// add a wide string to the console

@@ -182,6 +182,12 @@ bool ofxFileDialog::saveFile(string filename) {
 	return false;
 }
 
+//--------------------------------------------------------------
+void ofxFileDialog::undo() {}
+
+//--------------------------------------------------------------
+void ofxFileDialog::redo() {}
+
 // STATIC UTILS
 
 //--------------------------------------------------------------

@@ -103,7 +103,7 @@ void ofApp::keyPressed(int key) {
 			case 'n': case 14:
 				editor.setLineNumbers(!editor.getLineNumbers());
 				return;
-			case 'z': case 26:
+			case 'k': case 26:
 				editor.setAutoFocus(!editor.getAutoFocus());
 				return;
 		}

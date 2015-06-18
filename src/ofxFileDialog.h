@@ -66,6 +66,8 @@ class ofxFileDialog : public ofxEditor {
 	
 		bool openFile(string filename); //< dummy implementation
 		bool saveFile(string filename); //< dummy implementation
+		void undo(); //< no undo, dummy implementation
+		void redo(); //< no undo, dummy implementation
 	
 	/// \section Static Utils
 	
