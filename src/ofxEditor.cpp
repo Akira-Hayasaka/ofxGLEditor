@@ -54,7 +54,7 @@
 //#define DEBUG_AUTO_FOCUS
 
 // uncomment to print undo state on key input
-#define DEBUG_UNDO
+//#define DEBUG_UNDO
 
 ofPtr<ofxEditorFont> ofxEditor::s_font;
 int ofxEditor::s_charWidth = 1;
