@@ -27,7 +27,6 @@ ofxGLEditor::ofxGLEditor() {
 	m_currentEditor = 0;
 	bModifierPressed = false;
 	bHideEditor = false;
-	bShowFileDialog = false;
 	bFlashEvalSelection = false;
 }
 
@@ -91,7 +90,7 @@ void ofxGLEditor::draw() {
 		ofEnableAlphaBlending();
 	
 		if(!bHideEditor) {
-			if(bShowFileDialog) {
+			if(m_fileDialog->isActive()) {
 				m_fileDialog->draw();
 			}
 			else {
@@ -143,8 +142,7 @@ void ofxGLEditor::keyPressed(int key) {
 				if(m_currentEditor != 0) {
 					// show save as dialog on empty name
 					if(m_saveFiles[m_currentEditor] == "") {
-						m_fileDialog->setSaveAsMode(true);
-						bShowFileDialog = !bShowFileDialog;
+						m_fileDialog->setMode(ofxFileDialog::SAVEAS);
 					}
 					else {
 						if(saveFile(m_saveFiles[m_currentEditor])) {
@@ -158,16 +156,14 @@ void ofxGLEditor::keyPressed(int key) {
 			
 			case 'd': case 4:
 				if(m_currentEditor != 0) {
-					m_fileDialog->setSaveAsMode(true);
-					bShowFileDialog = !bShowFileDialog;
+					m_fileDialog->setMode(ofxFileDialog::SAVEAS);
 				}
 				return;
 				
 			case 'o': case 15:
 				if(m_currentEditor != 0) {
-					m_fileDialog->setSaveAsMode(false);
+					m_fileDialog->setMode(ofxFileDialog::OPEN);
 					m_fileDialog->refresh();
-					bShowFileDialog = !bShowFileDialog;
 				}
 				return;
 				
@@ -200,13 +196,10 @@ void ofxGLEditor::keyPressed(int key) {
 		}
 	}
 	
-	if(bShowFileDialog) {
-		if(key == OF_KEY_ESC) {
-			bShowFileDialog = false;
-		}
+	if(m_fileDialog->isActive()) {
 		m_fileDialog->keyPressed(key);
 		if(m_fileDialog->getSelectedPath() != "") {
-			if(m_fileDialog->getSaveAsMode()) {
+			if(m_fileDialog->getMode() == ofxFileDialog::SAVEAS) {
 				m_saveFiles[m_currentEditor] = m_fileDialog->getSelectedPath();
 				if(saveFile(m_saveFiles[m_currentEditor])) {
 					if(m_listener) {
@@ -223,7 +216,7 @@ void ofxGLEditor::keyPressed(int key) {
 				}
 			}
 			m_fileDialog->clearSelectedPath();
-			bShowFileDialog = false;
+			m_fileDialog->setActive(false);
 		}
 	}
 	else if(!bHideEditor) {
@@ -533,7 +526,7 @@ void ofxGLEditor::clearReplHistory() {
 void ofxGLEditor::setPath(string path) {
 	// make sure there is a trailing /
 	m_fileDialog->setPath(ofFilePath::addTrailingSlash(path));
-	if(bShowFileDialog) {
+	if(m_fileDialog->isActive()) {
 		m_fileDialog->refresh();
 	}
 }

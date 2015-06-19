@@ -333,7 +333,6 @@ class ofxGLEditor {
 		bool bModifierPressed; //< is the editor modifier key being pressed?
 		
 		bool bHideEditor;     //< hide the editor?
-		bool bShowFileDialog; //< show the file dialog right now?
 	
 		bool bFlashEvalSelection; //< flash selection on eval?
 };

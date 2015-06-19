@@ -34,6 +34,13 @@ class ofxFileDialog : public ofxEditor {
 
 	public:
 
+		/// file dialog mode types
+		enum Mode {
+			OPEN,
+			SAVEAS,
+			NEWFOLDER
+		};
+
 		ofxFileDialog();
 		ofxFileDialog(ofxEditorSettings &sharedSettings); //< share settings object
 		virtual ~ofxFileDialog();
@@ -44,6 +51,9 @@ class ofxFileDialog : public ofxEditor {
 		virtual void draw();
 	
 		/// handles key events
+		///
+		/// Note: ESC to exit must be disabled as ESC is used to exit
+		///
 		virtual void keyPressed(int key);
 	
 		/// set the current path in the file browser, reads directory contents
@@ -58,11 +68,18 @@ class ofxFileDialog : public ofxEditor {
 		/// clear the currently selected path
 		void clearSelectedPath();
 	
-		/// enable/disable save as mode
-		void setSaveAsMode(bool saveAs);
+		/// set the current mode, sets active to true
+		void setMode(Mode mode);
 	
-		/// currently in save as mode?
-		bool getSaveAsMode();
+		/// get current mode
+		Mode getMode();
+	
+		/// is the dialog currently active? set to true when setting the current mode,
+		/// set to false after dialog exit action detected
+		bool isActive();
+	
+		/// active/deactive the dialog
+		void setActive(bool active=true);
 	
 		bool openFile(string filename); //< dummy implementation
 		bool saveFile(string filename); //< dummy implementation
@@ -76,22 +93,57 @@ class ofxFileDialog : public ofxEditor {
 		static void setSaveAsText(const string &text);
 		static wstring& getWideSaveAsText();
 		static string getSaveAsText();
+	
+		/// set/get the new folder info text, default: "New folder (esc to exit)"
+		static void setNewFolderText(const wstring &text);
+		static void setNewFolderText(const string &text);
+		static wstring& getWideNewFolderText();
+		static string getNewFolderText();
+	
+		/// set/get the new folder button text in the save as dialog, default: "New Folder"
+		static void setNewFolderButton(const wstring &text);
+		static void setNewFolderButton(const string &text);
+		static wstring& getWideNewFolderButton();
+		static string getNewFolderButton();
 
 	protected:
 
 		void drawSaveAs();
 		void drawOpen();
+		void drawNewFolder();
 		void keyPressedSaveAs(int key);
-		void keyPressedOpen(int key);
+		void keyPressedOpen(int key, bool saveAs=false);
+		void keyPressedNewFolder(int key, bool saveAs=false);
+	
+		/// draw filenames & directory list centered on the current file
+		/// topOffset = num vert chars from top constraint
+		/// bottomOffset = num vert chars from bottom constraint
+		/// highlight = highlight current file?
+		void drawFilenames(int topOffset=2, int bottomOffset=0, bool highlight=true);
 
-		unsigned int m_currentFile; //< index of the current file
+		/// handle text input into the buffer
+		void keyPressedText(int key);
+
+		Mode m_mode; //< current dialog mode
+		bool m_active; //< is the dialog active?
+	
+		unsigned int m_currentFile;  //< index of the current file
 		vector<wstring> m_filenames; //< filenames & directories
-		set<int> m_directories;     //< which indexes are directories
+		set<int> m_directories;      //< which indexes are directories
 		wstring m_path;              //< current path
 		wstring m_selectedPath;      //< selected path on enter
 	
 		/// number of files to show above and below open file cursor
-		static const unsigned int s_fileDisplayRange;
 		static wstring s_saveAsText; //< save as info text
-		bool m_saveAs; //< are we in save as mode?
+		static wstring s_newFolderText; //< new folder info text
+		static wstring s_newFolderButtonText; //< save as new folder "button"
+	
+		/// save as dialog states
+		enum SaveAsState {
+			FILENAME,      //< entering filename
+			BROWSER,       //< using filebrowser
+			FOLDER,        //< on new folder button
+			FOLDER_DIALOG  //< in the new folder dialog
+		};
+		SaveAsState m_saveAsState; //< current save as state
 };
