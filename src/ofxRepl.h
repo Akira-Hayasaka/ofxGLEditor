@@ -65,11 +65,13 @@ class ofxRepl : public ofxEditor {
 		///
 		void keyPressed(int key);
 		
-		/// add a wide string to the console
-		void print(const wstring &what);
+		/// add a wide string to the console,
+		/// set beforePrompt to true to print a line above the current prompt
+		void print(const wstring &what, bool beforePrompt=false);
 	
-		/// add a string to the console with string conversion
-		void print(const string &what);
+		/// add a string to the console with string conversion,
+		/// set beforePrompt to true to print a line above the current prompt
+		void print(const string &what, bool beforePrompt=false);
 		
 		/// add a wide string to the console and print a return after
 		void printEvalReturn(const wstring &what);

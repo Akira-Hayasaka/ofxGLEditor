@@ -176,7 +176,7 @@ void ofxRepl::keyPressed(int key) {
 }
 
 //--------------------------------------------------------------
-void ofxRepl::print(const wstring &what) {
+void ofxRepl::print(const wstring &what, bool beforePrompt) {
 
 	// trim half of text if we overflow the max num of lines
 	if(m_numLines > MAX_TEXT_LINES) {
@@ -204,26 +204,39 @@ void ofxRepl::print(const wstring &what) {
 		}
 		to_print += *i;
 	}
-	insertText(to_print);
 	
-	m_promptPos = m_insertPos = m_position;
-	m_selectAllStartPos = m_promptPos;
-	m_highlightStart = m_promptPos;
-	m_highlightEnd = m_promptPos;
+	if(beforePrompt) {
+		m_text.insert(MAX(0, m_promptPos-s_prompt.length()), to_print);
+		m_position += to_print.length();
+		m_promptPos += to_print.length();
+		m_insertPos += to_print.length();
+		m_selectAllStartPos += to_print.length();
+		if(m_selection != NONE) {
+			m_highlightStart += to_print.length();
+			m_highlightEnd += to_print.length();
+		}
+	}
+	else {
+		insertText(to_print);
+		m_promptPos = m_insertPos;
+		m_promptPos = m_position+s_prompt.length();
+		m_selectAllStartPos = m_position;
+		m_highlightStart = m_position;
+		m_highlightEnd = m_position;
+	}
 	
 	keepCursorVisible();
 }
 
 //--------------------------------------------------------------
-void ofxRepl::print(const string &what) {
-	print(string_to_wstring(what));
+void ofxRepl::print(const string &what, bool beforePrompt) {
+	print(string_to_wstring(what), beforePrompt);
 }
 
 //--------------------------------------------------------------
 void ofxRepl::printEvalReturn(const wstring &what) {
 	if(what.size() > 0) {
-		print(what);
-		print(L"\n");
+		print(what+L"\n");
 	}
 	printPrompt();
 }
@@ -421,7 +434,7 @@ string ofxRepl::getReplPrompt() {
 void ofxRepl::Logger::log(ofLogLevel level, const string & module, const string & message){
 	ofConsoleLoggerChannel::log(level, module, message);
 	if(level >= ofGetLogLevel()) {
-		m_parent->print(string_to_wstring(message)+L"\n");
+		m_parent->print(string_to_wstring(message)+L"\n", true);
 	}
 }
 
@@ -429,7 +442,7 @@ void ofxRepl::Logger::log(ofLogLevel level, const string & module, const string 
 void ofxRepl::Logger::log(ofLogLevel level, const string & module, const char* format, va_list args){
 	ofConsoleLoggerChannel::log(level, module, format, args);
 	if(level >= ofGetLogLevel()) {
-		m_parent->print(string_to_wstring(ofVAArgsToString(format, args))+L"\n");
+		m_parent->print(string_to_wstring(ofVAArgsToString(format, args))+L"\n", true);
 	}
 }
 
