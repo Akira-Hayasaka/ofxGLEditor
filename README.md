@@ -83,4 +83,4 @@ A growing set of language syntax xml files can be found in the `syntaxes` folder
 
 ### Font
 
-You will need a monospaced font as variable width fonts are not currently supported. PrintChar21.ttf is included with the example projects. Unicode glyphs are supported if your font has them.
+Both monospaced and variable width fonts are supported. PrintChar21.ttf is included with the example projects. Unicode glyphs are supported if your font has them.
