@@ -347,7 +347,7 @@ void ofxFileDialog::drawSaveAs() {
 			int width = s_font->stringWidth(s_newFolderButtonText);
 			ofSetColor(m_settings->getCursorColor().r, m_settings->getCursorColor().g,
 							   m_settings->getCursorColor().b, m_settings->getCursorColor().a * m_settings->getAlpha());
-			ofRect(x, y-s_charWidth, width, s_charHeight);
+			ofDrawRectangle(x, y-s_charWidth, width, s_charHeight);
 		}
 		s_font->drawString(s_newFolderButtonText, 0, y, s_textShadow);
 	}
@@ -601,7 +601,7 @@ void ofxFileDialog::drawFilenames(int offset, int bottomOffset, bool highlight) 
 				if(highlight && count == m_currentFile) {
 					ofSetColor(m_settings->getCursorColor().r, m_settings->getCursorColor().g,
 					       m_settings->getCursorColor().b, m_settings->getCursorColor().a * m_settings->getAlpha());
-					ofRect(x, y-s_charHeight, characterWidth((*i)[c]), s_charHeight);
+					ofDrawRectangle(x, y-s_charHeight, characterWidth((*i)[c]), s_charHeight);
 				}
 				
 				// file or dir name
