@@ -1,29 +1,47 @@
-0.3.1
 
-	- updated for OF 0.9.0
+2015-12-02 Dan Wilcox <danomatika@gmail.com>
 
-0.3.0
+	0.3.1
 
-	- replaced ofTrueTypeFont with the fontstash library to improve performance,
+	* updated for OF 0.9.0
+
+2015-11-02 Dan Wilcox <danomatika@gmail.com>
+
+	0.3.0
+
+	* replaced ofTrueTypeFont with the fontstash library to improve performance,
 	  now draws using textures instead of paths at the expense of slightly
 	  blurry edges (depends on the font)
-	- added variable width font support
-	- reimplemented auto focus scaling (weee!)
-	- now supports full unicode char set (available glyphs depend on the font)
-	- selection & select all now work correctly
-	- added simple undo/redo
-	- dirs now listed before files in browser
-	- fixed line num = 10 not expanding to 2 digits
-	- fixed ofxGLEditor not remembering filenames after opening & saving
-	- can now save utf8 filenames
-	- improved animations between editors by sharing timestamp
+	* added variable width font support
+	* reimplemented auto focus scaling (weee!)
+	* now supports full unicode char set (available glyphs depend on the font)
+	* selection & select all now work correctly
+	* added simple undo/redo
+	* updated file dialog with current path on top, new folder mode, & browser
+	  + new folder options in save as
+	* added ofxGLEditor saveFile using current filename
+	* added colorScheme & syntax xml loading
+	* updated syntax parser to handle multiline strings, punctuation, & matching chars
+	* page down/up much improved 
+	* dirs now listed before files in browser
+	* fixed line num = 10 not expanding to 2 digits
+	* fixed ofxGLEditor not remembering filenames after opening & saving
+	* can now save utf8 filenames
+	* improved animations between editors by sharing timestamp
+	* ofxRepl: trim text if more than 256 lines
+	* and many other small updates ...
 
-0.2.0
+2015-02-02 Dan Wilcox <danomatika@gmail.com>
 
-	- rewrote GLEditor classes using ofTrueTypeFont and a pixel based grid
-	- added syntax coloring and a simple syntax parser
-	- various other improvements
+	0.2.0
 
-0.1.0
+	* rewrote GLEditor classes using ofTrueTypeFont and a pixel based grid
+	* added syntax coloring and a simple syntax parser
+	* various other improvements
 
-	- original version using the Fluxus GLEditor classes
+
+2014-07-23 Akira Hayasaka & Dan Wilcox <danomatika@gmail.com>
+	
+	0.1.0 
+
+	* original version using the Fluxus GLEditor classes
