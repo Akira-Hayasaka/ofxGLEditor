@@ -1,3 +1,7 @@
+0.3.1
+
+	- updated for OF 0.9.0
+
 0.3.0
 
 	- replaced ofTrueTypeFont with the fontstash library to improve performance,
@@ -7,6 +11,7 @@
 	- reimplemented auto focus scaling (weee!)
 	- now supports full unicode char set (available glyphs depend on the font)
 	- selection & select all now work correctly
+	- added simple undo/redo
 	- dirs now listed before files in browser
 	- fixed line num = 10 not expanding to 2 digits
 	- fixed ofxGLEditor not remembering filenames after opening & saving
