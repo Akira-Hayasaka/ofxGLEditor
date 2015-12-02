@@ -39,7 +39,7 @@ void ofApp::setup() {
 	luaSyntax.setWord("end", ofxEditorSyntax::KEYWORD);
 	luaSyntax.setWord("print", ofxEditorSyntax::FUNCTION);
 	editor.getSettings().addSyntax(&luaSyntax);
-	editor.getSettings().printSyntaxes(); // print availabel syntaxes
+	editor.getSettings().printSyntaxes(); // print available syntaxes
 	//editor.setLangSyntax("Lua"); // set editor syntax manually
 	
 	// syntax highlighter colors set programmatically (instead of loaded from xml)

@@ -28,8 +28,7 @@
 #include "Unicode.h"
 
 // GLFW needed for clipboard support
-#if !defined(TARGET_NODISPLAY) && !defined(TARGET_OF_IOS) && \
-    !defined(TARGET_ANDROID) && !defined(TARGET_RASPBERRY_PI)
+#if !defined(TARGET_NODISPLAY) && !defined(TARGET_OF_IOS) && !defined(TARGET_ANDROID)
 	#define HAS_GLFW
     #include "ofAppGLFWWindow.h"
 #endif
@@ -200,10 +199,10 @@ bool ofxEditor::loadFont(const string &font, int size) {
 	if(s_font == NULL) {
 		s_font = ofPtr<ofxEditorFont>(new ofxEditorFont());
 	}
-	if(s_font->loadFont(font, size)) {
+	if(s_font->load(font, size)) {
 		s_charWidth = s_font->characterWidth(' ');
 		s_zeroWidth = s_font->characterWidth('0');
-		s_charHeight = s_font->stringHeight("#Iqg"); // catch tall/chars which may hang down
+		s_charHeight = s_font->stringHeight("#ITqg"); // catch tall chars & chars which may hang down
 		s_cursorWidth = MAX(floor(s_charWidth*0.3), 6);
 		s_autoFocusError = MAX(floor(s_charHeight*0.5), 16); // make sure the error space is proportional to the glyph size
 	}

@@ -44,7 +44,7 @@ ofxEditorFont::~ofxEditorFont() {
 }
 
 //--------------------------------------------------------------
-bool ofxEditorFont::loadFont(string filename, int fontsize, int textureDimension) {
+bool ofxEditorFont::load(string filename, int fontsize, int textureDimension) {
 	
 	clear();
 	
@@ -180,7 +180,7 @@ void ofxEditorFont::stashError(void* uptr, int error, int val) {
 	FONScontext* context = (FONScontext*)uptr;
 	switch(error) {
 		case FONS_ATLAS_FULL: {
-			ofLogError("ofxEditorFont") << "font atlas texture full, expanding";
+			ofLogWarning("ofxEditorFont") << "font atlas texture full, expanding";
 			int width, height;
 			fonsGetAtlasSize(context, &width, &height);
 			if(width <= ATLAS_MAX_SIZE && height <= ATLAS_MAX_SIZE) {

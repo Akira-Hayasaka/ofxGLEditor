@@ -43,7 +43,7 @@ class ofxEditorFont {
 	
 		/// create a fonstash context and load a given font
 		/// returns false if the font could not be loaded
-		bool loadFont(string filename, int fontsize, int textureDimension = 512);
+		bool load(string filename, int fontsize, int textureDimension = 512);
 	
 		/// returns true if the fonstash context exists (aka font is loaded)
 		bool isLoaded();

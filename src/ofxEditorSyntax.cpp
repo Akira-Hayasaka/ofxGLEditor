@@ -177,7 +177,7 @@ void ofxEditorSyntax::addFileExt(const string &ext) {
 		fileExts.insert(ext.substr(1, ext.size()-1));
 	}
 	else {
-		fileExts.insert(ext);
+		fileExts.insert(string(ext)); // make deep copy to avoid possible BAD_ACCESS
 	}
 }
 
