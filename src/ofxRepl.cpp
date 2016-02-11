@@ -28,10 +28,10 @@
 #define MAX_HISTORY_LEN	256
 
 // utils
-bool isEmpty(wstring s);
+bool isEmpty(u32string s);
 
-wstring ofxRepl::s_banner = wstring(L"");
-wstring ofxRepl::s_prompt = wstring(L"> ");
+u32string ofxRepl::s_banner = u32string(U"");
+u32string ofxRepl::s_prompt = u32string(U"> ");
 
 //--------------------------------------------------------------
 ofxRepl::ofxRepl() : ofxEditor() {
@@ -67,7 +67,7 @@ void ofxRepl::setup() {
 	ofSetLoggerChannel(m_logger);
 
 	// print greeting and first prompt
-	if(s_banner != L"") {
+	if(s_banner != U"") {
 		resize();
 		print(s_banner);
 	}
@@ -176,7 +176,7 @@ void ofxRepl::keyPressed(int key) {
 }
 
 //--------------------------------------------------------------
-void ofxRepl::print(const wstring &what, bool beforePrompt) {
+void ofxRepl::print(const u32string &what, bool beforePrompt) {
 
 	// trim half of text if we overflow the max num of lines
 	if(m_numLines > MAX_TEXT_LINES) {
@@ -196,8 +196,8 @@ void ofxRepl::print(const wstring &what, bool beforePrompt) {
 		m_bottomTextPosition -= pos;
 	}
 
-	wstring to_print;
-	for(wstring::const_iterator i = what.begin(); i != what.end(); ++i) {
+	u32string to_print;
+	for(u32string::const_iterator i = what.begin(); i != what.end(); ++i) {
 		m_linePos++;
 		if(*i == '\n') {
 			m_linePos = 0;
@@ -234,9 +234,9 @@ void ofxRepl::print(const string &what, bool beforePrompt) {
 }
 
 //--------------------------------------------------------------
-void ofxRepl::printEvalReturn(const wstring &what) {
+void ofxRepl::printEvalReturn(const u32string &what) {
 	if(what.size() > 0) {
-		print(what+L"\n");
+		print(what+U"\n");
 	}
 	printPrompt();
 }
@@ -277,10 +277,10 @@ bool ofxRepl::saveFile(string filename) {
 //--------------------------------------------------------------
 void ofxRepl::eval() {
 	if(m_promptPos < m_text.size()) {
-		wstring defun = m_text.substr(m_promptPos);
+		u32string defun = m_text.substr(m_promptPos);
 		if(!isEmpty(defun)) {
 			m_insertPos = m_text.length();
-			print(L"\n");
+			print(U"\n");
 			
 			m_evalText = defun;
 			if(m_listener) {
@@ -360,7 +360,7 @@ void ofxRepl::historyNext() {
 }
 
 //--------------------------------------------------------------
-void ofxRepl::historyShow(wstring what) {
+void ofxRepl::historyShow(u32string what) {
 	m_text.resize(m_promptPos, 0);
 	m_text += what;
 	m_position = m_text.length();
@@ -373,7 +373,7 @@ void ofxRepl::keepCursorVisible() {
 	int curVisLine = 0;
 	size_t step = 0;
 	for(unsigned int i = m_topTextPosition;
-	    i < m_position && (step = m_text.find('\n', i)) != wstring::npos;
+	    i < m_position && (step = m_text.find('\n', i)) != u32string::npos;
 		i = step+1) {
 		curVisLine++;
 	}
@@ -389,7 +389,7 @@ void ofxRepl::keepCursorVisible() {
 // STATIC UTILS
 
 //--------------------------------------------------------------
-void ofxRepl::setReplBanner(const wstring &text) {
+void ofxRepl::setReplBanner(const u32string &text) {
 	s_banner = text;
 }
 
@@ -399,7 +399,7 @@ void ofxRepl::setReplBanner(const string &text) {
 }
 
 //--------------------------------------------------------------
-wstring& ofxRepl::getWideReplBanner() {
+u32string& ofxRepl::getWideReplBanner() {
 	return s_banner;
 }
 
@@ -409,7 +409,7 @@ string ofxRepl::getReplBanner() {
 }
 	
 //--------------------------------------------------------------
-void ofxRepl::setReplPrompt(const wstring &text) {
+void ofxRepl::setReplPrompt(const u32string &text) {
 	s_prompt = text;
 }
 
@@ -419,7 +419,7 @@ void ofxRepl::setReplPrompt(const string &text) {
 }
 
 //--------------------------------------------------------------
-wstring& ofxRepl::getWideReplPrompt() {
+u32string& ofxRepl::getWideReplPrompt() {
 	return s_prompt;
 }
 
@@ -434,7 +434,7 @@ string ofxRepl::getReplPrompt() {
 void ofxRepl::Logger::log(ofLogLevel level, const string & module, const string & message){
 	ofConsoleLoggerChannel::log(level, module, message);
 	if(level >= ofGetLogLevel()) {
-		m_parent->print(string_to_wstring(message)+L"\n", true);
+		m_parent->print(string_to_wstring(message)+U"\n", true);
 	}
 }
 
@@ -442,16 +442,16 @@ void ofxRepl::Logger::log(ofLogLevel level, const string & module, const string 
 void ofxRepl::Logger::log(ofLogLevel level, const string & module, const char* format, va_list args){
 	ofConsoleLoggerChannel::log(level, module, format, args);
 	if(level >= ofGetLogLevel()) {
-		m_parent->print(string_to_wstring(ofVAArgsToString(format, args))+L"\n", true);
+		m_parent->print(string_to_wstring(ofVAArgsToString(format, args))+U"\n", true);
 	}
 }
 
 // OTHER UTIL
 
 //--------------------------------------------------------------
-bool isEmpty(wstring s) {
-    const wstring ws = L" \t\n\r";
-	for(wstring::iterator i = s.begin(); i != s.end(); i++) {
+bool isEmpty(u32string s) {
+    const u32string ws = U" \t\n\r";
+	for(u32string::iterator i = s.begin(); i != s.end(); i++) {
 		if(ws.find(*i) == string::npos) {
 			return false;
 		}

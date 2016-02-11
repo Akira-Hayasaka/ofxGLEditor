@@ -90,11 +90,11 @@ class ofxEditorSettings {
 		/// set the matching open/close chars to highlight,
 		/// default: "([<{" & ")]>}", strings should not be empty
 		/// note: matching chars are not highlighted inside comments
-		void setMatchingChars(wstring openChars, wstring closeChars);
+		void setMatchingChars(u32string openChars, u32string closeChars);
 		void setMatchingChars(string openChars, string closeChars);
-		wstring& getWideOpenChars();
+		u32string& getWideOpenChars();
 		string getOpenChars();
-		wstring& getWideCloseChars();
+		u32string& getWideCloseChars();
 		string getCloseChars();
 	
 	/// \section Language Syntax
@@ -138,8 +138,8 @@ class ofxEditorSettings {
 		ofColor lineNumberColor;    //< line number color
 
 		bool highlightMatchingChars; //< highlight matching open/close chars?
-		wstring openChars;  //< open chars (parens, brackets, etc) for matching highlight
-		wstring closeChars; //< close chars (parens, bracket, etc) for matching highlight
+		u32string openChars;  //< open chars (parens, brackets, etc) for matching highlight
+		u32string closeChars; //< close chars (parens, bracket, etc) for matching highlight
 	
 		map<string,ofxEditorSyntax*> langs; //< available syntaxes by lang string
 };

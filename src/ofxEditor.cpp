@@ -62,7 +62,7 @@ int ofxEditor::s_charHeight = 1;
 int ofxEditor::s_cursorWidth = 1;
 bool ofxEditor::s_textShadow = true;
 
-wstring ofxEditor::s_copyBuffer;
+u32string ofxEditor::s_copyBuffer;
 
 float ofxEditor::s_time = 0;
 
@@ -705,7 +705,7 @@ void ofxEditor::keyPressed(int key) {
 			case 'a': case 10: // clear all text
 				if(ofGetKeyPressed(OF_KEY_SHIFT)) {
 					if(s_undo) {
-						updateUndo(DELETE, 0, L"", m_text);
+						updateUndo(DELETE, 0, U"", m_text);
 					}
 					clearText();
 				}
@@ -844,7 +844,7 @@ void ofxEditor::keyPressed(int key) {
 				int numLines = 0;
 				unsigned int i = m_position;
 				size_t step = 0;
-				while((step = m_text.find(L'\n', i)) != wstring::npos){
+				while((step = m_text.find(L'\n', i)) != u32string::npos){
 					numLines++;
 					i = step+1;
 				}
@@ -894,7 +894,7 @@ void ofxEditor::keyPressed(int key) {
 					}
 					else if(m_position < m_text.size()) {
 						if(s_undo) {
-							updateUndo(DELETE, m_position, L"", m_text.substr(m_position, 1));
+							updateUndo(DELETE, m_position, U"", m_text.substr(m_position, 1));
 						}
 						m_text.erase(m_position, 1);
 					}
@@ -909,7 +909,7 @@ void ofxEditor::keyPressed(int key) {
 					}
 					else if(m_position > 0) {
 						if(s_undo) {
-							updateUndo(BACKSPACE, m_position-1, L"", m_text.substr(m_position-1, 1));
+							updateUndo(BACKSPACE, m_position-1, U"", m_text.substr(m_position-1, 1));
 						}
 						m_text.erase(m_position-1, 1);
 						m_position--;
@@ -920,16 +920,16 @@ void ofxEditor::keyPressed(int key) {
 				
 			case OF_KEY_TAB:
 				if(m_settings->getConvertTabs()) {
-					m_text.insert(m_position, wstring(m_settings->getTabWidth(), ' '));
+					m_text.insert(m_position, u32string(m_settings->getTabWidth(), ' '));
 					if(s_undo) {
-						updateUndo(INSERT, m_position, m_text.substr(m_position, m_settings->getTabWidth()), L"");
+						updateUndo(INSERT, m_position, m_text.substr(m_position, m_settings->getTabWidth()), U"");
 					}
 					m_position += m_settings->getTabWidth();
 				}
 				else {
-					m_text.insert(m_position, L"\t");
+					m_text.insert(m_position, U"\t");
 					if(s_undo) {
-						updateUndo(INSERT, m_position, m_text.substr(m_position, 1), L"");
+						updateUndo(INSERT, m_position, m_text.substr(m_position, 1), U"");
 					}
 					m_position++;
 				}
@@ -986,7 +986,7 @@ void ofxEditor::keyPressed(int key) {
 				}
 				m_text.insert(m_position, string_to_wstring(m_UTF8Char));
 				if(s_undo) {
-					updateUndo(INSERT, m_position, m_text.substr(m_position, 1), L"");
+					updateUndo(INSERT, m_position, m_text.substr(m_position, 1), U"");
 				}
 				m_UTF8Char = "";
 				m_position++;
@@ -1115,7 +1115,7 @@ bool ofxEditor::saveFile(string filename) {
 }
 
 //--------------------------------------------------------------
-wstring ofxEditor::getWideText() {
+u32string ofxEditor::getWideText() {
 	if(m_selection != NONE) {
 		return m_text.substr(m_highlightStart, m_highlightEnd-m_highlightStart);
 	}
@@ -1131,8 +1131,8 @@ string ofxEditor::getText() {
 }
 
 //--------------------------------------------------------------
-void ofxEditor::setText(const wstring& text) {
-	if(m_text != L"") {
+void ofxEditor::setText(const u32string& text) {
+	if(m_text != U"") {
 		m_position = lineStart(m_position);
 		int line = getCurrentLine();
 		m_text = text;
@@ -1153,7 +1153,7 @@ void ofxEditor::setText(const string& text) {
 }
 
 //--------------------------------------------------------------
-void ofxEditor::insertText(const wstring& text) {
+void ofxEditor::insertText(const u32string& text) {
 	if(m_selection != NONE) {
 		m_text.erase(m_highlightStart, m_highlightEnd-m_highlightStart);
 		if(m_position >= m_highlightEnd) {
@@ -1196,7 +1196,7 @@ void ofxEditor::deleteText(unsigned int numChars, bool forward) {
 
 //--------------------------------------------------------------
 void ofxEditor::clearText() {
-	m_text = L"";
+	m_text = U"";
 	if(m_colorScheme) {
 		clearTextBlocks();
 	}
@@ -1314,7 +1314,7 @@ void ofxEditor::setAutoFocus(bool focus) {
 	int visLines = 0;
 	size_t step = 0;
 	for(unsigned int i = m_topTextPosition;
-		i < m_bottomTextPosition && (step = m_text.find(L'\n', i)) != wstring::npos;
+		i < m_bottomTextPosition && (step = m_text.find(L'\n', i)) != u32string::npos;
 		i = step+1) {
 		visLines++;
 	}
@@ -1340,7 +1340,7 @@ void ofxEditor::setAutoFocus(bool focus) {
 		
 		// count num lines from top to cursor
 		for(unsigned int i = m_topTextPosition;
-			i < m_position && (step = m_text.find('\n', i)) != wstring::npos;
+			i < m_position && (step = m_text.find('\n', i)) != u32string::npos;
 			i = step+1) {
 			cursorLines++;
 		}
@@ -1559,7 +1559,7 @@ float ofxEditor::drawString(string s, ofPoint& p) {
 }
 
 //--------------------------------------------------------------
-float ofxEditor::drawString(wstring s, float x, float y) {
+float ofxEditor::drawString(u32string s, float x, float y) {
 	s_font->pushState();
 	ofColor c = ofGetStyle().color;
 	s_font->setColor(c);
@@ -1583,7 +1583,7 @@ float ofxEditor::drawString(wstring s, float x, float y) {
 }
 
 //--------------------------------------------------------------
-float ofxEditor::drawString(wstring s, ofPoint& p) {
+float ofxEditor::drawString(u32string s, ofPoint& p) {
 	return drawString(s, p.x, p.y);
 }
 
@@ -1738,11 +1738,11 @@ void ofxEditor::drawLineNumber(int &x, int &y, int &currentLine) {
 
 //--------------------------------------------------------------
 void ofxEditor::processTabs() {
-	size_t pos = m_text.find(L"\t", 0);
+	size_t pos = m_text.find(U"\t", 0);
 	while(pos != string::npos) {
 		m_text.erase(pos, 1);
-		m_text.insert(pos, wstring(m_settings->getTabWidth(), ' '));
-		pos = m_text.find(L"\t", pos);
+		m_text.insert(pos, u32string(m_settings->getTabWidth(), ' '));
+		pos = m_text.find(U"\t", pos);
 	}
 }
 
@@ -1753,7 +1753,7 @@ int ofxEditor::offsetToCurrentLineStart() {
 
 //--------------------------------------------------------------
 int ofxEditor::nextLineLength(int pos) {
-	size_t nextLineStart = m_text.find(L"\n", pos);
+	size_t nextLineStart = m_text.find(U"\n", pos);
 	if(nextLineStart != string::npos) {
 		return lineLength(nextLineStart+1);
 	}
@@ -1764,7 +1764,7 @@ int ofxEditor::nextLineLength(int pos) {
 int ofxEditor::previousLineLength(int pos) {
 	size_t prevLineEnd = string::npos;
 	if(pos > 0) {
-		prevLineEnd = m_text.rfind(L"\n", pos-1);
+		prevLineEnd = m_text.rfind(U"\n", pos-1);
 	}
 	if(prevLineEnd != string::npos) {
 		return lineLength(prevLineEnd);
@@ -1784,10 +1784,10 @@ unsigned int ofxEditor::lineStart(int pos) {
 	if(pos > 0) {
 		// take one off if we're over a newline
 		if(m_text[pos] == '\n') {
-			start = m_text.rfind(L"\n", pos-1);
+			start = m_text.rfind(U"\n", pos-1);
 		}
 		else {
-			start = m_text.rfind(L"\n", pos);
+			start = m_text.rfind(U"\n", pos);
 		}
 	}
 	if(start != string::npos) {
@@ -1804,7 +1804,7 @@ unsigned int ofxEditor::lineEnd(int pos) {
 	if(m_text.empty()) {
 		return 0;
 	}
-	size_t end = m_text.find(L"\n", pos);
+	size_t end = m_text.find(U"\n", pos);
 	if(end == string::npos) {
 		end = m_text.size()-1;
 	}
@@ -1814,12 +1814,12 @@ unsigned int ofxEditor::lineEnd(int pos) {
 //--------------------------------------------------------------
 void ofxEditor::parseMatchingChars() {
 
-	wstring &openChars = m_settings->getWideOpenChars();
-	wstring &closeChars = m_settings->getWideCloseChars();
+	u32string &openChars = m_settings->getWideOpenChars();
+	u32string &closeChars = m_settings->getWideCloseChars();
 
 	// parse the parentheses
 	int type = 0;
-	for(wstring::iterator i = openChars.begin(); i != openChars.end(); ++i) {
+	for(u32string::iterator i = openChars.begin(); i != openChars.end(); ++i) {
 		if(m_text[m_position] == *i) {
 			parseOpenChars(m_position, type);
 		}
@@ -1828,7 +1828,7 @@ void ofxEditor::parseMatchingChars() {
 		
 	if(m_position > 0) {
 		type = 0;
-		for(wstring::iterator i = closeChars.begin(); i != closeChars.end(); ++i) {
+		for(u32string::iterator i = closeChars.begin(); i != closeChars.end(); ++i) {
 			if(m_text[m_position-1] == *i) {
 				parseCloseChars(m_position-1, type);
 			}
@@ -1840,8 +1840,8 @@ void ofxEditor::parseMatchingChars() {
 //--------------------------------------------------------------
 void ofxEditor::parseOpenChars(int pos, int type) {
 
-	wstring &openChars = m_settings->getWideOpenChars();
-	wstring &closeChars = m_settings->getWideCloseChars();
+	u32string &openChars = m_settings->getWideOpenChars();
+	u32string &closeChars = m_settings->getWideCloseChars();
 
 	// looking for a close, so search forward
 	int stack = 0, start_pos = pos;
@@ -1864,8 +1864,8 @@ void ofxEditor::parseOpenChars(int pos, int type) {
 //--------------------------------------------------------------
 void ofxEditor::parseCloseChars(int pos, int type) {
 
-	wstring &openChars = m_settings->getWideOpenChars();
-	wstring &closeChars = m_settings->getWideCloseChars();
+	u32string &openChars = m_settings->getWideOpenChars();
+	u32string &closeChars = m_settings->getWideCloseChars();
 
 	// looking for a open, so search backward
 	int stack = 0, start_pos = pos;
@@ -1927,7 +1927,7 @@ void ofxEditor::pasteSelection() {
 				updateUndo(REPLACE, m_highlightStart, string_to_wstring((string)text), m_text.substr(m_highlightStart, m_highlightEnd-m_highlightStart));
 			}
 			else {
-				updateUndo(INSERT, m_position, string_to_wstring((string)text), L"");
+				updateUndo(INSERT, m_position, string_to_wstring((string)text), U"");
 			}
 		}
 		insertText((string) text);
@@ -1947,7 +1947,7 @@ void ofxEditor::pasteSelection() {
 //--------------------------------------------------------------
 void ofxEditor::eraseSelection(UndoActionType type) {
 	if(s_undo) {
-		updateUndo(type, m_highlightStart, L"", m_text.substr(m_highlightStart, m_highlightEnd-m_highlightStart));
+		updateUndo(type, m_highlightStart, U"", m_text.substr(m_highlightStart, m_highlightEnd-m_highlightStart));
 	}
 	m_text.erase(m_highlightStart, m_highlightEnd-m_highlightStart);
 	if(m_position >= m_highlightEnd) {
@@ -2014,7 +2014,7 @@ void ofxEditor::updateVisibleSize() {
 }
 
 //--------------------------------------------------------------
-void ofxEditor::updateUndo(UndoActionType type, unsigned int pos, const wstring &insertText, const wstring &deleteText) {
+void ofxEditor::updateUndo(UndoActionType type, unsigned int pos, const u32string &insertText, const u32string &deleteText) {
 	
 	// add if empty
 	if(m_undoActions.empty()) {
@@ -2231,7 +2231,7 @@ void ofxEditor::parseTextBlocks() {
 						// catch hex literal aka 0x001F
 						if(m_syntax && m_syntax->getHexLiteral()) {
 							// started?
-							if((tb.text.substr(0, 2) == L"0x") &&
+							if((tb.text.substr(0, 2) == U"0x") &&
 							   ((m_text[i] >= 'a' && m_text[i] <= 'f') ||
 							   (m_text[i] >= 'A' && m_text[i] <= 'F'))) {
 								tb.text += m_text[i];
@@ -2259,8 +2259,8 @@ void ofxEditor::parseTextBlocks() {
 						if(!m_syntax) {
 						
 							// check for open/close characters
-							if(m_settings->getWideOpenChars().find(m_text[i], 0) != wstring::npos ||
-							   m_settings->getWideCloseChars().find(m_text[i], 0) != wstring::npos) {
+							if(m_settings->getWideOpenChars().find(m_text[i], 0) != u32string::npos ||
+							   m_settings->getWideCloseChars().find(m_text[i], 0) != u32string::npos) {
 								if(tb.type != UNKNOWN && tb.text.length() > 1) {
 									tb.text = tb.text.substr(0, tb.text.length()-1);
 									m_textBlocks.push_back(tb);
@@ -2321,8 +2321,8 @@ void ofxEditor::parseTextBlocks() {
 								}
 								
 								// check for open/close characters
-								if(m_settings->getWideOpenChars().find(m_text[i], 0) != wstring::npos ||
-								   m_settings->getWideCloseChars().find(m_text[i], 0) != wstring::npos) {
+								if(m_settings->getWideOpenChars().find(m_text[i], 0) != u32string::npos ||
+								   m_settings->getWideCloseChars().find(m_text[i], 0) != u32string::npos) {
 									if(tb.type != UNKNOWN && tb.text.length() > 1) {
 										tb.text = tb.text.substr(0, tb.text.length()-1);
 										m_textBlocks.push_back(tb);
@@ -2336,7 +2336,7 @@ void ofxEditor::parseTextBlocks() {
 								}
 								
 								// check for single operator characters
-								if(m_syntax->getWideOperatorChars().find(m_text[i], 0) != wstring::npos) {
+								if(m_syntax->getWideOperatorChars().find(m_text[i], 0) != u32string::npos) {
 									if(tb.type != UNKNOWN && tb.text.length() > 1) {
 										tb.text = tb.text.substr(0, tb.text.length()-1);
 										m_textBlocks.push_back(tb);
@@ -2350,7 +2350,7 @@ void ofxEditor::parseTextBlocks() {
 								}
 								
 								// check for single punctuation characters
-								if(m_syntax->getWidePunctuationChars().find(m_text[i], 0) != wstring::npos) {
+								if(m_syntax->getWidePunctuationChars().find(m_text[i], 0) != u32string::npos) {
 									if(tb.type != UNKNOWN && tb.text.length() > 1) {
 										tb.text = tb.text.substr(0, tb.text.length()-1);
 										m_textBlocks.push_back(tb);

@@ -122,27 +122,27 @@ class ofxEditorSyntax {
 
 		/// set the beginning string to match for a single line comment,
 		/// blank by default
-		void setSingleLineComment(const wstring &begin);
+		void setSingleLineComment(const u32string &begin);
 		void setSingleLineComment(const string &begin);
-		const wstring& getWideSingleLineComment();
+		const u32string& getWideSingleLineComment();
 		string getSingleLineComment();
 	
 		/// set the beginning and ending strings to match for a multi line comment,
 		/// blank by default
-		void setMultiLineComment(const wstring &begin, const wstring &end);
+		void setMultiLineComment(const u32string &begin, const u32string &end);
 		void setMultiLineComment(const string &begin, const string &end);
-		const wstring& getWideMultiLineCommentBegin();
+		const u32string& getWideMultiLineCommentBegin();
 		string getMultiLineCommentBegin();
-		const wstring& getWideMultiLineCommentEnd();
+		const u32string& getWideMultiLineCommentEnd();
 		string getMultiLineCommentEnd();
 	
 	/// \section Preprocessor
 	
 		/// preprocessor string which starts a preprocessor block until an endline
 		/// blank by default
-		void setPreprocessor(const wstring &begin);
+		void setPreprocessor(const u32string &begin);
 		void setPreprocessor(const string &begin);
-		const wstring& getWidePreprocessor();
+		const u32string& getWidePreprocessor();
 		string getPreprocessor();
 	
 	/// \section Words
@@ -155,19 +155,19 @@ class ofxEditorSyntax {
 		};
 	
 		/// set type for a given word
-		void setWord(const wstring &word, WordType type);
+		void setWord(const u32string &word, WordType type);
 		void setWord(const string &word, WordType type);
 	
 		/// set type for a vector of words
-		void setWords(const vector<wstring> &words, WordType type);
+		void setWords(const vector<u32string> &words, WordType type);
 		void setWords(const vector<string> &words, WordType type);
 	
 		/// get type for word, returns PLAIN if not found
-		WordType getWordType(const wstring &word);
+		WordType getWordType(const u32string &word);
 		WordType getWordType(const string &word);
 	
 		/// clear type for word
-		void clearWord(const wstring &word);
+		void clearWord(const u32string &word);
 		void clearWord(const string &word);
 	
 		/// clear all words of a given type
@@ -184,16 +184,16 @@ class ofxEditorSyntax {
 	
 		/// common math & comparison operator chars between highlighted text blocks when parsing
 		/// default: "=+-*/!|&^~", string should not be empty
-		void setOperatorChars(const wstring &chars);
+		void setOperatorChars(const u32string &chars);
 		void setOperatorChars(const string &chars);
-		const wstring& getWideOperatorChars();
+		const u32string& getWideOperatorChars();
 		string getOperatorChars();
 	
 		/// common punctuation chars between highlighted text blocks when parsing
 		/// default: ";:,?", string should not be empty
-		void setPunctuationChars(const wstring &chars);
+		void setPunctuationChars(const u32string &chars);
 		void setPunctuationChars(const string &chars);
-		const wstring& getWidePunctuationChars();
+		const u32string& getWidePunctuationChars();
 		string getPunctuationChars();
 	
 	protected:
@@ -201,13 +201,13 @@ class ofxEditorSyntax {
 		string lang; //< langauge string aka "GLSL", "Lua", etc
 		set<string> fileExts; //< associated file extensions (minus .)
 	
-		wstring singleLineComment; //< single line comment begin
-		wstring multiLineCommentBegin; //< multi line comment begin
-		wstring multiLineCommentEnd; //< multi line comment end
+		u32string singleLineComment; //< single line comment begin
+		u32string multiLineCommentBegin; //< multi line comment begin
+		u32string multiLineCommentEnd; //< multi line comment end
 	
-		wstring preprocessor; //< preprocessor begin
-		map<wstring,WordType> words; //< synatx types for specific words
+		u32string preprocessor; //< preprocessor begin
+		map<u32string,WordType> words; //< synatx types for specific words
 		bool hexLiteral; //< parse hex literals (0x123) as numbers?
-		wstring operatorChars; //< common operator chars
-		wstring punctuationChars; //< punctuation chars
+		u32string operatorChars; //< common operator chars
+		u32string punctuationChars; //< punctuation chars
 };

@@ -107,7 +107,7 @@ float ofxEditorFont::stringWidth(const string& s) {
 }
 
 //--------------------------------------------------------------
-float ofxEditorFont::stringWidth(const wstring& s) {
+float ofxEditorFont::stringWidth(const u32string& s) {
 	return stringWidth(wstring_to_string(s));
 }
 
@@ -119,7 +119,7 @@ float ofxEditorFont::stringHeight(const string& s) {
 }
 
 //--------------------------------------------------------------
-float ofxEditorFont::stringHeight(const wstring& s) {
+float ofxEditorFont::stringHeight(const u32string& s) {
 	return stringHeight(wstring_to_string(s));
 }
 
@@ -147,7 +147,7 @@ float ofxEditorFont::drawString(const string& s, float x, float y, bool shadowed
 }
 
 //--------------------------------------------------------------
-float ofxEditorFont::drawString(const wstring& s, float x, float y, bool shadowed) {
+float ofxEditorFont::drawString(const u32string& s, float x, float y, bool shadowed) {
 	return drawString(wstring_to_string(s), x, y, shadowed);
 }
 

@@ -38,8 +38,8 @@ ofxEditorSettings::ofxEditorSettings() {
 	lineNumberColor = ofColor(127);
 
 	highlightMatchingChars = true;
-	openChars = L"([<{";
-	closeChars = L")]>}";
+	openChars = U"([<{";
+	closeChars = U")]>}";
 }
 
 //--------------------------------------------------------------
@@ -190,7 +190,7 @@ bool ofxEditorSettings::getHighlightMatchingChars() {
 }
 
 //--------------------------------------------------------------
-void ofxEditorSettings::setMatchingChars(wstring openChars, wstring closeChars) {
+void ofxEditorSettings::setMatchingChars(u32string openChars, u32string closeChars) {
 	if(openChars.length() == 0 || closeChars.length() == 0) {
 		ofLogWarning("ofxEditorSettings") << "empty open or close char string";
 		return;
@@ -205,7 +205,7 @@ void ofxEditorSettings::setMatchingChars(string openChars, string closeChars) {
 }
 
 //--------------------------------------------------------------
-wstring& ofxEditorSettings::getWideOpenChars() {
+u32string& ofxEditorSettings::getWideOpenChars() {
 	return openChars;
 }
 
@@ -215,7 +215,7 @@ string ofxEditorSettings::getOpenChars() {
 }
 
 //--------------------------------------------------------------
-wstring& ofxEditorSettings::getWideCloseChars() {
+u32string& ofxEditorSettings::getWideCloseChars() {
 	return closeChars;
 }
 

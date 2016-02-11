@@ -67,14 +67,14 @@ class ofxRepl : public ofxEditor {
 		
 		/// add a wide string to the console,
 		/// set beforePrompt to true to print a line above the current prompt
-		void print(const wstring &what, bool beforePrompt=false);
+		void print(const u32string &what, bool beforePrompt=false);
 	
 		/// add a string to the console with string conversion,
 		/// set beforePrompt to true to print a line above the current prompt
 		void print(const string &what, bool beforePrompt=false);
 		
 		/// add a wide string to the console and print a return after
-		void printEvalReturn(const wstring &what);
+		void printEvalReturn(const u32string &what);
 	
 		/// add a string to the console and print a return after with string conversion
 		void printEvalReturn(const string &what);
@@ -91,15 +91,15 @@ class ofxRepl : public ofxEditor {
 	/// \section Static Utils
 	
 		/// set/get the Repl greeting banner, default: ""
-		static void setReplBanner(const wstring &text); //< call this before setup()
+		static void setReplBanner(const u32string &text); //< call this before setup()
 		static void setReplBanner(const string &text); //< call this before setup()
-		static wstring& getWideReplBanner();
+		static u32string& getWideReplBanner();
 		static string getReplBanner();
 		
 		/// set/get the Repl prompt, default: "> "
-		static void setReplPrompt(const wstring &text); //< call this before setup()
+		static void setReplPrompt(const u32string &text); //< call this before setup()
 		static void setReplPrompt(const string &text); //< call this before setup()
-		static wstring& getWideReplPrompt();
+		static u32string& getWideReplPrompt();
 		static string getReplPrompt();
 
 	protected:
@@ -109,7 +109,7 @@ class ofxRepl : public ofxEditor {
 		void historyPrev();
 		void historyNext();
 		void historyClear();
-		void historyShow(wstring what);
+		void historyShow(u32string what);
 		void keepCursorVisible();
 
 		ofxReplListener *m_listener; //< eval event listener
@@ -117,16 +117,16 @@ class ofxRepl : public ofxEditor {
 		unsigned int m_promptPos; //< prompt position in the text buffer
 		unsigned int m_insertPos; //< insert position in the text buffer
 
-		wstring m_evalText; //< text to be evaluated when enter is pressed
+		u32string m_evalText; //< text to be evaluated when enter is pressed
 		
-		deque<wstring> m_history; //< line history
-		deque<wstring>::iterator m_historyIter; //< current position in line history
+		deque<u32string> m_history; //< line history
+		deque<u32string>::iterator m_historyIter; //< current position in line history
 		bool m_historyNavStarted; //< is the cursor within the line history?
-		wstring m_historyPresent; //< current history line (aka live input)
+		u32string m_historyPresent; //< current history line (aka live input)
 		unsigned int m_linePos; //< current line the cursor is on
 	
-		static wstring s_banner; //< REPL header/greeting, default: ""
-		static wstring s_prompt; //< prompt string, default: "> "
+		static u32string s_banner; //< REPL header/greeting, default: ""
+		static u32string s_prompt; //< prompt string, default: "> "
 		
 	private:
 

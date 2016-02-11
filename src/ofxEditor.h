@@ -142,19 +142,19 @@ class ofxEditor {
 		virtual bool saveFile(string filename);
 	
 		/// get wide char text buffer contents or current selection
-		virtual wstring getWideText();
+		virtual u32string getWideText();
 	
 		/// get text buffer contents or current selection
 		virtual string getText();
 	
 		/// set text buffer contents
-		virtual void setText(const wstring& text);
+		virtual void setText(const u32string& text);
 	
 		/// set text buffer contents
 		virtual void setText(const string& text);
 	
 		/// insert text at the current buffer position
-		virtual void insertText(const wstring& text);
+		virtual void insertText(const u32string& text);
 	
 		/// insert text at the current buffer position
 		virtual void insertText(const string& text);
@@ -296,8 +296,8 @@ class ofxEditor {
 	
 		/// draw a wide char string using the current editor font
 		/// returns the width of drawn text
-		float drawString(wstring s, float x, float y);
-		float drawString(wstring s, ofPoint& p);
+		float drawString(u32string s, float x, float y);
+		float drawString(u32string s, ofPoint& p);
 	
 		/// draw a string using the current editor font
 		/// returns the width of drawn text
@@ -326,7 +326,7 @@ class ofxEditor {
 		static bool s_superAsModifier;   //< use the super key as modifier?
 	
 		/// shared copy/paste buffer if system clipboard isn't available
-		static wstring s_copyBuffer;
+		static u32string s_copyBuffer;
 	
 		/// timestamp for calculating animations, shared between editors for smooth
 		/// animation when switching back and forth
@@ -347,7 +347,7 @@ class ofxEditor {
 		ofxEditorSettings *m_settings; //< editor settings object
 		bool m_sharedSettings; //< are the settings shared? if so, do not delete
 	
-		wstring m_text; //< text buffer
+		u32string m_text; //< text buffer
 		unsigned int m_numLines; //< number of lines in the text buffer
 		
 		float m_width, m_height; //< editor viewport pixel size
@@ -427,11 +427,11 @@ class ofxEditor {
 			public:
 				
 				TextBlockType type; //< block type
-				wstring text; //< block text string
+				u32string text; //< block text string
 				
 				TextBlock() {clear();}
 				TextBlock(TextBlockType type) : type(type) {}
-				TextBlock(TextBlockType type, wstring text) : type(type), text(text) {}
+				TextBlock(TextBlockType type, u32string text) : type(type), text(text) {}
 				
 				TextBlock(const TextBlock &from) {
 					type = from.type;
@@ -440,7 +440,7 @@ class ofxEditor {
 				
 				void clear() {
 					type = UNKNOWN;
-					text = L"";
+					text = U"";
 				}
 		};
 		list<TextBlock> m_textBlocks; //< syntax parser text block linked list
@@ -461,7 +461,7 @@ class ofxEditor {
 			public:
 			
 				UndoActionType type; //< action type
-				wstring insertText, deleteText; //< any added/removed text
+				u32string insertText, deleteText; //< any added/removed text
 				unsigned int pos; //< text position
 				long timestamp; //< timestamp of last update
 			
@@ -477,8 +477,8 @@ class ofxEditor {
 			
 				void clear() {
 					type = INSERT;
-					insertText = L"";
-					deleteText = L"";
+					insertText = U"";
+					deleteText = U"";
 					pos = 0;
 					timestamp = ofGetElapsedTimeMillis();
 				}
@@ -574,7 +574,7 @@ class ofxEditor {
 	
 		/// update undo state, creates of modifies actions using timeout
 		/// on new input, clears actions newer than current undo pos
-		void updateUndo(UndoActionType type, unsigned int pos, const wstring &insertText, const wstring &deleteText);
+		void updateUndo(UndoActionType type, unsigned int pos, const u32string &insertText, const u32string &deleteText);
 	
 	private:
 	

@@ -89,21 +89,21 @@ class ofxFileDialog : public ofxEditor {
 	/// \section Static Utils
 	
 		/// set/get the save as info text, default: "Save as (esc to exit)"
-		static void setSaveAsText(const wstring &text);
+		static void setSaveAsText(const u32string &text);
 		static void setSaveAsText(const string &text);
-		static wstring& getWideSaveAsText();
+		static u32string& getWideSaveAsText();
 		static string getSaveAsText();
 	
 		/// set/get the new folder info text, default: "New folder (esc to exit)"
-		static void setNewFolderText(const wstring &text);
+		static void setNewFolderText(const u32string &text);
 		static void setNewFolderText(const string &text);
-		static wstring& getWideNewFolderText();
+		static u32string& getWideNewFolderText();
 		static string getNewFolderText();
 	
 		/// set/get the new folder button text in the save as dialog, default: "New Folder"
-		static void setNewFolderButton(const wstring &text);
+		static void setNewFolderButton(const u32string &text);
 		static void setNewFolderButton(const string &text);
-		static wstring& getWideNewFolderButton();
+		static u32string& getWideNewFolderButton();
 		static string getNewFolderButton();
 
 	protected:
@@ -128,15 +128,15 @@ class ofxFileDialog : public ofxEditor {
 		bool m_active; //< is the dialog active?
 	
 		unsigned int m_currentFile;  //< index of the current file
-		vector<wstring> m_filenames; //< filenames & directories
+		vector<u32string> m_filenames; //< filenames & directories
 		set<int> m_directories;      //< which indexes are directories
-		wstring m_path;              //< current path
-		wstring m_selectedPath;      //< selected path on enter
+		u32string m_path;              //< current path
+		u32string m_selectedPath;      //< selected path on enter
 	
 		/// number of files to show above and below open file cursor
-		static wstring s_saveAsText; //< save as info text
-		static wstring s_newFolderText; //< new folder info text
-		static wstring s_newFolderButtonText; //< save as new folder "button"
+		static u32string s_saveAsText; //< save as info text
+		static u32string s_newFolderText; //< new folder info text
+		static u32string s_newFolderButtonText; //< save as new folder "button"
 	
 		/// save as dialog states
 		enum SaveAsState {

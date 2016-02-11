@@ -64,11 +64,11 @@ class ofxEditorFont {
 	
 		/// get bounding box width for a given string
 		float stringWidth(const string& s);
-		float stringWidth(const wstring& s);
+		float stringWidth(const u32string& s);
 	
 		/// get bounding box height for a given string (single line only)
         float stringHeight(const string& s);
-		float stringHeight(const wstring& s);
+		float stringHeight(const u32string& s);
 	
 	/// \section Drawing
 	
@@ -85,7 +85,7 @@ class ofxEditorFont {
 		/// draw a wide char string using the current state color
 		/// set shadowed=true to draw an offset shadow using the shadow color
 		/// returns new x position
-		float drawString(const wstring& s, float x, float y, bool shadowed=false);
+		float drawString(const u32string& s, float x, float y, bool shadowed=false);
 	
 	/// \section Color & State
 	

@@ -26,9 +26,9 @@
 #include "Unicode.h"
 
 //const unsigned int ofxFileDialog::s_fileDisplayRange = 10;
-wstring ofxFileDialog::s_saveAsText = L"Save as (esc to exit)";
-wstring ofxFileDialog::s_newFolderText = L"New Folder (esc to exit)";
-wstring ofxFileDialog::s_newFolderButtonText = L"New Folder";
+u32string ofxFileDialog::s_saveAsText = U"Save as (esc to exit)";
+u32string ofxFileDialog::s_newFolderText = U"New Folder (esc to exit)";
+u32string ofxFileDialog::s_newFolderButtonText = U"New Folder";
 
 //--------------------------------------------------------------
 ofxFileDialog::ofxFileDialog() : ofxEditor() {
@@ -154,7 +154,7 @@ string ofxFileDialog::getSelectedPath() {
 
 //--------------------------------------------------------------
 void ofxFileDialog::clearSelectedPath() {
-	m_selectedPath = L"";
+	m_selectedPath = U"";
 }
 
 //--------------------------------------------------------------
@@ -196,7 +196,7 @@ void ofxFileDialog::refresh() {
 	
 	// one level up
 	m_directories.insert(0);
-	m_filenames.push_back(L"..");
+	m_filenames.push_back(U"..");
 	
 	// first dirs
 	for(int i = 0; i < files.size(); ++i) {
@@ -241,7 +241,7 @@ void ofxFileDialog::redo() {
 // STATIC UTILS
 
 //--------------------------------------------------------------
-void ofxFileDialog::setSaveAsText(const wstring &text) {
+void ofxFileDialog::setSaveAsText(const u32string &text) {
 	s_saveAsText = text;
 }
 
@@ -251,7 +251,7 @@ void ofxFileDialog::setSaveAsText(const string &text) {
 }
 
 //--------------------------------------------------------------
-wstring& ofxFileDialog::getWideSaveAsText() {
+u32string& ofxFileDialog::getWideSaveAsText() {
 	return s_saveAsText;
 }
 
@@ -261,7 +261,7 @@ string ofxFileDialog::getSaveAsText() {
 }
 
 //--------------------------------------------------------------
-void ofxFileDialog::setNewFolderText(const wstring &text) {
+void ofxFileDialog::setNewFolderText(const u32string &text) {
 	s_newFolderText = text;
 }
 
@@ -271,7 +271,7 @@ void ofxFileDialog::setNewFolderText(const string &text) {
 }
 
 //--------------------------------------------------------------
-wstring& ofxFileDialog::getWideNewFolderText() {
+u32string& ofxFileDialog::getWideNewFolderText() {
 	return s_newFolderText;
 }
 
@@ -281,7 +281,7 @@ string ofxFileDialog::getNewFolderText() {
 }
 
 //--------------------------------------------------------------
-void ofxFileDialog::setNewFolderButton(const wstring &text) {
+void ofxFileDialog::setNewFolderButton(const u32string &text) {
 	s_newFolderButtonText = text;
 }
 
@@ -291,7 +291,7 @@ void ofxFileDialog::setNewFolderButton(const string &text) {
 }
 
 //--------------------------------------------------------------
-wstring& ofxFileDialog::getWideNewFolderButton() {
+u32string& ofxFileDialog::getWideNewFolderButton() {
 	return s_newFolderButtonText;
 }
 
@@ -502,7 +502,7 @@ void ofxFileDialog::keyPressedOpen(int key, bool saveAs) {
 		case OF_KEY_RETURN:
 			if(m_directories.find(m_currentFile) != m_directories.end()) {
 				m_path += m_filenames[m_currentFile];
-				m_path += L"/";
+				m_path += U"/";
 				m_path = string_to_wstring(ofFilePath::getAbsolutePath(wstring_to_string(m_path)));
 				refresh();
 			}
@@ -579,7 +579,7 @@ void ofxFileDialog::drawFilenames(int offset, int bottomOffset, bool highlight) 
 	// start drawing based on current file location in file list so selection remains centered
 	float y = (m_currentFile/(float)m_filenames.size()) * -s_charHeight * (float)m_filenames.size() + s_charHeight;
 	unsigned int count = 0;
-	for(vector<wstring>::iterator i = m_filenames.begin(); i != m_filenames.end(); i++) {
+	for(vector<u32string>::iterator i = m_filenames.begin(); i != m_filenames.end(); i++) {
 	
 		m_numLines = 0;
 		bool isDir = m_directories.find(count) != m_directories.end();

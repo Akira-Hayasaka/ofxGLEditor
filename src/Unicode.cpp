@@ -62,7 +62,7 @@ unsigned int wchar_width(int input) {
 }
 
 //--------------------------------------------------------------
-std::string wchar_to_string(wchar_t input) {
+std::string wchar_to_string(char32_t input) {
 	string output;
 	// 0xxxxxxx
 	if(input < 0x80) {
@@ -106,7 +106,7 @@ std::string wchar_to_string(wchar_t input) {
 }
 
 //--------------------------------------------------------------
-wchar_t string_to_wchar(const std::string &input) {
+char32_t string_to_wchar(const std::string &input) {
 	Unicode4Bytes output = 0;
 	// 1111110x 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx
 	if(input.size() > 5 && (input[0] & MASK6BYTES) == MASK6BYTES) {
@@ -151,7 +151,7 @@ wchar_t string_to_wchar(const std::string &input) {
 }
 
 //--------------------------------------------------------------
-string wstring_to_string(const wstring &input) {
+string wstring_to_string(const u32string &input) {
 	string output;
 	for(unsigned int i = 0; i < input.size(); i++) {
 		output.append(wchar_to_string(input[i]));
@@ -160,8 +160,8 @@ string wstring_to_string(const wstring &input) {
 }
 
 //--------------------------------------------------------------
-wstring string_to_wstring(const string &input) {
-	wstring output;
+u32string string_to_wstring(const string &input) {
+	u32string output;
 	for(unsigned int i = 0; i < input.size();) {
 		Unicode4Bytes ch;
 		// 1111110x 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx

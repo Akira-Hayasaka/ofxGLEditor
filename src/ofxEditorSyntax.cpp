@@ -60,7 +60,7 @@ void ofxEditorSyntax::copy(const ofxEditorSyntax &from) {
 	// make deep copies
 	clearAllFileExts();
 	clearAllWords();
-	for(map<wstring,WordType>::const_iterator iter = from.words.begin(); iter != from.words.end(); ++iter) {
+	for(map<u32string,WordType>::const_iterator iter = from.words.begin(); iter != from.words.end(); ++iter) {
 		words[(*iter).first] = (*iter).second;
 	}
 	for(set<string>::const_iterator iter = from.fileExts.begin(); iter != from.fileExts.end(); ++iter) {
@@ -142,13 +142,13 @@ bool ofxEditorSyntax::loadFile(const string& xmlFile) {
 void ofxEditorSyntax::clear() {
 	lang = "";
 	clearAllFileExts();
-	singleLineComment = L"";
-	multiLineCommentBegin = L"";
-	multiLineCommentEnd = L"";
-	preprocessor = L"#";
+	singleLineComment = U"";
+	multiLineCommentBegin = U"";
+	multiLineCommentEnd = U"";
+	preprocessor = U"#";
 	hexLiteral = true;
-	operatorChars = L"=+-*/!|&~^";
-	punctuationChars = L";:,?";
+	operatorChars = U"=+-*/!|&~^";
+	punctuationChars = U";:,?";
 	clearAllWords();
 }
 
@@ -211,7 +211,7 @@ void ofxEditorSyntax::clearAllFileExts() {
 // COMMENTS
 
 //--------------------------------------------------------------
-void ofxEditorSyntax::setSingleLineComment(const wstring &begin) {
+void ofxEditorSyntax::setSingleLineComment(const u32string &begin) {
 	singleLineComment = begin;
 }
 
@@ -221,7 +221,7 @@ void ofxEditorSyntax::setSingleLineComment(const string &begin) {
 }
 
 //--------------------------------------------------------------
-const wstring& ofxEditorSyntax::getWideSingleLineComment() {
+const u32string& ofxEditorSyntax::getWideSingleLineComment() {
 	return singleLineComment;
 }
 
@@ -231,7 +231,7 @@ string ofxEditorSyntax::getSingleLineComment() {
 }
 
 //--------------------------------------------------------------
-void ofxEditorSyntax::setMultiLineComment(const wstring &begin, const wstring &end) {
+void ofxEditorSyntax::setMultiLineComment(const u32string &begin, const u32string &end) {
 	multiLineCommentBegin = begin;
 	multiLineCommentEnd = end;
 }
@@ -243,7 +243,7 @@ void ofxEditorSyntax::setMultiLineComment(const string &begin, const string &end
 }
 
 //--------------------------------------------------------------
-const wstring& ofxEditorSyntax::getWideMultiLineCommentBegin() {
+const u32string& ofxEditorSyntax::getWideMultiLineCommentBegin() {
 	return multiLineCommentBegin;
 }
 
@@ -253,7 +253,7 @@ string ofxEditorSyntax::getMultiLineCommentBegin() {
 }
 
 //--------------------------------------------------------------
-const wstring& ofxEditorSyntax::getWideMultiLineCommentEnd() {
+const u32string& ofxEditorSyntax::getWideMultiLineCommentEnd() {
 	return multiLineCommentEnd;
 }
 
@@ -265,7 +265,7 @@ string ofxEditorSyntax::getMultiLineCommentEnd() {
 // PREPROCESSOR
 
 //--------------------------------------------------------------
-void ofxEditorSyntax::setPreprocessor(const wstring &begin) {
+void ofxEditorSyntax::setPreprocessor(const u32string &begin) {
 	preprocessor = begin;
 }
 
@@ -275,7 +275,7 @@ void ofxEditorSyntax::setPreprocessor(const string &begin) {
 }
 
 //--------------------------------------------------------------
-const wstring& ofxEditorSyntax::getWidePreprocessor() {
+const u32string& ofxEditorSyntax::getWidePreprocessor() {
 	return preprocessor;
 }
 
@@ -287,8 +287,8 @@ string ofxEditorSyntax::getPreprocessor() {
 // WORDS
 
 //--------------------------------------------------------------
-void ofxEditorSyntax::setWord(const wstring &word, WordType type) {
-	if(word == L"") return;
+void ofxEditorSyntax::setWord(const u32string &word, WordType type) {
+	if(word == U"") return;
 	words[word] = type;
 }
 
@@ -298,7 +298,7 @@ void ofxEditorSyntax::setWord(const string &word, WordType type) {
 }
 
 //--------------------------------------------------------------
-void ofxEditorSyntax::setWords(const vector<wstring> &words, WordType type) {
+void ofxEditorSyntax::setWords(const vector<u32string> &words, WordType type) {
 	for(int i = 0; i < words.size(); ++i) {
 		setWord(words[i], type);
 	}
@@ -312,8 +312,8 @@ void ofxEditorSyntax::setWords(const vector<string> &words, WordType type) {
 }
 
 //--------------------------------------------------------------
-ofxEditorSyntax::WordType ofxEditorSyntax::getWordType(const wstring &word) {
-	map<wstring,WordType>::iterator iter = words.find(word);
+ofxEditorSyntax::WordType ofxEditorSyntax::getWordType(const u32string &word) {
+	map<u32string,WordType>::iterator iter = words.find(word);
 	if(iter != words.end()) { // already exists
 		return (*iter).second;
 	}
@@ -326,8 +326,8 @@ ofxEditorSyntax::WordType ofxEditorSyntax::getWordType(const string &word) {
 }
 
 //--------------------------------------------------------------
-void ofxEditorSyntax::clearWord(const wstring &word) {
-	map<wstring,WordType>::iterator iter = words.find(word);
+void ofxEditorSyntax::clearWord(const u32string &word) {
+	map<u32string,WordType>::iterator iter = words.find(word);
 	if(iter != words.end()) { // already exists
 		words.erase(iter);
 	}
@@ -340,7 +340,7 @@ void ofxEditorSyntax::clearWord(const string &word) {
 
 //--------------------------------------------------------------
 void ofxEditorSyntax::clearWordType(WordType type) {
-	map<wstring,WordType>::iterator iter = words.begin();
+	map<u32string,WordType>::iterator iter = words.begin();
 	while(iter != words.end()) {
 		if((*iter).second == type) {
 			words.erase(++iter);
@@ -369,7 +369,7 @@ bool ofxEditorSyntax::getHexLiteral() {
 }
 
 //--------------------------------------------------------------
-void ofxEditorSyntax::setOperatorChars(const wstring &chars) {
+void ofxEditorSyntax::setOperatorChars(const u32string &chars) {
 	if(chars.length() == 0) {
 		ofLogWarning("ofxEditorSyntax") << "empty operator string";
 		return;
@@ -383,7 +383,7 @@ void ofxEditorSyntax::setOperatorChars(const string &chars) {
 }
 
 //--------------------------------------------------------------
-const wstring& ofxEditorSyntax::getWideOperatorChars() {
+const u32string& ofxEditorSyntax::getWideOperatorChars() {
 	return operatorChars;
 }
 
@@ -393,7 +393,7 @@ string ofxEditorSyntax::getOperatorChars() {
 }
 
 //--------------------------------------------------------------
-void ofxEditorSyntax::setPunctuationChars(const wstring &chars) {
+void ofxEditorSyntax::setPunctuationChars(const u32string &chars) {
 	if(chars.length() == 0) {
 		ofLogWarning("ofxEditorSyntax") << "empty punctuation string";
 		return;
@@ -407,7 +407,7 @@ void ofxEditorSyntax::setPunctuationChars(const string &chars) {
 }
 
 //--------------------------------------------------------------
-const wstring& ofxEditorSyntax::getWidePunctuationChars() {
+const u32string& ofxEditorSyntax::getWidePunctuationChars() {
 	return punctuationChars;
 }
 

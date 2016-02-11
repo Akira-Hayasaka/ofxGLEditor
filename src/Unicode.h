@@ -29,13 +29,13 @@
 unsigned int wchar_width(int input);
 
 /// split a single wide char value into UTF-8 bytes
-std::string wchar_to_string(wchar_t input);
+std::string wchar_to_string(char32_t input);
 
 /// split a set of UTF-8 bytes into the first single wide char value found
-wchar_t string_to_wchar(const std::string &input);
+char32_t string_to_wchar(const std::string &input);
 
 /// split wide chars into UTF-8 bytes
-std::string wstring_to_string(const std::wstring &input);
+std::string wstring_to_string(const std::u32string &input);
 
 /// parse UTF-8 bytes into wide chars
-std::wstring string_to_wstring(const std::string &input);
+std::u32string string_to_wstring(const std::string &input);
