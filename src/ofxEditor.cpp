@@ -337,7 +337,10 @@ void ofxEditor::draw() {
 			#ifdef DEBUG_AUTO_FOCUS
 				ofNoFill();
 				ofSetColor(ofColor::green);
+				ofRectMode rectMode = ofGetRectMode();
+				ofSetRectMode(OF_RECTMODE_CORNER);
 				ofDrawRectangle(0, 0, m_width, m_height);
+				ofSetRectMode(rectMode);
 				ofFill();
 			#endif
 			ofTranslate(0, m_height/2);
@@ -1666,7 +1669,10 @@ void ofxEditor::drawMatchingCharBlock(int c, int x, int y) {
 	ofSetColor(
 		m_settings->getMatchingCharsColor().r, m_settings->getMatchingCharsColor().g,
 		m_settings->getMatchingCharsColor().b, m_settings->getMatchingCharsColor().a * m_settings->getAlpha());
+	ofRectMode rectMode = ofGetRectMode();
+	ofSetRectMode(OF_RECTMODE_CORNER);
 	ofDrawRectangle(x, y-s_charHeight, characterWidth(c), s_charHeight);
+	ofSetRectMode(rectMode);
 }
 
 //--------------------------------------------------------------
@@ -1674,16 +1680,21 @@ void ofxEditor::drawSelectionCharBlock(int c, int x, int y) {
 	ofSetColor(
 		m_settings->getSelectionColor().r, m_settings->getSelectionColor().g,
 		m_settings->getSelectionColor().b, m_settings->getSelectionColor().a * m_settings->getAlpha());
+	ofRectMode rectMode = ofGetRectMode();
+	ofSetRectMode(OF_RECTMODE_CORNER);
 	ofDrawRectangle(x, y-s_charHeight, characterWidth(c), s_charHeight);
+	ofSetRectMode(rectMode);
 }
 
 //--------------------------------------------------------------
 void ofxEditor::drawFlashCharBlock(int c, int x, int y) {
 	float cur_alpha = (SELECTION_FLASH_DURATION - m_flashSelTime) / SELECTION_FLASH_DURATION;
-
 	ofColor &color = m_settings->getFlashColor();
 	ofSetColor(color.r, color.g, color.b, cur_alpha * color.a * m_settings->getAlpha());
+	ofRectMode rectMode = ofGetRectMode();
+	ofSetRectMode(OF_RECTMODE_CORNER);
 	ofDrawRectangle(x, y-s_charHeight, characterWidth(c), s_charHeight);
+	ofSetRectMode(rectMode);
 }
 
 //--------------------------------------------------------------
@@ -1693,29 +1704,32 @@ void ofxEditor::drawCursor(int x, int y) {
 		
 		// set this to zero when starting
 		m_blowup += m_delta;
-		if (m_blowup >= BLOWUP_FLASHES) {
+		if(m_blowup >= BLOWUP_FLASHES) {
 			m_blowupCursor = false;
 		}
 		else {
 			float maxCW = (BLOWUP_FLASHES - m_blowup) / BLOWUP_FLASHES * (CURSOR_MAX_WIDTH * s_cursorWidth * 0.5f) + s_cursorWidth * 0.5f;
 			float maxCH = (BLOWUP_FLASHES - m_blowup) / BLOWUP_FLASHES * (CURSOR_MAX_HEIGHT * s_charHeight) + s_charHeight;
-			ofSetRectMode(OF_RECTMODE_CENTER);
 			ofSetColor(m_settings->getCursorColor().r, m_settings->getCursorColor().g,
 					   m_settings->getCursorColor().b, m_settings->getCursorColor().a * m_settings->getAlpha() * m_blowup/BLOWUP_FLASHES);
-			ofDrawRectangle(MAX(x+maxCW/2, x), MAX(y-s_charHeight+maxCH/2, y-s_charHeight), MAX(maxCW, s_cursorWidth), MAX(maxCH, s_charHeight));
+			ofRectMode rectMode = ofGetRectMode();
 			ofSetRectMode(OF_RECTMODE_CORNER);
+			ofDrawRectangle(MAX(x+maxCW/2, x), MAX(y-s_charHeight+maxCH/2, y-s_charHeight), MAX(maxCW, s_cursorWidth), MAX(maxCH, s_charHeight));
+			ofSetRectMode(rectMode);
 		}
 	}
 	else {
 		m_flash += m_delta;
-		if (m_flash > FLASH_RATE) {
+		if(m_flash > FLASH_RATE) {
 			m_flash = 0;
 		}
-		if (m_flash > HALF_FLASH_RATE) {
+		if(m_flash > HALF_FLASH_RATE) {
 			ofSetColor(m_settings->getCursorColor().r, m_settings->getCursorColor().g,
 					   m_settings->getCursorColor().b, m_settings->getCursorColor().a * m_settings->getAlpha());
-			ofDrawRectangle(x, y-s_charHeight, s_cursorWidth, s_charHeight);
+			ofRectMode rectMode = ofGetRectMode();
 			ofSetRectMode(OF_RECTMODE_CORNER);
+			ofDrawRectangle(x, y-s_charHeight, s_cursorWidth, s_charHeight);
+			ofSetRectMode(rectMode);
 		}
 	}
 }

@@ -347,7 +347,10 @@ void ofxFileDialog::drawSaveAs() {
 			int width = s_font->stringWidth(s_newFolderButtonText);
 			ofSetColor(m_settings->getCursorColor().r, m_settings->getCursorColor().g,
 							   m_settings->getCursorColor().b, m_settings->getCursorColor().a * m_settings->getAlpha());
+			ofRectMode rectMode = ofGetRectMode();
+			ofSetRectMode(OF_RECTMODE_CORNER);
 			ofDrawRectangle(x, y-s_charWidth, width, s_charHeight);
+			ofSetRectMode(rectMode);
 		}
 		s_font->drawString(s_newFolderButtonText, 0, y, s_textShadow);
 	}
@@ -366,7 +369,7 @@ void ofxFileDialog::drawNewFolder() {
 	s_font->setColor(m_settings->getTextColor(), m_settings->getAlpha());
 	s_font->setShadowColor(m_settings->getTextShadowColor(), m_settings->getAlpha());
 	
-	ofTranslate(0, m_visibleLines*0.5*s_charHeight);//s_charHeight*2);
+	ofTranslate(0, m_visibleLines*0.5*s_charHeight);
 
 	// info text
 	s_font->drawString(s_newFolderText, x, y, s_textShadow);
@@ -601,7 +604,10 @@ void ofxFileDialog::drawFilenames(int offset, int bottomOffset, bool highlight) 
 				if(highlight && count == m_currentFile) {
 					ofSetColor(m_settings->getCursorColor().r, m_settings->getCursorColor().g,
 					       m_settings->getCursorColor().b, m_settings->getCursorColor().a * m_settings->getAlpha());
+					ofRectMode rectMode = ofGetRectMode();
+					ofSetRectMode(OF_RECTMODE_CORNER);
 					ofDrawRectangle(x, y-s_charHeight, characterWidth((*i)[c]), s_charHeight);
+					ofSetRectMode(rectMode);
 				}
 				
 				// file or dir name
