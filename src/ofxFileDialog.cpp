@@ -195,8 +195,10 @@ void ofxFileDialog::refresh() {
 	ofLogVerbose("ofxFileDialog") << files.size() << " files: ";
 	
 	// one level up
-	m_directories.insert(0);
-	m_filenames.push_back(U"..");
+	if(m_path != U"/") {
+		m_directories.insert(0);
+		m_filenames.push_back(U"..");
+	}
 	
 	// first dirs
 	for(int i = 0; i < files.size(); ++i) {
@@ -204,6 +206,10 @@ void ofxFileDialog::refresh() {
 			m_directories.insert(m_filenames.size());
 			m_filenames.push_back(string_to_wstring(files[i].getFileName()));
 			ofLogVerbose("ofxFileDialog") << "\t" << wstring_to_string(m_filenames.back());
+			// select previous dir
+			if(m_prevBasename != U"" && m_filenames.back() == m_prevBasename) {
+				m_currentFile = m_filenames.size()-1;
+			}
 		}
 	}
 	
@@ -214,6 +220,8 @@ void ofxFileDialog::refresh() {
 			ofLogVerbose("ofxFileDialog") << "\t" << wstring_to_string(m_filenames.back());
 		}
 	}
+	
+	m_prevBasename = U"";
 }
 
 //--------------------------------------------------------------
@@ -504,12 +512,16 @@ void ofxFileDialog::keyPressedOpen(int key, bool saveAs) {
 
 		case OF_KEY_RETURN:
 			if(m_directories.find(m_currentFile) != m_directories.end()) {
+				if(m_filenames[m_currentFile] == U"..") { // go back?
+					m_prevBasename = string_to_wstring(ofSplitString(ofFilePath::removeTrailingSlash(wstring_to_string(m_path)), "/").back());
+				}
 				m_path += m_filenames[m_currentFile];
 				m_path += U"/";
 				m_path = string_to_wstring(ofFilePath::getAbsolutePath(wstring_to_string(m_path)));
+				m_currentFile = 0;
 				refresh();
 			}
-			else if(!saveAs) {
+			else if(!saveAs) { // file
 				m_selectedPath = m_path + m_filenames[m_currentFile];
 				m_active = false;
 			}

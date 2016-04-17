@@ -78,7 +78,7 @@ class ofxFileDialog : public ofxEditor {
 		/// set to false after dialog exit action detected
 		bool isActive();
 	
-		/// active/deactive the dialog
+		/// activate/deactivate the dialog
 		void setActive(bool active=true);
 	
 		bool openFile(string filename); //< dummy implementation
@@ -127,11 +127,12 @@ class ofxFileDialog : public ofxEditor {
 		Mode m_mode; //< current dialog mode
 		bool m_active; //< is the dialog active?
 	
-		unsigned int m_currentFile;  //< index of the current file
+		unsigned int m_currentFile;    //< index of the current file
 		vector<u32string> m_filenames; //< filenames & directories
-		set<int> m_directories;      //< which indexes are directories
+		set<int> m_directories;        //< which indexes are directories
 		u32string m_path;              //< current path
 		u32string m_selectedPath;      //< selected path on enter
+		u32string m_prevBasename;      //< previous path basename
 	
 		/// number of files to show above and below open file cursor
 		static u32string s_saveAsText; //< save as info text
