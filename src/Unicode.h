@@ -18,10 +18,15 @@
  * See https://github.com/Akira-Hayasaka/ofxGLEditor for more info.
  *
  * Algorithm by Marius Bancila
- * http://www.codeguru.com/cpp/misc/misc/multi-lingualsupport/article.php/c10451/
+ * http://www.codeguru.com/cpp/misc/misc/multi-lingualsupport/article.php/c10451
  *
  * Expanded from code originally in Fluxus http://www.pawfal.org/fluxus
  * Copyright (C) Dave Griffiths
+ *
+ * This seems to be a little faster than the C++11 std::wstring_convert class
+ * or at least eliminates calling the converter class constructor when used
+ * in a loop.
+ *
  */
 #include <string>
 

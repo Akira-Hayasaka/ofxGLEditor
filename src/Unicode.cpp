@@ -27,17 +27,13 @@
 
 using namespace std;
 
-#define         MASKBITS                0x3F
-#define         MASKBYTE                0x80
-#define         MASK2BYTES              0xC0
-#define         MASK3BYTES              0xE0
-#define         MASK4BYTES              0xF0
-#define         MASK5BYTES              0xF8
-#define         MASK6BYTES              0xFC
-
-typedef unsigned short   Unicode2Bytes;
-typedef unsigned int     Unicode4Bytes;
-typedef unsigned char    byte;
+#define MASKBITS   0x3F
+#define MASKBYTE   0x80
+#define MASK2BYTES 0xC0
+#define MASK3BYTES 0xE0
+#define MASK4BYTES 0xF0
+#define MASK5BYTES 0xF8
+#define MASK6BYTES 0xFC
 
 //--------------------------------------------------------------
 unsigned int wchar_width(int input) {
@@ -66,48 +62,48 @@ std::string wchar_to_string(char32_t input) {
 	string output;
 	// 0xxxxxxx
 	if(input < 0x80) {
-		output.push_back((byte)input);
+		output.push_back((char)input);
 	}
 	// 110xxxxx 10xxxxxx
 	else if(input < 0x800) {
-		output.push_back((byte)(MASK2BYTES | input >> 6));
-		output.push_back((byte)(MASKBYTE | (input & MASKBITS)));
+		output.push_back((char)(MASK2BYTES | input >> 6));
+		output.push_back((char)(MASKBYTE | (input & MASKBITS)));
 	}
 	// 1110xxxx 10xxxxxx 10xxxxxx
 	else if(input < 0x10000) {
-		output.push_back((byte)(MASK3BYTES | (input >> 12)));
-		output.push_back((byte)(MASKBYTE | (input >> 6 & MASKBITS)));
-		output.push_back((byte)(MASKBYTE | (input & MASKBITS)));
+		output.push_back((char)(MASK3BYTES | (input >> 12)));
+		output.push_back((char)(MASKBYTE | (input >> 6 & MASKBITS)));
+		output.push_back((char)(MASKBYTE | (input & MASKBITS)));
 	}
 	// 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
 	else if(input < 0x200000) {
-		output.push_back((byte)(MASK4BYTES | (input >> 18)));
-		output.push_back((byte)(MASKBYTE | (input >> 12 & MASKBITS)));
-		output.push_back((byte)(MASKBYTE | (input >> 6 & MASKBITS)));
-		output.push_back((byte)(MASKBYTE | (input & MASKBITS)));
+		output.push_back((char)(MASK4BYTES | (input >> 18)));
+		output.push_back((char)(MASKBYTE | (input >> 12 & MASKBITS)));
+		output.push_back((char)(MASKBYTE | (input >> 6 & MASKBITS)));
+		output.push_back((char)(MASKBYTE | (input & MASKBITS)));
 	}
 	// 111110xx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx
 	else if(input < 0x4000000) {
-		output.push_back((byte)(MASK5BYTES | (input >> 24)));
-		output.push_back((byte)(MASKBYTE | (input >> 18 & MASKBITS)));
-		output.push_back((byte)(MASKBYTE | (input >> 12 & MASKBITS)));
-		output.push_back((byte)(MASKBYTE | (input >> 6 & MASKBITS)));
-		output.push_back((byte)(MASKBYTE | (input & MASKBITS)));
+		output.push_back((char)(MASK5BYTES | (input >> 24)));
+		output.push_back((char)(MASKBYTE | (input >> 18 & MASKBITS)));
+		output.push_back((char)(MASKBYTE | (input >> 12 & MASKBITS)));
+		output.push_back((char)(MASKBYTE | (input >> 6 & MASKBITS)));
+		output.push_back((char)(MASKBYTE | (input & MASKBITS)));
 	}
 	// 1111110x 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx
 	else if(input < 0x8000000) {
-		output.push_back((byte)(MASK6BYTES | (input >> 30)));
-		output.push_back((byte)(MASKBYTE | (input >> 18 & MASKBITS)));
-		output.push_back((byte)(MASKBYTE | (input >> 12 & MASKBITS)));
-		output.push_back((byte)(MASKBYTE | (input >> 6 & MASKBITS)));
-		output.push_back((byte)(MASKBYTE | (input & MASKBITS)));
+		output.push_back((char)(MASK6BYTES | (input >> 30)));
+		output.push_back((char)(MASKBYTE | (input >> 18 & MASKBITS)));
+		output.push_back((char)(MASKBYTE | (input >> 12 & MASKBITS)));
+		output.push_back((char)(MASKBYTE | (input >> 6 & MASKBITS)));
+		output.push_back((char)(MASKBYTE | (input & MASKBITS)));
 	}
 	return output;
 }
 
 //--------------------------------------------------------------
 char32_t string_to_wchar(const std::string &input) {
-	Unicode4Bytes output = 0;
+	char32_t output = 0;
 	// 1111110x 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx
 	if(input.size() > 5 && (input[0] & MASK6BYTES) == MASK6BYTES) {
 		output = ((input[0] & 0x01) << 30) |
@@ -144,7 +140,7 @@ char32_t string_to_wchar(const std::string &input) {
 		          (input[1] & MASKBITS);
 	}
 	// 0xxxxxxx
-	else { //if(input[i] < MASKBYTE)
+	else {
 		output = input[0];
 	}
 	return output;
@@ -153,8 +149,8 @@ char32_t string_to_wchar(const std::string &input) {
 //--------------------------------------------------------------
 string wstring_to_string(const u32string &input) {
 	string output;
-	for(unsigned int i = 0; i < input.size(); i++) {
-		output.append(wchar_to_string(input[i]));
+	for(char32_t c: input) {
+		output.append(wchar_to_string(c));
 	}
 	return output;
 }
@@ -163,7 +159,7 @@ string wstring_to_string(const u32string &input) {
 u32string string_to_wstring(const string &input) {
 	u32string output;
 	for(unsigned int i = 0; i < input.size();) {
-		Unicode4Bytes ch;
+		char32_t ch;
 		// 1111110x 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx
 		if((input[i] & MASK6BYTES) == MASK6BYTES) {
 			ch = ((input[i] & 0x01) << 30) |
@@ -205,7 +201,7 @@ u32string string_to_wstring(const string &input) {
 			i += 2;
 		}
 		// 0xxxxxxx
-		else { //if(input[i] < MASKBYTE)
+		else {
 			ch = input[i];
 			i += 1;
 		}
