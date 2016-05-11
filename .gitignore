@@ -29,7 +29,6 @@ example-output/obj
 # ignore example files for now
 editorSyntaxExample/Makefile
 editorSyntaxExample/Project.xcconfig
-editorSyntaxExample/addons.make
 editorSyntaxExample/bin/data/hello4.txt
 editorSyntaxExample/bin/data/test.txt
 editorSyntaxExample/bin/data/test2.txt
@@ -39,7 +38,6 @@ editorSyntaxExample/openFrameworks-Info.plist
 
 glEditorExample/Makefile
 glEditorExample/Project.xcconfig
-glEditorExample/addons.make
 glEditorExample/config.make
 glEditorExample/editorExample.xcodeproj
 glEditorExample/openFrameworks-Info.plist
@@ -47,7 +45,6 @@ glEditorExample/glEditorExample.xcodeproj
 
 glslExample/Makefile
 glslExample/Project.xcconfig
-glslExample/addons.make
 glslExample/config.make
 glslExample/livecodingExample.xcodeproj
 glslExample/openFrameworks-Info.plist
@@ -55,7 +52,6 @@ glslExample/glslExample.xcodeproj
 
 livecodingExample/Makefile
 livecodingExample/Project.xcconfig
-livecodingExample/addons.make
 livecodingExample/config.make
 livecodingExample/livecodingExample.xcodeproj
 livecodingExample/openFrameworks-Info.plist
