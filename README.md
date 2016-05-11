@@ -77,7 +77,7 @@ If everything went Ok, you should now be able to open the generated project and 
 
 #### glslExample
 
-This is a simple GLSL fragment (pixel) shader editor including GLSL syntax highlighting. The shader is reloaded whenever it is saved or evaluated (MD key + e).
+This is a simple GLSL fragment (pixel) shader editor including GLSL syntax highlighting. The shader is reloaded whenever it is saved or evaluated (MOD key + e).
 
 #### liveCodingExample
 
@@ -91,4 +91,4 @@ A growing set of language syntax xml files can be found in the `syntaxes` folder
 
 Both monospaced and variable width fonts are supported. PrintChar21.ttf is included with the example projects. Unicode glyphs are supported if your font has them.
 
-Most *real* text editors load multiple fonts to support different language character sets. ofxGLEditor is *simple*, so it only loads 1 font at a time and you'll need to use an expanded character set font for multiple languages. Another option is to load a specifc font for a specific language or locale in your app. Giant full character set fonts do exist (eg. [Unifont](http://www.unifoundry.com/unifont.html]), but they are generally too large to be useful as they may take a lagre amount of resources. Your mileage may vary.
+Most *real* text editors load multiple fonts to support different language character sets. ofxGLEditor is *simple*, so it only loads 1 font at a time and you'll need to use an expanded character set font for multiple languages. Another option is to load a specifc font for a specific language or locale in your app. Giant full character set fonts do exist (eg. [Unifont](http://www.unifoundry.com/unifont.html])), but they are generally too large to be useful as they may take a lagre amount of resources. Your mileage may vary.
