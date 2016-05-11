@@ -67,7 +67,13 @@ See the examples in `editorSyntaxExample`, `glEditorExample`, `glslExample`, `li
 
 Project files for the examples are not included so you will need to generate the project files for your operating system and development environment using the OF ProjectGenerator which is included with the OpenFrameworks distribution.
 
-Point the ProjectGenerator to `addons/ofxGLEditor`, change the project name to the **exact** name of the example you want to generate (ie `editorExample`), and make sure to choose `ofxGLEditor` from the addons. Hitting "Generate Project" will populate that example with the project files you will need to build it.
+To (re)generate project files for an *existing* project:
+
+* click the "Import" button in the ProjectGenerator
+* navigate the to base folder for the project ie. "glEditorExample"
+* click the "Update" button
+
+If everything went Ok, you should now be able to open the generated project and build/run the example.
 
 #### glslExample
 
