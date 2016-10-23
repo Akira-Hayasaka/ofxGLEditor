@@ -104,6 +104,10 @@ bool ofxEditorSyntax::loadFile(const string& xmlFile) {
 			if(xml.exists("begin")) {multiLineCommentBegin = string_to_wstring(xml.getValue("begin"));}
 			if(xml.exists("end")) {multiLineCommentBegin = string_to_wstring(xml.getValue("end"));}
 		}
+		else if(xml.getName() == "stringliteral")  {
+			if(xml.exists("begin")) {stringLiteralBegin = string_to_wstring(xml.getValue("begin"));}
+			if(xml.exists("end")) {stringLiteralEnd = string_to_wstring(xml.getValue("end"));}
+		}
 		else if(xml.getName() == "preprocessor") {preprocessor = string_to_wstring(xml.getValue());}
 		else if(xml.getName() == "hexliteral") {
 			string b = xml.getValue();
@@ -145,6 +149,8 @@ void ofxEditorSyntax::clear() {
 	singleLineComment = U"";
 	multiLineCommentBegin = U"";
 	multiLineCommentEnd = U"";
+	stringLiteralBegin = U"";
+	stringLiteralEnd = U"";
 	preprocessor = U"#";
 	hexLiteral = true;
 	operatorChars = U"=+-*/!|&~^";
@@ -261,6 +267,44 @@ const u32string& ofxEditorSyntax::getWideMultiLineCommentEnd() {
 string ofxEditorSyntax::getMultiLineCommentEnd() {
 	return wstring_to_string(multiLineCommentEnd);
 }
+
+
+
+
+//--------------------------------------------------------------
+void ofxEditorSyntax::setStringLiteral(const u32string &begin, const u32string &end) {
+	stringLiteralBegin = begin;
+	stringLiteralEnd = end;
+}
+
+//--------------------------------------------------------------
+void ofxEditorSyntax::setStringLiteral(const string &begin, const string &end) {
+	stringLiteralBegin = string_to_wstring(begin);
+	stringLiteralEnd = string_to_wstring(end);
+}
+
+//--------------------------------------------------------------
+const u32string& ofxEditorSyntax::getWideStringLiteralBegin() {
+	return stringLiteralBegin;
+}
+
+//--------------------------------------------------------------
+string ofxEditorSyntax::getStringLiteralBegin() {
+	return wstring_to_string(stringLiteralBegin);
+}
+
+//--------------------------------------------------------------
+const u32string& ofxEditorSyntax::getWideStringLiteralEnd() {
+	return stringLiteralEnd;
+}
+
+//--------------------------------------------------------------
+string ofxEditorSyntax::getStringLiteralEnd() {
+	return wstring_to_string(stringLiteralEnd);
+}
+
+
+
 
 // PREPROCESSOR
 

@@ -35,6 +35,7 @@ void ofApp::setup() {
 	luaSyntax.addFileExt("lua"); // associate .lua with Lua
 	luaSyntax.setSingleLineComment("--");
 	luaSyntax.setMultiLineComment("--[[", "]]");
+	luaSyntax.setStringLiteral("[[", "]]");
 	luaSyntax.setWord("function", ofxEditorSyntax::KEYWORD);
 	luaSyntax.setWord("end", ofxEditorSyntax::KEYWORD);
 	luaSyntax.setWord("print", ofxEditorSyntax::FUNCTION);

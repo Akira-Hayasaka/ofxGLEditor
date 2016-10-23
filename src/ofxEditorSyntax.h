@@ -60,6 +60,12 @@ class ofxEditorSyntax {
 		///     <end>*/</end>
 		///   </multicomment>
 		///
+		///   <!-- multi line string literal begin and end -->
+		///   <stringliteral>
+		///     <begin>R"</begin>
+		///     <end>"</end>
+		///   </stringliteral>
+		///
 		///   <!-- preprocessor begin -->
 		///   <preprocessor>#</preprocessor>
 		///
@@ -136,6 +142,17 @@ class ofxEditorSyntax {
 		const u32string& getWideMultiLineCommentEnd();
 		string getMultiLineCommentEnd();
 	
+	/// \section String Literals
+	
+		/// set the beginning and ending strings to match for a multi line string literal,
+		/// blank by default
+		void setStringLiteral(const u32string &begin, const u32string &end);
+		void setStringLiteral(const string &begin, const string &end);
+		const u32string& getWideStringLiteralBegin();
+		string getStringLiteralBegin();
+		const u32string& getWideStringLiteralEnd();
+		string getStringLiteralEnd();
+	
 	/// \section Preprocessor
 	
 		/// preprocessor string which starts a preprocessor block until an endline
@@ -178,7 +195,8 @@ class ofxEditorSyntax {
 	
 	/// \section Parsing Chars
 	
-		/// parse "0x123" as a number? default: truenot all languages support this
+		/// parse "0x123" as a number?
+		/// default: true, not all languages support this
 		void setHexLiteral(bool hex);
 		bool getHexLiteral();
 	
@@ -204,6 +222,9 @@ class ofxEditorSyntax {
 		u32string singleLineComment; //< single line comment begin
 		u32string multiLineCommentBegin; //< multi line comment begin
 		u32string multiLineCommentEnd; //< multi line comment end
+	
+		u32string stringLiteralBegin; //< multi line string literal begin
+		u32string stringLiteralEnd; //< multi line string literal end
 	
 		u32string preprocessor; //< preprocessor begin
 		map<u32string,WordType> words; //< synatx types for specific words

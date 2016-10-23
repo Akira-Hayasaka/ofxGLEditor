@@ -418,6 +418,8 @@ class ofxEditor {
 			PUNCTUATION_CHAR,   //< standard punctuation chars aka ;:,?
 			COMMENT_BEGIN,      //< tag only, no text
 			COMMENT_END,        //< tag only, no text
+			LITERAL_BEGIN,      //< tag only, no text
+			LITERAL_END,        //< tag only, no text
 			PREPROCESSOR_BEGIN, //< tag only, no text
 			PREPROCESSOR_END,   //< tag only, no text
 		};

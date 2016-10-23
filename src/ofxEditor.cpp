@@ -386,6 +386,35 @@ void ofxEditor::draw() {
 				
 				// burn through text blocks until we get to the first visible line
 				if(textPos < m_topTextPosition) {
+					// set preceding colors in the case of syntax which could begin on the preceeding line
+					switch(tb.type) {
+						case STRING_BEGIN: case LITERAL_BEGIN:
+							string = true;
+							s_font->setColor(m_colorScheme->getStringColor(), m_settings->getAlpha());
+							break;
+						case STRING_END: case LITERAL_END:
+							string = false;
+							s_font->setColor(m_colorScheme->getTextColor(), m_settings->getAlpha());
+							break;
+						case COMMENT_BEGIN:
+							comment = true;
+							s_font->setColor(m_colorScheme->getCommentColor(), m_settings->getAlpha());
+							break;
+						case COMMENT_END:
+							comment = false;
+							s_font->setColor(m_colorScheme->getTextColor(), m_settings->getAlpha());
+							break;
+						case PREPROCESSOR_BEGIN:
+							preprocessor = true;
+							s_font->setColor(m_colorScheme->getPreprocessorColor(), m_settings->getAlpha());
+							break;
+						case PREPROCESSOR_END:
+							preprocessor = false;
+							s_font->setColor(m_colorScheme->getTextColor(), m_settings->getAlpha());
+							break;
+						default:
+							break;
+					}
 					if(tb.type == ENDLINE) {
 						textPos++;
 					}
@@ -464,6 +493,16 @@ void ofxEditor::draw() {
 						
 					case COMMENT_END:
 						comment = false;
+						s_font->setColor(m_colorScheme->getTextColor(), m_settings->getAlpha());
+						continue; // nothing to draw
+						
+					case LITERAL_BEGIN:
+						string = true;
+						s_font->setColor(m_colorScheme->getStringColor(), m_settings->getAlpha());
+						continue; // nothing to draw
+						
+					case LITERAL_END:
+						string = false;
 						s_font->setColor(m_colorScheme->getTextColor(), m_settings->getAlpha());
 						continue; // nothing to draw
 						
@@ -1611,6 +1650,8 @@ void ofxEditor::printSyntax() {
 			case PUNCTUATION_CHAR:   type += "PUNCTUATION_CHAR"; break;
 			case COMMENT_BEGIN:      ofLogNotice("ofxEditor") << "COMMENT_BEGIN"; continue;
 			case COMMENT_END:        ofLogNotice("ofxEditor") << "COMMENT_END"; continue;
+			case LITERAL_BEGIN:      ofLogNotice("ofxEditor") << "LITERAL_BEGIN"; continue;
+			case LITERAL_END:        ofLogNotice("ofxEditor") << "LITERAL_END"; continue;
 			case PREPROCESSOR_BEGIN: ofLogNotice("ofxEditor") << "PREPROCESSOR_BEGIN"; continue;
 			case PREPROCESSOR_END:   ofLogNotice("ofxEditor") << "PREPROCESSOR_END"; continue;
 		}
@@ -2121,6 +2162,7 @@ void ofxEditor::parseTextBlocks() {
 	bool preprocessor = false;
 	bool singleComment = false;
 	bool multiComment = false;
+	bool stringLiteral = false;
 	
 	TextBlock tb;
 	for(int i = 0; i < m_text.length(); ++i) {
@@ -2170,7 +2212,7 @@ void ofxEditor::parseTextBlocks() {
 				break;
 				
 			case '"': case '\'':
-				if(singleComment || multiComment) { // ignore strings in comments
+				if(singleComment || multiComment || stringLiteral) { // ignore strings in comments
 					tb.text += m_text[i];
 					break;
 				}
@@ -2289,11 +2331,28 @@ void ofxEditor::parseTextBlocks() {
 						}
 						
 						// detect comments
-						if(!multiComment) {
-							
-							// check ahead for multi line comment begin
-							if(i <= m_text.size()-m_syntax->getWideMultiLineCommentBegin().length() &&
+						if(!multiComment && !stringLiteral) {
+						
+							// check ahead for string literal begin
+							if(i <= m_text.size()-m_syntax->getWideStringLiteralBegin().length() &&
+							   m_text.substr(i, m_syntax->getWideStringLiteralBegin().length()) == m_syntax->getWideStringLiteralBegin()) {
+								if(stringLiteral) { // already pushed string literal begin
+									stringLiteral = false;
+								}
+								else {
+									if(preprocessor) {
+										m_textBlocks.push_back(TextBlock(PREPROCESSOR_END));
+										preprocessor = false;
+									}
+									m_textBlocks.push_back(TextBlock(LITERAL_BEGIN));
+								}
+								stringLiteral = true;
+								continue;
+							}
+							else if(i <= m_text.size()-m_syntax->getWideMultiLineCommentBegin().length() &&
 							   m_text.substr(i, m_syntax->getWideMultiLineCommentBegin().length()) == m_syntax->getWideMultiLineCommentBegin()) {
+								
+								// check ahead for multi line comment begin
 								if(singleComment) { // already pushed comment begin
 									singleComment = false;
 								}
@@ -2378,15 +2437,31 @@ void ofxEditor::parseTextBlocks() {
 								}
 							}
 						}
-						else { // check for multi line comment end
-							if(tb.text.length() >= m_syntax->getWideMultiLineCommentEnd().length() &&
-								   tb.text.substr(tb.text.length()-m_syntax->getWideMultiLineCommentEnd().length(),
-								                  m_syntax->getWideMultiLineCommentEnd().length()) == m_syntax->getWideMultiLineCommentEnd()) {
-								m_textBlocks.push_back(tb); // push latest block
-								tb.clear();
-								m_textBlocks.push_back(TextBlock(COMMENT_END)); // push comment end
-								multiComment = false;
-								continue;
+						else {
+							// check for multi line comment end
+							if(multiComment) {
+								if(tb.text.length() >= m_syntax->getWideMultiLineCommentEnd().length() &&
+									   tb.text.substr(tb.text.length()-m_syntax->getWideMultiLineCommentEnd().length(),
+													  m_syntax->getWideMultiLineCommentEnd().length()) == m_syntax->getWideMultiLineCommentEnd()) {
+									m_textBlocks.push_back(tb); // push latest block
+									tb.clear();
+									m_textBlocks.push_back(TextBlock(COMMENT_END)); // push comment end
+									multiComment = false;
+									continue;
+								}
+							}
+							
+							// check for string literal end
+							if(stringLiteral) {
+								if(tb.text.length() >= m_syntax->getWideStringLiteralEnd().length() &&
+									   tb.text.substr(tb.text.length()-m_syntax->getWideStringLiteralEnd().length(),
+													  m_syntax->getWideStringLiteralEnd().length()) == m_syntax->getWideStringLiteralEnd()) {
+									m_textBlocks.push_back(tb); // push latest block
+									tb.clear();
+									m_textBlocks.push_back(TextBlock(LITERAL_END)); // push string literal end
+									stringLiteral = false;
+									continue;
+								}
 							}
 						}
 						break;

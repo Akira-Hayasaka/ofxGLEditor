@@ -12,6 +12,11 @@
 		<end>]]</end>
 	</multicomment>
 
+	<stringliteral>
+		<begin>[[</begin>
+		<end>]]</end>
+	</stringliteral>
+
     <!-- lua doesn't support hex literals aka 0x123 -->
     <hexliteral>false</hexliteral>
     

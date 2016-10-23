@@ -22,3 +22,8 @@ end
 
 -- a very long line that should scroll or wrap
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+
+-- a string literal
+[[
+	hello world
+]]

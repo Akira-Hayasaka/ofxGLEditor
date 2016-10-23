@@ -9,6 +9,10 @@
 		<begin>/*</begin>
 		<end>*/</end>
 	</multicomment>
+	<stringliteral>
+		<begin>R"</begin>
+		<end>"</end>
+	</stringliteral>
 	<preprocessor>#</preprocessor>
 	<operator>+-*/!|&amp;^~</operator>
 	<punctuation>;:,?</punctuation>
