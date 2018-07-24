@@ -28,7 +28,7 @@ ofxEditorSyntax::ofxEditorSyntax() {
 }
 
 //--------------------------------------------------------------
-ofxEditorSyntax::ofxEditorSyntax(const string& xmlFile) {
+ofxEditorSyntax::ofxEditorSyntax(const std::string& xmlFile) {
 	if(!loadFile(xmlFile)) {
 		clear();
 	}
@@ -60,84 +60,77 @@ void ofxEditorSyntax::copy(const ofxEditorSyntax &from) {
 	// make deep copies
 	clearAllFileExts();
 	clearAllWords();
-	for(map<u32string,WordType>::const_iterator iter = from.words.begin(); iter != from.words.end(); ++iter) {
+	for(std::map<std::u32string,WordType>::const_iterator iter = from.words.begin(); iter != from.words.end(); ++iter) {
 		words[(*iter).first] = (*iter).second;
 	}
-	for(set<string>::const_iterator iter = from.fileExts.begin(); iter != from.fileExts.end(); ++iter) {
+	for(std::set<std::string>::const_iterator iter = from.fileExts.begin(); iter != from.fileExts.end(); ++iter) {
 		fileExts.insert((*iter));
 	}
 }
 
 //--------------------------------------------------------------
-bool ofxEditorSyntax::loadFile(const string& xmlFile) {
-	string path = ofToDataPath(xmlFile);
+bool ofxEditorSyntax::loadFile(const std::string& xmlFile) {
+	std::string path = ofToDataPath(xmlFile);
 	ofXml xml;
 	if(!xml.load(path)) {
 		ofLogError("ofxEditorSyntax") << "couldn't load \""
 			<< ofFilePath::getFileName(xmlFile) << "\"";
 		return false;
 	}
-	xml.setToParent();
-	if(!xml.exists("syntax")) {
+	auto root = xml.getChild("syntax");
+	if(!root) {
 		ofLogWarning("ofxEditorSyntax") << "root xml tag not \"syntax\", ignoring";
 		return false;
 	}
-	xml.setTo("syntax");
-	int numTags = xml.getNumChildren();
 	clear();
-	for(int i = 0; i < numTags; ++i) {
-		xml.setToChild(i);
-		if(xml.getName() == "lang") {setLang(xml.getValue());}
-		else if(xml.getName() == "files") {
-			int numExts = xml.getNumChildren();
-			for(int e = 0; e < numExts; ++e) {
-				xml.setToChild(e);
-				if(xml.getName() == "ext") {addFileExt(xml.getValue());}
+	for(auto & child : root.getChildren()) {
+		if(child.getName() == "lang") {setLang(child.getValue());}
+		else if(child.getName() == "files") {
+			for(auto & file : child.getChildren()) {
+				if(file.getName() == "ext") {addFileExt(file.getValue());}
 				else {
-					ofLogWarning("ofxEditorSyntax") << "ignoring unknown files xml tag \"" << xml.getName() << "\"";
+					ofLogWarning("ofxEditorSyntax") << "ignoring unknown files xml tag \"" << file.getName() << "\"";
 				}
-				xml.setToParent();
 			}
 		}
-		else if(xml.getName() == "singlecomment") {singleLineComment = string_to_wstring(xml.getValue());}
-		else if(xml.getName() == "multicomment")  {
-			if(xml.exists("begin")) {multiLineCommentBegin = string_to_wstring(xml.getValue("begin"));}
-			if(xml.exists("end")) {multiLineCommentBegin = string_to_wstring(xml.getValue("end"));}
+		else if(child.getName() == "singlecomment") {singleLineComment = string_to_wstring(child.getValue());}
+		else if(child.getName() == "multicomment")  {
+			auto begin = child.getChild("begin");
+			auto end = child.getChild("end");
+			if(begin) {multiLineCommentBegin = string_to_wstring(begin.getValue());}
+			if(end) {multiLineCommentBegin = string_to_wstring(end.getValue());}
 		}
-		else if(xml.getName() == "stringliteral")  {
-			if(xml.exists("begin")) {stringLiteralBegin = string_to_wstring(xml.getValue("begin"));}
-			if(xml.exists("end")) {stringLiteralEnd = string_to_wstring(xml.getValue("end"));}
+		else if(child.getName() == "stringliteral")  {
+			auto begin = child.getChild("begin");
+			auto end = child.getChild("end");
+			if(begin) {stringLiteralBegin = string_to_wstring(begin.getValue());}
+			if(end) {stringLiteralEnd = string_to_wstring(end.getValue());}
 		}
-		else if(xml.getName() == "preprocessor") {preprocessor = string_to_wstring(xml.getValue());}
-		else if(xml.getName() == "hexliteral") {
-			string b = xml.getValue();
+		else if(child.getName() == "preprocessor") {preprocessor = string_to_wstring(child.getValue());}
+		else if(child.getName() == "hexliteral") {
+			std::string b = child.getValue();
 			if(b == "true")       {setHexLiteral(true);}
 			else if(b == "false") {setHexLiteral(false);}
 			else {
 				ofLogWarning("ofxEditorSyntax") << "ignoring unknown xml bool string \"" << b << "\"";
 			}
 		}
-		else if(xml.getName() == "operator")     {operatorChars = string_to_wstring(xml.getValue());}
-		else if(xml.getName() == "punctuation")  {punctuationChars = string_to_wstring(xml.getValue());}
-		else if(xml.getName() == "words")  {
-			int numWords = xml.getNumChildren();
-			for(int w = 0; w < numWords; ++w) {
-				xml.setToChild(w);
-				if(xml.getName() == "keyword")       {setWord(xml.getValue(), KEYWORD);}
-				else if(xml.getName() == "typename") {setWord(xml.getValue(), TYPENAME);}
-				else if(xml.getName() == "function") {setWord(xml.getValue(), FUNCTION);}
+		else if(child.getName() == "operator")     {operatorChars = string_to_wstring(child.getValue());}
+		else if(child.getName() == "punctuation")  {punctuationChars = string_to_wstring(child.getValue());}
+		else if(child.getName() == "words")  {
+			for(auto &word : child.getChildren()) {
+				if(word.getName() == "keyword")       {setWord(word.getValue(), KEYWORD);}
+				else if(word.getName() == "typename") {setWord(word.getValue(), TYPENAME);}
+				else if(word.getName() == "function") {setWord(word.getValue(), FUNCTION);}
 				else {
-					ofLogWarning("ofxEditorSyntax") << "ignoring unknown words xml tag \"" << xml.getName() << "\"";
+					ofLogWarning("ofxEditorSyntax") << "ignoring unknown words xml tag \"" << word.getName() << "\"";
 				}
-				xml.setToParent();
 			}
 		}
 		else {
-			ofLogWarning("ofxEditorSyntax") << "ignoring unknown xml tag \"" << xml.getName() << "\"";
+			ofLogWarning("ofxEditorSyntax") << "ignoring unknown xml tag \"" << child.getName() << "\"";
 		}
-		xml.setToParent();
 	}
-	xml.clear();
 	
 	return true;
 }
@@ -161,12 +154,12 @@ void ofxEditorSyntax::clear() {
 // META
 
 //--------------------------------------------------------------
-void ofxEditorSyntax::setLang(const string &lang) {
+void ofxEditorSyntax::setLang(const std::string &lang) {
 	this->lang = lang;
 }
 
 //--------------------------------------------------------------
-const string& ofxEditorSyntax::getLang() {
+const std::string& ofxEditorSyntax::getLang() {
 	return lang;
 }
 
@@ -176,36 +169,36 @@ void ofxEditorSyntax::clearLang() {
 }
 
 //--------------------------------------------------------------
-void ofxEditorSyntax::addFileExt(const string &ext) {
+void ofxEditorSyntax::addFileExt(const std::string &ext) {
 	if(ext == "") return;
 	if(ext[0] == '.') { // be helpful here
 		ofLogWarning("ofxEditorSyntax") << "dropping initial . from file extension: \"" << ext << "\"";
 		fileExts.insert(ext.substr(1, ext.size()-1));
 	}
 	else {
-		fileExts.insert(string(ext)); // make deep copy to avoid possible BAD_ACCESS
+		fileExts.insert(std::string(ext)); // make deep copy to avoid possible BAD_ACCESS
 	}
 }
 
 //--------------------------------------------------------------
-void ofxEditorSyntax::addFileExt(const vector<string> &exts) {
+void ofxEditorSyntax::addFileExt(const std::vector<std::string> &exts) {
 	for(int i = 0; i < exts.size(); ++i) {
 		addFileExt(exts[i]);
 	}
 }
 
 //--------------------------------------------------------------
-bool ofxEditorSyntax::hasFileExt(const string &ext) {
+bool ofxEditorSyntax::hasFileExt(const std::string &ext) {
 	return (fileExts.find(ext) != fileExts.end());
 }
 
 //--------------------------------------------------------------
-const set<string>& ofxEditorSyntax::getFileExts() {
+const std::set<std::string>& ofxEditorSyntax::getFileExts() {
 	return fileExts;
 }
 
 //--------------------------------------------------------------
-void ofxEditorSyntax::clearFileExt(const string &ext) {
+void ofxEditorSyntax::clearFileExt(const std::string &ext) {
 	fileExts.erase(ext);
 }
 
@@ -217,54 +210,54 @@ void ofxEditorSyntax::clearAllFileExts() {
 // COMMENTS
 
 //--------------------------------------------------------------
-void ofxEditorSyntax::setSingleLineComment(const u32string &begin) {
+void ofxEditorSyntax::setSingleLineComment(const std::u32string &begin) {
 	singleLineComment = begin;
 }
 
 //--------------------------------------------------------------
-void ofxEditorSyntax::setSingleLineComment(const string &begin) {
+void ofxEditorSyntax::setSingleLineComment(const std::string &begin) {
 	singleLineComment = string_to_wstring(begin);
 }
 
 //--------------------------------------------------------------
-const u32string& ofxEditorSyntax::getWideSingleLineComment() {
+const std::u32string& ofxEditorSyntax::getWideSingleLineComment() {
 	return singleLineComment;
 }
 
 //--------------------------------------------------------------
-string ofxEditorSyntax::getSingleLineComment() {
+std::string ofxEditorSyntax::getSingleLineComment() {
 	return wstring_to_string(singleLineComment);
 }
 
 //--------------------------------------------------------------
-void ofxEditorSyntax::setMultiLineComment(const u32string &begin, const u32string &end) {
+void ofxEditorSyntax::setMultiLineComment(const std::u32string &begin, const std::u32string &end) {
 	multiLineCommentBegin = begin;
 	multiLineCommentEnd = end;
 }
 
 //--------------------------------------------------------------
-void ofxEditorSyntax::setMultiLineComment(const string &begin, const string &end) {
+void ofxEditorSyntax::setMultiLineComment(const std::string &begin, const std::string &end) {
 	multiLineCommentBegin = string_to_wstring(begin);
 	multiLineCommentEnd = string_to_wstring(end);
 }
 
 //--------------------------------------------------------------
-const u32string& ofxEditorSyntax::getWideMultiLineCommentBegin() {
+const std::u32string& ofxEditorSyntax::getWideMultiLineCommentBegin() {
 	return multiLineCommentBegin;
 }
 
 //--------------------------------------------------------------
-string ofxEditorSyntax::getMultiLineCommentBegin() {
+std::string ofxEditorSyntax::getMultiLineCommentBegin() {
 	return wstring_to_string(multiLineCommentBegin);
 }
 
 //--------------------------------------------------------------
-const u32string& ofxEditorSyntax::getWideMultiLineCommentEnd() {
+const std::u32string& ofxEditorSyntax::getWideMultiLineCommentEnd() {
 	return multiLineCommentEnd;
 }
 
 //--------------------------------------------------------------
-string ofxEditorSyntax::getMultiLineCommentEnd() {
+std::string ofxEditorSyntax::getMultiLineCommentEnd() {
 	return wstring_to_string(multiLineCommentEnd);
 }
 
@@ -272,34 +265,34 @@ string ofxEditorSyntax::getMultiLineCommentEnd() {
 
 
 //--------------------------------------------------------------
-void ofxEditorSyntax::setStringLiteral(const u32string &begin, const u32string &end) {
+void ofxEditorSyntax::setStringLiteral(const std::u32string &begin, const std::u32string &end) {
 	stringLiteralBegin = begin;
 	stringLiteralEnd = end;
 }
 
 //--------------------------------------------------------------
-void ofxEditorSyntax::setStringLiteral(const string &begin, const string &end) {
+void ofxEditorSyntax::setStringLiteral(const std::string &begin, const std::string &end) {
 	stringLiteralBegin = string_to_wstring(begin);
 	stringLiteralEnd = string_to_wstring(end);
 }
 
 //--------------------------------------------------------------
-const u32string& ofxEditorSyntax::getWideStringLiteralBegin() {
+const std::u32string& ofxEditorSyntax::getWideStringLiteralBegin() {
 	return stringLiteralBegin;
 }
 
 //--------------------------------------------------------------
-string ofxEditorSyntax::getStringLiteralBegin() {
+std::string ofxEditorSyntax::getStringLiteralBegin() {
 	return wstring_to_string(stringLiteralBegin);
 }
 
 //--------------------------------------------------------------
-const u32string& ofxEditorSyntax::getWideStringLiteralEnd() {
+const std::u32string& ofxEditorSyntax::getWideStringLiteralEnd() {
 	return stringLiteralEnd;
 }
 
 //--------------------------------------------------------------
-string ofxEditorSyntax::getStringLiteralEnd() {
+std::string ofxEditorSyntax::getStringLiteralEnd() {
 	return wstring_to_string(stringLiteralEnd);
 }
 
@@ -309,55 +302,55 @@ string ofxEditorSyntax::getStringLiteralEnd() {
 // PREPROCESSOR
 
 //--------------------------------------------------------------
-void ofxEditorSyntax::setPreprocessor(const u32string &begin) {
+void ofxEditorSyntax::setPreprocessor(const std::u32string &begin) {
 	preprocessor = begin;
 }
 
 //--------------------------------------------------------------
-void ofxEditorSyntax::setPreprocessor(const string &begin) {
+void ofxEditorSyntax::setPreprocessor(const std::string &begin) {
 	preprocessor = string_to_wstring(begin);
 }
 
 //--------------------------------------------------------------
-const u32string& ofxEditorSyntax::getWidePreprocessor() {
+const std::u32string& ofxEditorSyntax::getWidePreprocessor() {
 	return preprocessor;
 }
 
 //--------------------------------------------------------------
-string ofxEditorSyntax::getPreprocessor() {
+std::string ofxEditorSyntax::getPreprocessor() {
 	return wstring_to_string(preprocessor);
 }
 
 // WORDS
 
 //--------------------------------------------------------------
-void ofxEditorSyntax::setWord(const u32string &word, WordType type) {
+void ofxEditorSyntax::setWord(const std::u32string &word, WordType type) {
 	if(word == U"") return;
 	words[word] = type;
 }
 
 //--------------------------------------------------------------
-void ofxEditorSyntax::setWord(const string &word, WordType type) {
+void ofxEditorSyntax::setWord(const std::string &word, WordType type) {
 	setWord(string_to_wstring(word), type);
 }
 
 //--------------------------------------------------------------
-void ofxEditorSyntax::setWords(const vector<u32string> &words, WordType type) {
+void ofxEditorSyntax::setWords(const std::vector<std::u32string> &words, WordType type) {
 	for(int i = 0; i < words.size(); ++i) {
 		setWord(words[i], type);
 	}
 }
 
 //--------------------------------------------------------------
-void ofxEditorSyntax::setWords(const vector<string> &words, WordType type) {
+void ofxEditorSyntax::setWords(const std::vector<std::string> &words, WordType type) {
 	for(int i = 0; i < words.size(); ++i) {
 		setWord(words[i], type);
 	}
 }
 
 //--------------------------------------------------------------
-ofxEditorSyntax::WordType ofxEditorSyntax::getWordType(const u32string &word) {
-	map<u32string,WordType>::iterator iter = words.find(word);
+ofxEditorSyntax::WordType ofxEditorSyntax::getWordType(const std::u32string &word) {
+	std::map<std::u32string,WordType>::iterator iter = words.find(word);
 	if(iter != words.end()) { // already exists
 		return (*iter).second;
 	}
@@ -365,26 +358,26 @@ ofxEditorSyntax::WordType ofxEditorSyntax::getWordType(const u32string &word) {
 }
 
 //--------------------------------------------------------------
-ofxEditorSyntax::WordType ofxEditorSyntax::getWordType(const string &word) {
+ofxEditorSyntax::WordType ofxEditorSyntax::getWordType(const std::string &word) {
 	getWordType(string_to_wstring(word));
 }
 
 //--------------------------------------------------------------
-void ofxEditorSyntax::clearWord(const u32string &word) {
-	map<u32string,WordType>::iterator iter = words.find(word);
+void ofxEditorSyntax::clearWord(const std::u32string &word) {
+	std::map<std::u32string,WordType>::iterator iter = words.find(word);
 	if(iter != words.end()) { // already exists
 		words.erase(iter);
 	}
 }
 
 //--------------------------------------------------------------
-void ofxEditorSyntax::clearWord(const string &word) {
+void ofxEditorSyntax::clearWord(const std::string &word) {
 	clearWord(word);
 }
 
 //--------------------------------------------------------------
 void ofxEditorSyntax::clearWordType(WordType type) {
-	map<u32string,WordType>::iterator iter = words.begin();
+	std::map<std::u32string,WordType>::iterator iter = words.begin();
 	while(iter != words.end()) {
 		if((*iter).second == type) {
 			words.erase(++iter);
@@ -413,7 +406,7 @@ bool ofxEditorSyntax::getHexLiteral() {
 }
 
 //--------------------------------------------------------------
-void ofxEditorSyntax::setOperatorChars(const u32string &chars) {
+void ofxEditorSyntax::setOperatorChars(const std::u32string &chars) {
 	if(chars.length() == 0) {
 		ofLogWarning("ofxEditorSyntax") << "empty operator string";
 		return;
@@ -422,22 +415,22 @@ void ofxEditorSyntax::setOperatorChars(const u32string &chars) {
 }
 
 //--------------------------------------------------------------
-void ofxEditorSyntax::setOperatorChars(const string &chars) {
+void ofxEditorSyntax::setOperatorChars(const std::string &chars) {
 	setOperatorChars(string_to_wstring(chars));
 }
 
 //--------------------------------------------------------------
-const u32string& ofxEditorSyntax::getWideOperatorChars() {
+const std::u32string& ofxEditorSyntax::getWideOperatorChars() {
 	return operatorChars;
 }
 
 //--------------------------------------------------------------
-string ofxEditorSyntax::getOperatorChars() {
+std::string ofxEditorSyntax::getOperatorChars() {
 	return wstring_to_string(operatorChars);
 }
 
 //--------------------------------------------------------------
-void ofxEditorSyntax::setPunctuationChars(const u32string &chars) {
+void ofxEditorSyntax::setPunctuationChars(const std::u32string &chars) {
 	if(chars.length() == 0) {
 		ofLogWarning("ofxEditorSyntax") << "empty punctuation string";
 		return;
@@ -446,16 +439,16 @@ void ofxEditorSyntax::setPunctuationChars(const u32string &chars) {
 }
 
 //--------------------------------------------------------------
-void ofxEditorSyntax::setPunctuationChars(const string &chars) {
+void ofxEditorSyntax::setPunctuationChars(const std::string &chars) {
 	setPunctuationChars(string_to_wstring(chars));
 }
 
 //--------------------------------------------------------------
-const u32string& ofxEditorSyntax::getWidePunctuationChars() {
+const std::u32string& ofxEditorSyntax::getWidePunctuationChars() {
 	return punctuationChars;
 }
 
 //--------------------------------------------------------------
-string ofxEditorSyntax::getPunctuationChars() {
+std::string ofxEditorSyntax::getPunctuationChars() {
 	return wstring_to_string(punctuationChars);
 }

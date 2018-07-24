@@ -20,6 +20,7 @@
 #include "ofxEditorSettings.h"
 
 #include "ofLog.h"
+#include "ofMath.h"
 #include "Unicode.h"
 
 //--------------------------------------------------------------
@@ -73,7 +74,7 @@ void ofxEditorSettings::copy(const ofxEditorSettings &from) {
 	
 	// make deep copies
 	clearAllSyntaxes();
-	for(map<string,ofxEditorSyntax*>::const_iterator iter = from.langs.begin();
+	for(std::map<std::string,ofxEditorSyntax*>::const_iterator iter = from.langs.begin();
 	    iter == from.langs.end(); ++iter) {
 		langs[(*iter).first] = (*iter).second;
 	}
@@ -190,7 +191,7 @@ bool ofxEditorSettings::getHighlightMatchingChars() {
 }
 
 //--------------------------------------------------------------
-void ofxEditorSettings::setMatchingChars(u32string openChars, u32string closeChars) {
+void ofxEditorSettings::setMatchingChars(std::u32string openChars, std::u32string closeChars) {
 	if(openChars.length() == 0 || closeChars.length() == 0) {
 		ofLogWarning("ofxEditorSettings") << "empty open or close char string";
 		return;
@@ -200,27 +201,27 @@ void ofxEditorSettings::setMatchingChars(u32string openChars, u32string closeCha
 }
 
 //--------------------------------------------------------------
-void ofxEditorSettings::setMatchingChars(string openChars, string closeChars) {
+void ofxEditorSettings::setMatchingChars(std::string openChars, std::string closeChars) {
 	setMatchingChars(string_to_wstring(openChars), string_to_wstring(closeChars));
 }
 
 //--------------------------------------------------------------
-u32string& ofxEditorSettings::getWideOpenChars() {
+std::u32string& ofxEditorSettings::getWideOpenChars() {
 	return openChars;
 }
 
 //--------------------------------------------------------------
-string ofxEditorSettings::getOpenChars() {
+std::string ofxEditorSettings::getOpenChars() {
 	return wstring_to_string(openChars);
 }
 
 //--------------------------------------------------------------
-u32string& ofxEditorSettings::getWideCloseChars() {
+std::u32string& ofxEditorSettings::getWideCloseChars() {
 	return closeChars;
 }
 
 //--------------------------------------------------------------
-string ofxEditorSettings::getCloseChars() {
+std::string ofxEditorSettings::getCloseChars() {
 	return wstring_to_string(closeChars);
 }
 
@@ -235,7 +236,7 @@ void ofxEditorSettings::addSyntax(ofxEditorSyntax *syntax) {
 }
 
 //--------------------------------------------------------------
-void ofxEditorSettings::addSyntax(const string &lang, ofxEditorSyntax *syntax) {
+void ofxEditorSettings::addSyntax(const std::string &lang, ofxEditorSyntax *syntax) {
 	if(!syntax) return;
 	if(lang == "") {
 		ofLogWarning("ofxEditorSettings") << "cannot add syntax with empty lang string";
@@ -245,8 +246,8 @@ void ofxEditorSettings::addSyntax(const string &lang, ofxEditorSyntax *syntax) {
 }
 
 //--------------------------------------------------------------
-ofxEditorSyntax* ofxEditorSettings::getSyntax(const string &lang) {
-	map<string,ofxEditorSyntax*>::iterator iter = langs.find(lang);
+ofxEditorSyntax* ofxEditorSettings::getSyntax(const std::string &lang) {
+	std::map<std::string,ofxEditorSyntax*>::iterator iter = langs.find(lang);
 	if(iter != langs.end()) {
 		return (*iter).second;
 	}
@@ -254,8 +255,8 @@ ofxEditorSyntax* ofxEditorSettings::getSyntax(const string &lang) {
 }
 
 //--------------------------------------------------------------
-void ofxEditorSettings::clearSyntax(const string &lang) {
-	map<string,ofxEditorSyntax*>::iterator iter = langs.find(lang);
+void ofxEditorSettings::clearSyntax(const std::string &lang) {
+	std::map<std::string,ofxEditorSyntax*>::iterator iter = langs.find(lang);
 	if(iter != langs.end()) {
 		langs.erase(iter);
 	}
@@ -267,8 +268,8 @@ void ofxEditorSettings::clearAllSyntaxes() {
 }
 
 //--------------------------------------------------------------
-ofxEditorSyntax* ofxEditorSettings::getSyntaxForFileExt(const string &ext) {
-	map<string,ofxEditorSyntax*>::iterator iter;
+ofxEditorSyntax* ofxEditorSettings::getSyntaxForFileExt(const std::string &ext) {
+	std::map<std::string,ofxEditorSyntax*>::iterator iter;
 	for(iter = langs.begin(); iter != langs.end(); ++iter) {
 		if((*iter).second->hasFileExt(ext)) {
 			return (*iter).second;
@@ -280,14 +281,14 @@ ofxEditorSyntax* ofxEditorSettings::getSyntaxForFileExt(const string &ext) {
 //--------------------------------------------------------------
 void ofxEditorSettings::printSyntaxes() {
 	ofLogNotice("ofxEditorSettings") << "syntaxes: " << (langs.empty() ? "none" : "");
-	map<string,ofxEditorSyntax*>::iterator iter;
+	std::map<std::string,ofxEditorSyntax*>::iterator iter;
 	for(iter = langs.begin(); iter != langs.end(); ++iter) {
-		string line = "  " + (*iter).second->getLang();
-		const set<string> &fileExts = (*iter).second->getFileExts();
+		std::string line = "  " + (*iter).second->getLang();
+		const std::set<std::string> &fileExts = (*iter).second->getFileExts();
 		if(!fileExts.empty()) {
 			line += " (";
 			int count = 0;
-			for(set<string>::const_iterator i = fileExts.begin(); i != fileExts.end(); ++i) {
+			for(std::set<std::string>::const_iterator i = fileExts.begin(); i != fileExts.end(); ++i) {
 				line += (*i);
 				count++;
 				if(count < fileExts.size()) {

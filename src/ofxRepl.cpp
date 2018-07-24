@@ -30,8 +30,8 @@
 // utils
 bool isEmpty(u32string s);
 
-u32string ofxRepl::s_banner = u32string(U"");
-u32string ofxRepl::s_prompt = u32string(U"> ");
+std::u32string ofxRepl::s_banner = U"";
+std::u32string ofxRepl::s_prompt = U"> ";
 
 //--------------------------------------------------------------
 ofxRepl::ofxRepl() : ofxEditor() {
@@ -62,7 +62,7 @@ ofxRepl::~ofxRepl() {
 void ofxRepl::setup() {
 
 	// setup our custom logger
-	m_logger = ofPtr<Logger>(new Logger);
+	m_logger = std::shared_ptr<Logger>(new Logger);
 	m_logger->m_parent = this;
 	ofSetLoggerChannel(m_logger);
 
@@ -138,7 +138,7 @@ void ofxRepl::keyPressed(int key) {
 	}
 	
 	// any text input moves cursor to end of the prompt line
-	if(key < OF_KEY_MODIFIER && m_position < m_promptPos && !copying) {
+	if(isalnum(key) && m_position < m_promptPos && !copying) {
 		m_position = m_text.length();
 		keepCursorVisible();
 	}
@@ -176,7 +176,7 @@ void ofxRepl::keyPressed(int key) {
 }
 
 //--------------------------------------------------------------
-void ofxRepl::print(const u32string &what, bool beforePrompt) {
+void ofxRepl::print(const std::u32string &what, bool beforePrompt) {
 
 	// trim half of text if we overflow the max num of lines
 	if(m_numLines > MAX_TEXT_LINES) {
@@ -196,8 +196,8 @@ void ofxRepl::print(const u32string &what, bool beforePrompt) {
 		m_bottomTextPosition -= pos;
 	}
 
-	u32string to_print;
-	for(u32string::const_iterator i = what.begin(); i != what.end(); ++i) {
+	std::u32string to_print;
+	for(std::u32string::const_iterator i = what.begin(); i != what.end(); ++i) {
 		m_linePos++;
 		if(*i == '\n') {
 			m_linePos = 0;
@@ -229,12 +229,12 @@ void ofxRepl::print(const u32string &what, bool beforePrompt) {
 }
 
 //--------------------------------------------------------------
-void ofxRepl::print(const string &what, bool beforePrompt) {
+void ofxRepl::print(const std::string &what, bool beforePrompt) {
 	print(string_to_wstring(what), beforePrompt);
 }
 
 //--------------------------------------------------------------
-void ofxRepl::printEvalReturn(const u32string &what) {
+void ofxRepl::printEvalReturn(const std::u32string &what) {
 	if(what.size() > 0) {
 		print(what+U"\n");
 	}
@@ -242,7 +242,7 @@ void ofxRepl::printEvalReturn(const u32string &what) {
 }
 
 //--------------------------------------------------------------
-void ofxRepl::printEvalReturn(const string &what) {
+void ofxRepl::printEvalReturn(const std::string &what) {
 	printEvalReturn(string_to_wstring(what));
 }
 
@@ -261,7 +261,7 @@ void ofxRepl::clearHistory() {
 }
 
 //--------------------------------------------------------------
-bool ofxRepl::openFile(string filename) {
+bool ofxRepl::openFile(std::string filename) {
 	ofLogWarning("ofxRepl") << "ignoring openFile";
 	return false;
 }
@@ -360,7 +360,7 @@ void ofxRepl::historyNext() {
 }
 
 //--------------------------------------------------------------
-void ofxRepl::historyShow(u32string what) {
+void ofxRepl::historyShow(std::u32string what) {
 	m_text.resize(m_promptPos, 0);
 	m_text += what;
 	m_position = m_text.length();
@@ -373,7 +373,7 @@ void ofxRepl::keepCursorVisible() {
 	int curVisLine = 0;
 	size_t step = 0;
 	for(unsigned int i = m_topTextPosition;
-	    i < m_position && (step = m_text.find('\n', i)) != u32string::npos;
+	    i < m_position && (step = m_text.find('\n', i)) != std::u32string::npos;
 		i = step+1) {
 		curVisLine++;
 	}
@@ -389,49 +389,49 @@ void ofxRepl::keepCursorVisible() {
 // STATIC UTILS
 
 //--------------------------------------------------------------
-void ofxRepl::setReplBanner(const u32string &text) {
+void ofxRepl::setReplBanner(const std::u32string &text) {
 	s_banner = text;
 }
 
 //--------------------------------------------------------------
-void ofxRepl::setReplBanner(const string &text) {
+void ofxRepl::setReplBanner(const std::string &text) {
 	s_banner = string_to_wstring(text);
 }
 
 //--------------------------------------------------------------
-u32string& ofxRepl::getWideReplBanner() {
+std::u32string& ofxRepl::getWideReplBanner() {
 	return s_banner;
 }
 
 //--------------------------------------------------------------
-string ofxRepl::getReplBanner() {
+std::string ofxRepl::getReplBanner() {
 	return wstring_to_string(s_banner);
 }
 	
 //--------------------------------------------------------------
-void ofxRepl::setReplPrompt(const u32string &text) {
+void ofxRepl::setReplPrompt(const std::u32string &text) {
 	s_prompt = text;
 }
 
 //--------------------------------------------------------------
-void ofxRepl::setReplPrompt(const string &text) {
+void ofxRepl::setReplPrompt(const std::string &text) {
 	s_prompt = string_to_wstring(text);
 }
 
 //--------------------------------------------------------------
-u32string& ofxRepl::getWideReplPrompt() {
+std::u32string& ofxRepl::getWideReplPrompt() {
 	return s_prompt;
 }
 
 //--------------------------------------------------------------
-string ofxRepl::getReplPrompt() {
+std::string ofxRepl::getReplPrompt() {
 	return wstring_to_string(s_prompt);
 }
 
 // PRIVATE
 
 //--------------------------------------------------------------
-void ofxRepl::Logger::log(ofLogLevel level, const string & module, const string & message){
+void ofxRepl::Logger::log(ofLogLevel level, const std::string & module, const std::string & message){
 	ofConsoleLoggerChannel::log(level, module, message);
 	if(level >= ofGetLogLevel()) {
 		m_parent->print(string_to_wstring(message)+U"\n", true);
@@ -439,7 +439,7 @@ void ofxRepl::Logger::log(ofLogLevel level, const string & module, const string 
 }
 
 //--------------------------------------------------------------
-void ofxRepl::Logger::log(ofLogLevel level, const string & module, const char* format, va_list args){
+void ofxRepl::Logger::log(ofLogLevel level, const std::string & module, const char* format, va_list args){
 	ofConsoleLoggerChannel::log(level, module, format, args);
 	if(level >= ofGetLogLevel()) {
 		m_parent->print(string_to_wstring(ofVAArgsToString(format, args))+U"\n", true);
@@ -450,9 +450,9 @@ void ofxRepl::Logger::log(ofLogLevel level, const string & module, const char* f
 
 //--------------------------------------------------------------
 bool isEmpty(u32string s) {
-    const u32string ws = U" \t\n\r";
-	for(u32string::iterator i = s.begin(); i != s.end(); i++) {
-		if(ws.find(*i) == string::npos) {
+    const std::u32string ws = U" \t\n\r";
+	for(std::u32string::iterator i = s.begin(); i != s.end(); i++) {
+		if(ws.find(*i) == std::string::npos) {
 			return false;
 		}
 	}

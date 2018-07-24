@@ -48,7 +48,7 @@ class ofxEditor {
 		///
 		/// call this before drawing any editor
 		///
-		static bool loadFont(const string &font, int size);
+		static bool loadFont(const std::string &font, int size);
 	
 		/// is a font currently loaded?
 		static bool isFontLoaded();
@@ -135,29 +135,29 @@ class ofxEditor {
 	
 		/// open & load a file, clears existing text
 		/// returns true on success
-		virtual bool openFile(string filename);
+		virtual bool openFile(std::string filename);
 		
 		/// save the text to a file
 		/// returns true on success
-		virtual bool saveFile(string filename);
+		virtual bool saveFile(std::string filename);
 	
 		/// get wide char text buffer contents or current selection
-		virtual u32string getWideText();
+		virtual std::u32string getWideText();
 	
 		/// get text buffer contents or current selection
-		virtual string getText();
+		virtual std::string getText();
 	
 		/// set text buffer contents
-		virtual void setText(const u32string& text);
+		virtual void setText(const std::u32string& text);
 	
 		/// set text buffer contents
-		virtual void setText(const string& text);
+		virtual void setText(const std::string& text);
 	
 		/// insert text at the current buffer position
-		virtual void insertText(const u32string& text);
+		virtual void insertText(const std::u32string& text);
 	
 		/// insert text at the current buffer position
-		virtual void insertText(const string& text);
+		virtual void insertText(const std::string& text);
 	
 		/// delete char(s) or selection at the current buffer position
 		/// set optional number of chars and direction (default: current char)
@@ -201,13 +201,13 @@ class ofxEditor {
 		/// set language syntax for this editor based on language string
 		/// aka "C++", "Lua", "GLSL", etc from the available syntaxes in the
 		/// current settings
-		void setLangSyntax(const string& lang);
+		void setLangSyntax(const std::string& lang);
 	
 		/// set language syntax for this editor based on file extension string
 		/// from the available syntaxes in the current settings
 		///
 		/// note: file extensions do not include the period, ex: "lua" not ".lua"
-		void setFileExtSyntax(const string& ext);
+		void setFileExtSyntax(const std::string& ext);
 	
 		/// clear the current language syntax
 		void clearSyntax();
@@ -296,13 +296,13 @@ class ofxEditor {
 	
 		/// draw a wide char string using the current editor font
 		/// returns the width of drawn text
-		float drawString(u32string s, float x, float y);
-		float drawString(u32string s, ofPoint& p);
+		float drawString(std::u32string s, float x, float y);
+		float drawString(std::u32string s, ofPoint& p);
 	
 		/// draw a string using the current editor font
 		/// returns the width of drawn text
-		float drawString(string s, float x, float y);
-		float drawString(string s, ofPoint& p);
+		float drawString(std::string s, float x, float y);
+		float drawString(std::string s, ofPoint& p);
 	
 		/// print the current syntax parser text blocks, useful for debugging
 		void printSyntax();
@@ -316,7 +316,7 @@ class ofxEditor {
 	
 	/// \section Static Variables
 	
-		static ofPtr<ofxEditorFont> s_font; //< global editor font
+		static std::shared_ptr<ofxEditorFont> s_font; //< global editor font
 		static int s_charWidth;          //< space char pixel width
 		static int s_zeroWidth;          //< zero char pixel width for line nums
 		static int s_charHeight;         //< char block pixel height
@@ -326,7 +326,7 @@ class ofxEditor {
 		static bool s_superAsModifier;   //< use the super key as modifier?
 	
 		/// shared copy/paste buffer if system clipboard isn't available
-		static u32string s_copyBuffer;
+		static std::u32string s_copyBuffer;
 	
 		/// timestamp for calculating animations, shared between editors for smooth
 		/// animation when switching back and forth
@@ -347,7 +347,7 @@ class ofxEditor {
 		ofxEditorSettings *m_settings; //< editor settings object
 		bool m_sharedSettings; //< are the settings shared? if so, do not delete
 	
-		u32string m_text; //< text buffer
+		std::u32string m_text; //< text buffer
 		unsigned int m_numLines; //< number of lines in the text buffer
 		
 		float m_width, m_height; //< editor viewport pixel size
@@ -378,7 +378,7 @@ class ofxEditor {
 	
 		bool m_shiftState; //< is shift pressed?
 		unsigned int m_UTF8Bytes; //< number of expected UTF8 input bytes
-		string m_UTF8Char; //< used to build multibyte UTF8 input char
+		std::string m_UTF8Char; //< used to build multibyte UTF8 input char
 		
 		ofxEditorColorScheme *m_colorScheme; //< optional syntax color scheme
 		ofxEditorSyntax *m_syntax; //< optional lang syntax
@@ -429,7 +429,7 @@ class ofxEditor {
 			public:
 				
 				TextBlockType type; //< block type
-				u32string text; //< block text string
+				std::u32string text; //< block text string
 				
 				TextBlock() {clear();}
 				TextBlock(TextBlockType type) : type(type) {}
@@ -463,7 +463,7 @@ class ofxEditor {
 			public:
 			
 				UndoActionType type; //< action type
-				u32string insertText, deleteText; //< any added/removed text
+				std::u32string insertText, deleteText; //< any added/removed text
 				unsigned int pos; //< text position
 				long timestamp; //< timestamp of last update
 			
@@ -486,7 +486,7 @@ class ofxEditor {
 				}
 			
 		};
-		vector<UndoAction> m_undoActions; //< current undo actions
+		std::vector<UndoAction> m_undoActions; //< current undo actions
 		int m_undoPos; //< current undo position, -1 denotes no undos left
 	
 	/// \section Helper Functions

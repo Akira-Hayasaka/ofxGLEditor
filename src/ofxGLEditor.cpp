@@ -240,7 +240,7 @@ void ofxGLEditor::resize(int width, int height) {
 }
 
 //--------------------------------------------------------------
-bool ofxGLEditor::openFile(string filename, int editor) {
+bool ofxGLEditor::openFile(std::string filename, int editor) {
 	
 	if(editor < 0 && (editor - 1) >= (int) m_editors.size()) {
 		ofLogError("ofxGLEditor") << "cannot load into unknown editor " << editor;
@@ -265,7 +265,7 @@ bool ofxGLEditor::openFile(string filename, int editor) {
 }
 
 //--------------------------------------------------------------
-bool ofxGLEditor::saveFile(string filename, int editor) {
+bool ofxGLEditor::saveFile(std::string filename, int editor) {
 	
 	if(editor < 0 && (editor - 1) >= (int) m_editors.size()) {
 		ofLogError("ofxGLEditor") << "cannot save from unknown editor " << editor;
@@ -315,7 +315,7 @@ string ofxGLEditor::getText(int editor) {
 }
 
 //--------------------------------------------------------------
-void ofxGLEditor::setText(string text, int editor) {
+void ofxGLEditor::setText(std::string text, int editor) {
 
 	editor = getEditorIndex(editor);
 	if(editor == -1) {
@@ -328,7 +328,7 @@ void ofxGLEditor::setText(string text, int editor) {
 }
 
 //--------------------------------------------------------------
-void ofxGLEditor::insertText(string text, int editor) {
+void ofxGLEditor::insertText(std::string text, int editor) {
 
 	editor = getEditorIndex(editor);
 	if(editor == -1) {
@@ -390,7 +390,7 @@ int ofxGLEditor::getCurrentEditor() {
 }
 
 //--------------------------------------------------------------
-void ofxGLEditor::setEditorFilename(int editor, string filename) {
+void ofxGLEditor::setEditorFilename(int editor, std::string filename) {
 	
 	if(editor < 0 && (editor - 1) >= (int) m_editors.size()) {
 		ofLogError("ofxGLEditor") << "cannot set filename for unknown editor " << editor;
@@ -407,7 +407,7 @@ void ofxGLEditor::setEditorFilename(int editor, string filename) {
 }
 	
 //--------------------------------------------------------------
-string ofxGLEditor::getEditorFilename(int editor) {
+std::string ofxGLEditor::getEditorFilename(int editor) {
 	if(editor < 0 && (editor - 1) >= (int) m_editors.size()) {
 		ofLogError("ofxGLEditor") << "cannot get filename for unknown editor " << editor;
 		return "";
@@ -523,7 +523,7 @@ void ofxGLEditor::clearReplHistory() {
 }
 
 //--------------------------------------------------------------
-void ofxGLEditor::setPath(string path) {
+void ofxGLEditor::setPath(std::string path) {
 	// make sure there is a trailing /
 	m_fileDialog->setPath(ofFilePath::addTrailingSlash(path));
 	if(m_fileDialog->isActive()) {
@@ -537,12 +537,12 @@ void ofxGLEditor::setHidden(bool hidden) {
 }
 
 //--------------------------------------------------------------
-void ofxGLEditor::drawString(const string& s, float x, float y) {
+void ofxGLEditor::drawString(const std::string& s, float x, float y) {
 	m_editors[m_currentEditor]->drawString(s, x, y);
 }
 
 //--------------------------------------------------------------
-void ofxGLEditor::drawString(const string& s, ofPoint& p) {
+void ofxGLEditor::drawString(const std::string& s, ofPoint& p) {
 	drawString(s, p.x, p.y);
 }
 
@@ -623,7 +623,7 @@ ofxEditorColorScheme* ofxGLEditor::getColorScheme() {
 // LANG SYNTAX
 
 //--------------------------------------------------------------
-void ofxGLEditor::setLangSyntax(const string& lang, int editor) {
+void ofxGLEditor::setLangSyntax(const std::string& lang, int editor) {
 	editor = getEditorIndex(editor);
 	if(editor == -1) {
 		ofLogError("ofxGLEditor") << "cannot set syntax from unknown editor " << editor;

@@ -90,12 +90,12 @@ class ofxEditorSettings {
 		/// set the matching open/close chars to highlight,
 		/// default: "([<{" & ")]>}", strings should not be empty
 		/// note: matching chars are not highlighted inside comments
-		void setMatchingChars(u32string openChars, u32string closeChars);
-		void setMatchingChars(string openChars, string closeChars);
-		u32string& getWideOpenChars();
-		string getOpenChars();
-		u32string& getWideCloseChars();
-		string getCloseChars();
+		void setMatchingChars(std::u32string openChars, std::u32string closeChars);
+		void setMatchingChars(std::string openChars, std::string closeChars);
+		std::u32string& getWideOpenChars();
+		std::string getOpenChars();
+		std::u32string& getWideCloseChars();
+		std::string getCloseChars();
 	
 	/// \section Language Syntax
 	
@@ -106,19 +106,19 @@ class ofxEditorSettings {
 		/// set syntax for a given language string aka "GLSL", "Lua", "C++", etc
 		/// overrides syntax getLang() value
 		/// note: pointer is never deleted
-		void addSyntax(const string &lang, ofxEditorSyntax *syntax);
+		void addSyntax(const std::string &lang, ofxEditorSyntax *syntax);
 	
 		/// get the syntax for a language string, returns NULL if not found
-		ofxEditorSyntax* getSyntax(const string &lang);
+		ofxEditorSyntax* getSyntax(const std::string &lang);
 
 		/// clear the syntax for a language string
-		void clearSyntax(const string &lang);
+		void clearSyntax(const std::string &lang);
 	
 		/// clears all language syntaxes
 		void clearAllSyntaxes();
 	
 		/// get the syntax for a file extension, returns NULL if not found
-		ofxEditorSyntax* getSyntaxForFileExt(const string &ext);
+		ofxEditorSyntax* getSyntaxForFileExt(const std::string &ext);
 	
 		/// print the available syntax languages and assoicated file extensions
 		void printSyntaxes();
@@ -138,8 +138,8 @@ class ofxEditorSettings {
 		ofColor lineNumberColor;    //< line number color
 
 		bool highlightMatchingChars; //< highlight matching open/close chars?
-		u32string openChars;  //< open chars (parens, brackets, etc) for matching highlight
-		u32string closeChars; //< close chars (parens, bracket, etc) for matching highlight
+		std::u32string openChars;  //< open chars (parens, brackets, etc) for matching highlight
+		std::u32string closeChars; //< close chars (parens, bracket, etc) for matching highlight
 	
-		map<string,ofxEditorSyntax*> langs; //< available syntaxes by lang string
+		std::map<std::string,ofxEditorSyntax*> langs; //< available syntaxes by lang string
 };

@@ -41,7 +41,7 @@ class ofxGLEditorListener : public ofxReplListener {
 	
 		/// this event is triggered when Enter is pressed in the Repl console
 		/// returns the text to be evaluated
-		virtual void evalReplEvent(const string &text) {}
+		virtual void evalReplEvent(const std::string &text) {}
 };
 
 /// 9 text editor buffers with a live optional Read-Eval-Print Loop,
@@ -114,14 +114,14 @@ class ofxGLEditor {
 		/// or an editor index from 1- 9
 		///
 		/// returns true on success
-		bool openFile(string filename, int editor=0);
+		bool openFile(std::string filename, int editor=0);
 		
 		/// save the text in an editor to a file
 		///
 		/// set editor to 0 for the current editor or an editor index from 1- 9
 		///
 		/// returns true on success
-		bool saveFile(string filename, int editor=0);
+		bool saveFile(std::string filename, int editor=0);
 	
 		/// save the text in an editor to the current filename
 		///
@@ -140,13 +140,13 @@ class ofxGLEditor {
 		///
 		/// set editor to 0 for the current editor
 		/// or an editor index from 1 - 9
-		void setText(string text, int editor=0);
+		void setText(std::string text, int editor=0);
 	
 		/// insert text into an editor at the current position
 		///
 		/// set editor to 0 for the current editor
 		/// or an editor index from 1 - 9
-		void insertText(string text, int editor=0);
+		void insertText(std::string text, int editor=0);
 		
 		/// clear the contents of an editor
 		void clearText(int editor=0);
@@ -161,7 +161,7 @@ class ofxGLEditor {
 		int getCurrentEditor();
 		
 		/// set the filename of the editor by index, from 1 - 9
-		void setEditorFilename(int editor, string filename);
+		void setEditorFilename(int editor, std::string filename);
 		
 		/// get the filename of the current editor,
 		/// eturns empty string "" on error
@@ -200,7 +200,7 @@ class ofxGLEditor {
 		/// print the next prompt ...
 		///
 		/// note: this does nothing if the repl was not enabled in setup()
-		void evalReplReturn(const string &text="");
+		void evalReplReturn(const std::string &text="");
 		
 		/// clears text in Repl buffer, does not clear history
 		void clearRepl();
@@ -283,7 +283,7 @@ class ofxGLEditor {
 		/// note: syntax does not apply to REPL or FileDialog
 		///
 		/// set editor to 0 for the current editor
-		void setLangSyntax(const string& lang, int editor=0);
+		void setLangSyntax(const std::string& lang, int editor=0);
 	
 		/// clear the current language syntax for an editor
 		/// set editor to 0 for the current editor
@@ -296,7 +296,7 @@ class ofxGLEditor {
 	/// \section Util
 		
 		/// set the file browser path, default: data path when setup() is called
-		void setPath(string path);
+		void setPath(std::string path);
 	
 		/// the current modifier as set in setup(), either CTRL (default) or Super
 		inline bool isModifierPressed() {return bModifierPressed;}
@@ -311,8 +311,8 @@ class ofxGLEditor {
 		static const int s_numEditors = 10;
 		
 		/// draw a string using the current editor font
-		void drawString(const string& s, float x, float y);
-		void drawString(const string& s, ofPoint& p);
+		void drawString(const std::string& s, float x, float y);
+		void drawString(const std::string& s, ofPoint& p);
 	
 	private:
 	
@@ -328,7 +328,7 @@ class ofxGLEditor {
 		ofxFileDialog *m_fileDialog; //< file dialog instance
 	
 		int m_currentEditor; //< current editor, repl is at index 0
-		vector<string> m_saveFiles; //< one for each editor
+		std::vector<std::string> m_saveFiles; //< one for each editor
 		
 		bool bModifierPressed; //< is the editor modifier key being pressed?
 		

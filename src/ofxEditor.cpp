@@ -31,6 +31,7 @@
 #if !defined(TARGET_NODISPLAY) && !defined(TARGET_OF_IOS) && !defined(TARGET_ANDROID)
 	#define HAS_GLFW
     #include "ofAppGLFWWindow.h"
+    #include "GLFW/glfw3.h"
 #endif
 
 #define FLASH_RATE 1
@@ -187,7 +188,7 @@ ofxEditor::~ofxEditor() {
 // STATIC SETTINGS
 
 //--------------------------------------------------------------
-bool ofxEditor::loadFont(const string &font, int size) {
+bool ofxEditor::loadFont(const std::string &font, int size) {
 	
 	string path = ofToDataPath(font);
 	if(!ofFile::doesFileExist(path)) {
@@ -1114,7 +1115,6 @@ void ofxEditor::resize() {
 	resize(w, h);
 }
 
-
 void ofxEditor::resize(int width, int height) {
 	m_width = width;
 	m_height = height;
@@ -1124,7 +1124,7 @@ void ofxEditor::resize(int width, int height) {
 }
 
 //--------------------------------------------------------------
-bool ofxEditor::openFile(string filename) {
+bool ofxEditor::openFile(std::string filename) {
 	ofFile file;
 	if(!file.open(ofToDataPath(filename), ofFile::ReadOnly)) {
 		ofLogError("ofxEditor") << "couldn't load \""
@@ -1139,7 +1139,7 @@ bool ofxEditor::openFile(string filename) {
 }
 		
 //--------------------------------------------------------------
-bool ofxEditor::saveFile(string filename) {
+bool ofxEditor::saveFile(std::string filename) {
 	ofFile file;
 	if(!file.open(ofToDataPath(filename), ofFile::WriteOnly)) {
 		ofLogError("ofxEditor") << "couldn't save \""
@@ -1157,7 +1157,7 @@ bool ofxEditor::saveFile(string filename) {
 }
 
 //--------------------------------------------------------------
-u32string ofxEditor::getWideText() {
+std::u32string ofxEditor::getWideText() {
 	if(m_selection != NONE) {
 		return m_text.substr(m_highlightStart, m_highlightEnd-m_highlightStart);
 	}
@@ -1165,7 +1165,7 @@ u32string ofxEditor::getWideText() {
 }
 
 //--------------------------------------------------------------
-string ofxEditor::getText() {
+std::string ofxEditor::getText() {
 	if(m_selection != NONE) {
 		return wstring_to_string(m_text.substr(m_highlightStart, m_highlightEnd-m_highlightStart));
 	}
@@ -1173,7 +1173,7 @@ string ofxEditor::getText() {
 }
 
 //--------------------------------------------------------------
-void ofxEditor::setText(const u32string& text) {
+void ofxEditor::setText(const std::u32string& text) {
 	if(m_text != U"") {
 		m_position = lineStart(m_position);
 		int line = getCurrentLine();
@@ -1190,12 +1190,12 @@ void ofxEditor::setText(const u32string& text) {
 }
 
 //--------------------------------------------------------------
-void ofxEditor::setText(const string& text) {
+void ofxEditor::setText(const std::string& text) {
 	setText(string_to_wstring(text));
 }
 
 //--------------------------------------------------------------
-void ofxEditor::insertText(const u32string& text) {
+void ofxEditor::insertText(const std::u32string& text) {
 	if(m_selection != NONE) {
 		m_text.erase(m_highlightStart, m_highlightEnd-m_highlightStart);
 		if(m_position >= m_highlightEnd) {
@@ -1212,7 +1212,7 @@ void ofxEditor::insertText(const u32string& text) {
 }
 
 //--------------------------------------------------------------
-void ofxEditor::insertText(const string& text) {
+void ofxEditor::insertText(const std::string& text) {
 	insertText(string_to_wstring(text));
 }
 
@@ -1297,12 +1297,12 @@ void ofxEditor::setSyntax(ofxEditorSyntax *syntax) {
 }
 
 //--------------------------------------------------------------
-void ofxEditor::setLangSyntax(const string& lang) {
+void ofxEditor::setLangSyntax(const std::string& lang) {
 	m_syntax = m_settings->getSyntax(lang);
 }
 
 //--------------------------------------------------------------
-void ofxEditor::setFileExtSyntax(const string& ext) {
+void ofxEditor::setFileExtSyntax(const std::string& ext) {
 	m_syntax = m_settings->getSyntaxForFileExt(ext);
 }
 
@@ -1985,7 +1985,7 @@ void ofxEditor::pasteSelection() {
 				updateUndo(INSERT, m_position, string_to_wstring((string)text), U"");
 			}
 		}
-		insertText((string) text);
+		insertText((std::string) text);
 	#else
 		if(s_undo) {
 			if(m_selection != NONE) {

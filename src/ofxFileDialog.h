@@ -57,7 +57,7 @@ class ofxFileDialog : public ofxEditor {
 		virtual void keyPressed(int key);
 	
 		/// set the current path in the file browser, reads directory contents
-		void setPath(string path);
+		void setPath(std::string path);
 
 		/// refresh directory contents
 		void refresh();
@@ -81,30 +81,30 @@ class ofxFileDialog : public ofxEditor {
 		/// activate/deactivate the dialog
 		void setActive(bool active=true);
 	
-		bool openFile(string filename); //< dummy implementation
-		bool saveFile(string filename); //< dummy implementation
+		bool openFile(std::string filename); //< dummy implementation
+		bool saveFile(std::string filename); //< dummy implementation
 		void undo(); //< no undo, dummy implementation
 		void redo(); //< no undo, dummy implementation
 	
 	/// \section Static Utils
 	
 		/// set/get the save as info text, default: "Save as (esc to exit)"
-		static void setSaveAsText(const u32string &text);
-		static void setSaveAsText(const string &text);
-		static u32string& getWideSaveAsText();
-		static string getSaveAsText();
+		static void setSaveAsText(const std::u32string &text);
+		static void setSaveAsText(const std::string &text);
+		static std::u32string& getWideSaveAsText();
+		static std::string getSaveAsText();
 	
 		/// set/get the new folder info text, default: "New folder (esc to exit)"
-		static void setNewFolderText(const u32string &text);
-		static void setNewFolderText(const string &text);
-		static u32string& getWideNewFolderText();
-		static string getNewFolderText();
+		static void setNewFolderText(const std::u32string &text);
+		static void setNewFolderText(const std::string &text);
+		static std::u32string& getWideNewFolderText();
+		static std::string getNewFolderText();
 	
 		/// set/get the new folder button text in the save as dialog, default: "New Folder"
-		static void setNewFolderButton(const u32string &text);
-		static void setNewFolderButton(const string &text);
-		static u32string& getWideNewFolderButton();
-		static string getNewFolderButton();
+		static void setNewFolderButton(const std::u32string &text);
+		static void setNewFolderButton(const std::string &text);
+		static std::u32string& getWideNewFolderButton();
+		static std::string getNewFolderButton();
 
 	protected:
 
@@ -128,16 +128,16 @@ class ofxFileDialog : public ofxEditor {
 		bool m_active; //< is the dialog active?
 	
 		unsigned int m_currentFile;    //< index of the current file
-		vector<u32string> m_filenames; //< filenames & directories
-		set<int> m_directories;        //< which indexes are directories
-		u32string m_path;              //< current path
-		u32string m_selectedPath;      //< selected path on enter
-		u32string m_prevBasename;      //< previous path basename
+		std::vector<std::u32string> m_filenames; //< filenames & directories
+		std::set<int> m_directories;        //< which indexes are directories
+		std::u32string m_path;              //< current path
+		std::u32string m_selectedPath;      //< selected path on enter
+		std::u32string m_prevBasename;      //< previous path basename
 	
 		/// number of files to show above and below open file cursor
-		static u32string s_saveAsText; //< save as info text
-		static u32string s_newFolderText; //< new folder info text
-		static u32string s_newFolderButtonText; //< save as new folder "button"
+		static std::u32string s_saveAsText; //< save as info text
+		static std::u32string s_newFolderText; //< new folder info text
+		static std::u32string s_newFolderButtonText; //< save as new folder "button"
 	
 		/// save as dialog states
 		enum SaveAsState {

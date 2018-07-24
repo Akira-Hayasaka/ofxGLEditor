@@ -57,7 +57,7 @@ void ofApp::draw() {
         shader.setUniform3f("iResolution", width, height, 1);
     
         ofSetColor(255, 255, 255);
-        ofRect(0, 0, width, height);
+        ofDrawRectangle(0, 0, width, height);
         shader.end();
     fbo.end();
     fbo.draw(0, 0, ofGetWidth(), ofGetHeight());

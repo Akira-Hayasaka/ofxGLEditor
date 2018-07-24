@@ -29,7 +29,7 @@ class ofxEditorColorScheme {
 	public:
 	
 		ofxEditorColorScheme();
-		ofxEditorColorScheme(const string& xmlFile); //< load from an xml file
+		ofxEditorColorScheme(const std::string& xmlFile); //< load from an xml file
 	
 		/// load colors from an xml file
 		///
@@ -72,7 +72,7 @@ class ofxEditorColorScheme {
 		/// </colorcheme>
 		///
 		/// returns false on read or parse error
-		bool loadFile(const string& xmlFile);
+		bool loadFile(const std::string& xmlFile);
 	
 		/// clear all colors to white
 		void clear();

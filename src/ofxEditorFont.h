@@ -43,7 +43,7 @@ class ofxEditorFont {
 	
 		/// create a fonstash context and load a given font
 		/// returns false if the font could not be loaded
-		bool load(string filename, int fontsize, int textureDimension = 512);
+		bool load(std::string filename, int fontsize, int textureDimension = 512);
 	
 		/// returns true if the fonstash context exists (aka font is loaded)
 		bool isLoaded();
@@ -63,12 +63,12 @@ class ofxEditorFont {
 		float characterWidth(int c);
 	
 		/// get bounding box width for a given string
-		float stringWidth(const string& s);
-		float stringWidth(const u32string& s);
+		float stringWidth(const std::string& s);
+		float stringWidth(const std::u32string& s);
 	
 		/// get bounding box height for a given string (single line only)
-        float stringHeight(const string& s);
-		float stringHeight(const u32string& s);
+        float stringHeight(const std::string& s);
+		float stringHeight(const std::u32string& s);
 	
 	/// \section Drawing
 	
@@ -80,12 +80,12 @@ class ofxEditorFont {
 		/// draw a UTF8 string using the current state color
 		/// set shadowed=true to draw an offset shadow using the shadow color
 		/// returns new x position
-		float drawString(const string& s, float x, float y, bool shadowed=false);
+		float drawString(const std::string& s, float x, float y, bool shadowed=false);
 	
 		/// draw a wide char string using the current state color
 		/// set shadowed=true to draw an offset shadow using the shadow color
 		/// returns new x position
-		float drawString(const u32string& s, float x, float y, bool shadowed=false);
+		float drawString(const std::u32string& s, float x, float y, bool shadowed=false);
 	
 	/// \section Color & State
 	

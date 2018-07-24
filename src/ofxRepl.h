@@ -31,7 +31,7 @@ class ofxReplListener {
 	
 		/// this event is triggered when Enter is pressed in the Repl console
 		/// returns the text to be evaluated
-		virtual void evalReplEvent(const string &text) = 0;
+		virtual void evalReplEvent(const std::string &text) = 0;
 };
 
 /// Read-eval-print Loop
@@ -67,17 +67,17 @@ class ofxRepl : public ofxEditor {
 		
 		/// add a wide string to the console,
 		/// set beforePrompt to true to print a line above the current prompt
-		void print(const u32string &what, bool beforePrompt=false);
+		void print(const std::u32string &what, bool beforePrompt=false);
 	
 		/// add a string to the console with string conversion,
 		/// set beforePrompt to true to print a line above the current prompt
-		void print(const string &what, bool beforePrompt=false);
+		void print(const std::string &what, bool beforePrompt=false);
 		
 		/// add a wide string to the console and print a return after
-		void printEvalReturn(const u32string &what);
+		void printEvalReturn(const std::u32string &what);
 	
 		/// add a string to the console and print a return after with string conversion
-		void printEvalReturn(const string &what);
+		void printEvalReturn(const std::string &what);
 		
 		/// clear the console
 		void clearText();
@@ -85,22 +85,22 @@ class ofxRepl : public ofxEditor {
 		/// clear the command history
 		void clearHistory();
 	
-		bool openFile(string filename); //< dummy implementation
-		bool saveFile(string filename); //< dummy implementation
+		bool openFile(std::string filename); //< dummy implementation
+		bool saveFile(std::string filename); //< dummy implementation
 
 	/// \section Static Utils
 	
 		/// set/get the Repl greeting banner, default: ""
-		static void setReplBanner(const u32string &text); //< call this before setup()
-		static void setReplBanner(const string &text); //< call this before setup()
-		static u32string& getWideReplBanner();
-		static string getReplBanner();
+		static void setReplBanner(const std::u32string &text); //< call this before setup()
+		static void setReplBanner(const std::string &text); //< call this before setup()
+		static std::u32string& getWideReplBanner();
+		static std::string getReplBanner();
 		
 		/// set/get the Repl prompt, default: "> "
-		static void setReplPrompt(const u32string &text); //< call this before setup()
-		static void setReplPrompt(const string &text); //< call this before setup()
-		static u32string& getWideReplPrompt();
-		static string getReplPrompt();
+		static void setReplPrompt(const std::u32string &text); //< call this before setup()
+		static void setReplPrompt(const std::string &text); //< call this before setup()
+		static std::u32string& getWideReplPrompt();
+		static std::string getReplPrompt();
 
 	protected:
 	
@@ -109,7 +109,7 @@ class ofxRepl : public ofxEditor {
 		void historyPrev();
 		void historyNext();
 		void historyClear();
-		void historyShow(u32string what);
+		void historyShow(std::u32string what);
 		void keepCursorVisible();
 
 		ofxReplListener *m_listener; //< eval event listener
@@ -117,16 +117,16 @@ class ofxRepl : public ofxEditor {
 		unsigned int m_promptPos; //< prompt position in the text buffer
 		unsigned int m_insertPos; //< insert position in the text buffer
 
-		u32string m_evalText; //< text to be evaluated when enter is pressed
+		std::u32string m_evalText; //< text to be evaluated when enter is pressed
 		
-		deque<u32string> m_history; //< line history
-		deque<u32string>::iterator m_historyIter; //< current position in line history
+		deque<std::u32string> m_history; //< line history
+		deque<std::u32string>::iterator m_historyIter; //< current position in line history
 		bool m_historyNavStarted; //< is the cursor within the line history?
-		u32string m_historyPresent; //< current history line (aka live input)
+		std::u32string m_historyPresent; //< current history line (aka live input)
 		unsigned int m_linePos; //< current line the cursor is on
 	
-		static u32string s_banner; //< REPL header/greeting, default: ""
-		static u32string s_prompt; //< prompt string, default: "> "
+		static std::u32string s_banner; //< REPL header/greeting, default: ""
+		static std::u32string s_prompt; //< prompt string, default: "> "
 		
 	private:
 
@@ -134,8 +134,8 @@ class ofxRepl : public ofxEditor {
 		class Logger : public ofConsoleLoggerChannel {
 		public:
 			ofxRepl *m_parent;
-			void log(ofLogLevel level, const string & module, const string & message);
-			void log(ofLogLevel level, const string & module, const char* format, va_list args);
+			void log(ofLogLevel level, const std::string & module, const std::string & message);
+			void log(ofLogLevel level, const std::string & module, const char* format, va_list args);
 		};
-		ofPtr<Logger> m_logger;
+		std::shared_ptr<Logger> m_logger;
 };

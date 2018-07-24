@@ -10,7 +10,7 @@ function setup()
 	of.setCircleResolution(50)
 	of.setWindowTitle("livecoding example")
 
-	of.setFrameRate(60) -- if vertical sync is off, we can go a bit fast... this caps the framerate at 60fps
+	of.setFrameRate(60) -- if vertical sync is off
 end
 
 ----------------------------------------------------

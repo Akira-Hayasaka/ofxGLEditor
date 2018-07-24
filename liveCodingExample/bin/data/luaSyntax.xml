@@ -1,17 +1,21 @@
 <!-- lua 5.1 http://www.lua.org/manual/5.1/manual.html -->
 <syntax>
-	
-    <lang>Lua</lang>
-	<files>
-		<ext>lua</ext>
-	</files>
-	
-    <singlecomment>--</singlecomment>
 
-	<multicomment>
-		<begin>--[[</begin>
-		<end>]]</end>
-	</multicomment>
+    <lang>Lua</lang>
+    <files>
+        <ext>lua</ext>
+    </files>
+    
+    <singlecomment>--</singlecomment>
+    <multicomment>
+        <begin>--[[</begin>
+        <end>]]</end>
+    </multicomment>
+
+    <stringliteral>
+        <begin>[[</begin>
+        <end>]]</end>
+    </stringliteral>
 
     <!-- lua doesn't support hex literals aka 0x123 -->
     <hexliteral>false</hexliteral>
@@ -20,14 +24,14 @@
     <operator>=+-*/^!.</operator>
 
     <words>
-		
+        
         <!-- lang keywords -->
-		<keyword>and</keyword>
-		<keyword>end</keyword>
-		<keyword>in</keyword>
-		<keyword>repeat</keyword>
-		<keyword>break</keyword>
-		<keyword>false</keyword>
+        <keyword>and</keyword>
+        <keyword>end</keyword>
+        <keyword>in</keyword>
+        <keyword>repeat</keyword>
+        <keyword>break</keyword>
+        <keyword>false</keyword>
         <keyword>local</keyword>
         <keyword>return</keyword>
         <keyword>do</keyword>
@@ -73,5 +77,5 @@
         <function>_VERSION</function>
         <function>xpcall</function>
 
-	</words>
+    </words>
 </syntax>

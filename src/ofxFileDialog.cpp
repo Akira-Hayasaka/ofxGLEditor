@@ -131,7 +131,7 @@ void ofxFileDialog::keyPressed(int key) {
 }
 
 //--------------------------------------------------------------
-void ofxFileDialog::setPath(string path) {
+void ofxFileDialog::setPath(std::string path) {
 
 	if(!ofDirectory::doesDirectoryExist(path)) {
 		ofLogWarning("ofxFileDialog") << "can't set path, " << path << " doesn't exist";
@@ -225,13 +225,13 @@ void ofxFileDialog::refresh() {
 }
 
 //--------------------------------------------------------------
-bool ofxFileDialog::openFile(string filename) {
+bool ofxFileDialog::openFile(std::string filename) {
 	ofLogWarning("ofxFileDialog") << "ignoring openFile";
 	return false;
 }
 
 //--------------------------------------------------------------
-bool ofxFileDialog::saveFile(string filename) {
+bool ofxFileDialog::saveFile(std::string filename) {
 	ofLogWarning("ofxFileDialog") << "ignoring saveFile";
 	return false;
 }
@@ -249,62 +249,62 @@ void ofxFileDialog::redo() {
 // STATIC UTILS
 
 //--------------------------------------------------------------
-void ofxFileDialog::setSaveAsText(const u32string &text) {
+void ofxFileDialog::setSaveAsText(const std::u32string &text) {
 	s_saveAsText = text;
 }
 
 //--------------------------------------------------------------
-void ofxFileDialog::setSaveAsText(const string &text) {
+void ofxFileDialog::setSaveAsText(const std::string &text) {
 	s_saveAsText = string_to_wstring(text);
 }
 
 //--------------------------------------------------------------
-u32string& ofxFileDialog::getWideSaveAsText() {
+std::u32string& ofxFileDialog::getWideSaveAsText() {
 	return s_saveAsText;
 }
 
 //--------------------------------------------------------------
-string ofxFileDialog::getSaveAsText() {
+std::string ofxFileDialog::getSaveAsText() {
 	return wstring_to_string(s_saveAsText);
 }
 
 //--------------------------------------------------------------
-void ofxFileDialog::setNewFolderText(const u32string &text) {
+void ofxFileDialog::setNewFolderText(const std::u32string &text) {
 	s_newFolderText = text;
 }
 
 //--------------------------------------------------------------
-void ofxFileDialog::setNewFolderText(const string &text) {
+void ofxFileDialog::setNewFolderText(const std::string &text) {
 	s_newFolderText = string_to_wstring(text);
 }
 
 //--------------------------------------------------------------
-u32string& ofxFileDialog::getWideNewFolderText() {
+std::u32string& ofxFileDialog::getWideNewFolderText() {
 	return s_newFolderText;
 }
 
 //--------------------------------------------------------------
-string ofxFileDialog::getNewFolderText() {
+std::string ofxFileDialog::getNewFolderText() {
 	return wstring_to_string(s_newFolderText);
 }
 
 //--------------------------------------------------------------
-void ofxFileDialog::setNewFolderButton(const u32string &text) {
+void ofxFileDialog::setNewFolderButton(const std::u32string &text) {
 	s_newFolderButtonText = text;
 }
 
 //--------------------------------------------------------------
-void ofxFileDialog::setNewFolderButton(const string &text) {
+void ofxFileDialog::setNewFolderButton(const std::string &text) {
 	s_newFolderButtonText = string_to_wstring(text);
 }
 
 //--------------------------------------------------------------
-u32string& ofxFileDialog::getWideNewFolderButton() {
+std::u32string& ofxFileDialog::getWideNewFolderButton() {
 	return s_newFolderButtonText;
 }
 
 //--------------------------------------------------------------
-string ofxFileDialog::getNewFolderButton() {
+std::string ofxFileDialog::getNewFolderButton() {
 	return wstring_to_string(s_newFolderButtonText);;
 }
 

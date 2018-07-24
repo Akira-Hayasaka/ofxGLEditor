@@ -44,7 +44,7 @@ ofxEditorFont::~ofxEditorFont() {
 }
 
 //--------------------------------------------------------------
-bool ofxEditorFont::load(string filename, int fontsize, int textureDimension) {
+bool ofxEditorFont::load(std::string filename, int fontsize, int textureDimension) {
 	
 	clear();
 	
@@ -102,24 +102,24 @@ float ofxEditorFont::characterWidth(int c) {
 }
 
 //--------------------------------------------------------------
-float ofxEditorFont::stringWidth(const string& s) {
+float ofxEditorFont::stringWidth(const std::string& s) {
 	return fonsTextBounds(context, 0, 0, s.c_str(), NULL, NULL);
 }
 
 //--------------------------------------------------------------
-float ofxEditorFont::stringWidth(const u32string& s) {
+float ofxEditorFont::stringWidth(const std::u32string& s) {
 	return stringWidth(wstring_to_string(s));
 }
 
 //--------------------------------------------------------------
-float ofxEditorFont::stringHeight(const string& s) {
+float ofxEditorFont::stringHeight(const std::string& s) {
 	float bounds[4] = {0, 0, 0, 0};
 	fonsTextBounds(context, 0, 0, s.c_str(), NULL, bounds);
 	return bounds[3] - bounds[1]; // maxy - miny
 }
 
 //--------------------------------------------------------------
-float ofxEditorFont::stringHeight(const u32string& s) {
+float ofxEditorFont::stringHeight(const std::u32string& s) {
 	return stringHeight(wstring_to_string(s));
 }
 
@@ -136,7 +136,7 @@ float ofxEditorFont::drawCharacter(int c, float x, float y, bool shadowed) {
 }
 
 //--------------------------------------------------------------
-float ofxEditorFont::drawString(const string& s, float x, float y, bool shadowed) {
+float ofxEditorFont::drawString(const std::string& s, float x, float y, bool shadowed) {
 	if(shadowed) {
 		fonsPushState(context);
 		fonsSetColor(context, textShadowColor);
@@ -147,7 +147,7 @@ float ofxEditorFont::drawString(const string& s, float x, float y, bool shadowed
 }
 
 //--------------------------------------------------------------
-float ofxEditorFont::drawString(const u32string& s, float x, float y, bool shadowed) {
+float ofxEditorFont::drawString(const std::u32string& s, float x, float y, bool shadowed) {
 	return drawString(wstring_to_string(s), x, y, shadowed);
 }
 

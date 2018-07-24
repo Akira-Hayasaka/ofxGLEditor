@@ -3,7 +3,7 @@ ofxGLEditor
 
 ![image](https://github.com/Akira-Hayasaka/ofxGLEditor/raw/master/doc/editor.png)
 
-Copyright © [Dan Wilcox](http://danomatika.com) & [Akira Hayasaka](http://www.ampontang.com) 2011-2015
+Copyright © [Dan Wilcox](http://danomatika.com) & [Akira Hayasaka](http://www.ampontang.com) 2011-2018
 
 GNU Public License v2.
 
@@ -44,11 +44,11 @@ To use ofxGLEditor, first you need to download and install OpenFrameworks. Devel
 
 [OF github repository](https://github.com/openframeworks/openFrameworks)
 
-On Mac OSX, you will need to install Xcode.
+On macOS, you will need to install Xcode.
 
-On Linux, you can use Makefiles and/or Codeblocks project files (without the "_win" suffix).
+On Linux, you can use Makefiles and/or Codeblocks project files (without the "\_win" suffix).
 
-On Win, you will need either Microsoft Visual Studio C++ or [Codeblocks+MiniGW](http://www.codeblocks.org/downloads/26) and the [Win Codeblocks OF package](http://www.openframeworks.cc/download). Use the Codeblocks projects files with the "_win" suffix.
+On Win, you will need either Microsoft Visual Studio C++ or [Codeblocks+MiniGW](http://www.codeblocks.org/downloads/26) and the [Win Codeblocks OF package](http://www.openframeworks.cc/download). Use the Codeblocks projects files with the "\_win" suffix.
 
 Installation
 ------------

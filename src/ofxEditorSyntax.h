@@ -29,7 +29,7 @@ class ofxEditorSyntax {
 	public:
 	
 		ofxEditorSyntax();
-		ofxEditorSyntax(const string& xmlFile); //< load from an xml file
+		ofxEditorSyntax(const std::string& xmlFile); //< load from an xml file
 		ofxEditorSyntax(const ofxEditorSyntax &from);
 		ofxEditorSyntax& operator=(const ofxEditorSyntax &from);
 		void copy(const ofxEditorSyntax &from); //< copy data from another object
@@ -91,7 +91,7 @@ class ofxEditorSyntax {
 		/// </syntax>
 		///
 		/// returns false on read or parse error
-		bool loadFile(const string& xmlFile);
+		bool loadFile(const std::string& xmlFile);
 	
 		/// clear everything to defaults
 		void clear();
@@ -99,27 +99,27 @@ class ofxEditorSyntax {
 	/// \section Meta
 	
 		/// set the language string for this syntax aka "GLSL", "Lua", etc
-		void setLang(const string &lang);
+		void setLang(const std::string &lang);
 	
 		/// get language string, returns "" if not set
-		const string& getLang();
+		const std::string& getLang();
 	
 		/// clear language string to ""
 		void clearLang();
 	
 		/// add file extension associated to this syntax
 		/// note: file extensions do not include the period, ex: "lua" not ".lua"
-		void addFileExt(const string &ext);
-		void addFileExt(const vector<string> &exts);
+		void addFileExt(const std::string &ext);
+		void addFileExt(const std::vector<std::string> &exts);
 	
 		/// is a given file extension associated with this syntax
-		bool hasFileExt(const string &ext);
+		bool hasFileExt(const std::string &ext);
 	
 		/// get file extensions
-		const set<string>& getFileExts();
+		const std::set<std::string>& getFileExts();
 	
 		/// clear language string for a file extension
-		void clearFileExt(const string &ext);
+		void clearFileExt(const std::string &ext);
 	
 		/// clear all file extension language strings
 		void clearAllFileExts();
@@ -128,39 +128,39 @@ class ofxEditorSyntax {
 
 		/// set the beginning string to match for a single line comment,
 		/// blank by default
-		void setSingleLineComment(const u32string &begin);
-		void setSingleLineComment(const string &begin);
-		const u32string& getWideSingleLineComment();
-		string getSingleLineComment();
+		void setSingleLineComment(const std::u32string &begin);
+		void setSingleLineComment(const std::string &begin);
+		const std::u32string& getWideSingleLineComment();
+		std::string getSingleLineComment();
 	
 		/// set the beginning and ending strings to match for a multi line comment,
 		/// blank by default
-		void setMultiLineComment(const u32string &begin, const u32string &end);
-		void setMultiLineComment(const string &begin, const string &end);
-		const u32string& getWideMultiLineCommentBegin();
-		string getMultiLineCommentBegin();
-		const u32string& getWideMultiLineCommentEnd();
-		string getMultiLineCommentEnd();
+		void setMultiLineComment(const std::u32string &begin, const std::u32string &end);
+		void setMultiLineComment(const std::string &begin, const std::string &end);
+		const std::u32string& getWideMultiLineCommentBegin();
+		std::string getMultiLineCommentBegin();
+		const std::u32string& getWideMultiLineCommentEnd();
+		std::string getMultiLineCommentEnd();
 	
 	/// \section String Literals
 	
 		/// set the beginning and ending strings to match for a multi line string literal,
 		/// blank by default
-		void setStringLiteral(const u32string &begin, const u32string &end);
-		void setStringLiteral(const string &begin, const string &end);
-		const u32string& getWideStringLiteralBegin();
-		string getStringLiteralBegin();
-		const u32string& getWideStringLiteralEnd();
-		string getStringLiteralEnd();
+		void setStringLiteral(const std::u32string &begin, const std::u32string &end);
+		void setStringLiteral(const std::string &begin, const std::string &end);
+		const std::u32string& getWideStringLiteralBegin();
+		std::string getStringLiteralBegin();
+		const std::u32string& getWideStringLiteralEnd();
+		std::string getStringLiteralEnd();
 	
 	/// \section Preprocessor
 	
 		/// preprocessor string which starts a preprocessor block until an endline
 		/// blank by default
-		void setPreprocessor(const u32string &begin);
-		void setPreprocessor(const string &begin);
-		const u32string& getWidePreprocessor();
-		string getPreprocessor();
+		void setPreprocessor(const std::u32string &begin);
+		void setPreprocessor(const std::string &begin);
+		const std::u32string& getWidePreprocessor();
+		std::string getPreprocessor();
 	
 	/// \section Words
 	
@@ -172,20 +172,20 @@ class ofxEditorSyntax {
 		};
 	
 		/// set type for a given word
-		void setWord(const u32string &word, WordType type);
-		void setWord(const string &word, WordType type);
+		void setWord(const std::u32string &word, WordType type);
+		void setWord(const std::string &word, WordType type);
 	
 		/// set type for a vector of words
-		void setWords(const vector<u32string> &words, WordType type);
-		void setWords(const vector<string> &words, WordType type);
+		void setWords(const std::vector<std::u32string> &words, WordType type);
+		void setWords(const std::vector<std::string> &words, WordType type);
 	
 		/// get type for word, returns PLAIN if not found
-		WordType getWordType(const u32string &word);
-		WordType getWordType(const string &word);
+		WordType getWordType(const std::u32string &word);
+		WordType getWordType(const std::string &word);
 	
 		/// clear type for word
-		void clearWord(const u32string &word);
-		void clearWord(const string &word);
+		void clearWord(const std::u32string &word);
+		void clearWord(const std::string &word);
 	
 		/// clear all words of a given type
 		void clearWordType(WordType type);
@@ -202,33 +202,33 @@ class ofxEditorSyntax {
 	
 		/// common math & comparison operator chars between highlighted text blocks when parsing
 		/// default: "=+-*/!|&^~", string should not be empty
-		void setOperatorChars(const u32string &chars);
-		void setOperatorChars(const string &chars);
-		const u32string& getWideOperatorChars();
-		string getOperatorChars();
+		void setOperatorChars(const std::u32string &chars);
+		void setOperatorChars(const std::string &chars);
+		const std::u32string& getWideOperatorChars();
+		std::string getOperatorChars();
 	
 		/// common punctuation chars between highlighted text blocks when parsing
 		/// default: ";:,?", string should not be empty
-		void setPunctuationChars(const u32string &chars);
-		void setPunctuationChars(const string &chars);
-		const u32string& getWidePunctuationChars();
-		string getPunctuationChars();
+		void setPunctuationChars(const std::u32string &chars);
+		void setPunctuationChars(const std::string &chars);
+		const std::u32string& getWidePunctuationChars();
+		std::string getPunctuationChars();
 	
 	protected:
 	
-		string lang; //< langauge string aka "GLSL", "Lua", etc
-		set<string> fileExts; //< associated file extensions (minus .)
+		std::string lang; //< langauge string aka "GLSL", "Lua", etc
+		std::set<std::string> fileExts; //< associated file extensions (minus .)
 	
-		u32string singleLineComment; //< single line comment begin
-		u32string multiLineCommentBegin; //< multi line comment begin
-		u32string multiLineCommentEnd; //< multi line comment end
+		std::u32string singleLineComment; //< single line comment begin
+		std::u32string multiLineCommentBegin; //< multi line comment begin
+		std::u32string multiLineCommentEnd; //< multi line comment end
 	
-		u32string stringLiteralBegin; //< multi line string literal begin
-		u32string stringLiteralEnd; //< multi line string literal end
+		std::u32string stringLiteralBegin; //< multi line string literal begin
+		std::u32string stringLiteralEnd; //< multi line string literal end
 	
-		u32string preprocessor; //< preprocessor begin
-		map<u32string,WordType> words; //< synatx types for specific words
+		std::u32string preprocessor; //< preprocessor begin
+		std::map<std::u32string,WordType> words; //< synatx types for specific words
 		bool hexLiteral; //< parse hex literals (0x123) as numbers?
-		u32string operatorChars; //< common operator chars
-		u32string punctuationChars; //< punctuation chars
+		std::u32string operatorChars; //< common operator chars
+		std::u32string punctuationChars; //< punctuation chars
 };

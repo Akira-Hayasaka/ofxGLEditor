@@ -31,45 +31,40 @@ ofxEditorColorScheme::ofxEditorColorScheme() {
 }
 
 //--------------------------------------------------------------
-ofxEditorColorScheme::ofxEditorColorScheme(const string& xmlFile) {
+ofxEditorColorScheme::ofxEditorColorScheme(const std::string& xmlFile) {
 	if(!loadFile(xmlFile)) {
 		clear();
 	}
 }
 
 //--------------------------------------------------------------
-bool ofxEditorColorScheme::loadFile(const string& xmlFile) {
-	string path = ofToDataPath(xmlFile);
+bool ofxEditorColorScheme::loadFile(const std::string& xmlFile) {
+	std::string path = ofToDataPath(xmlFile);
 	ofXml xml;
 	if(!xml.load(path)) {
 		ofLogError("ofxEditorColorScheme") << "couldn't load \""
 			<< ofFilePath::getFileName(xmlFile) << "\"";
 		return false;
 	}
-	xml.setToParent();
-	if(!xml.exists("colorscheme")) {
+	auto root = xml.getChild("colorscheme");
+	if(!root) {
 		ofLogWarning("ofxEditorColorScheme") << "root xml tag not \"colorscheme\", ignoring";
 		return false;
 	}
-	xml.setTo("colorscheme");
-	int numTags = xml.getNumChildren();
 	clear();
-	for(int i = 0; i < numTags; ++i) {
-		xml.setToChild(i);
-		if(xml.getName() == "text")    {setColorFromXml(xml, textColor);}
-		else if(xml.getName() == "string")  {setColorFromXml(xml, stringColor);}
-		else if(xml.getName() == "number")  {setColorFromXml(xml, numberColor);}
-		else if(xml.getName() == "comment") {setColorFromXml(xml, commentColor);}
-		else if(xml.getName() == "preprocessor") {setColorFromXml(xml, preprocessorColor);}
-		else if(xml.getName() == "keyword")  {setColorFromXml(xml, keywordColor);}
-		else if(xml.getName() == "typename") {setColorFromXml(xml, typenameColor);}
-		else if(xml.getName() == "function") {setColorFromXml(xml, functionColor);}
+	for(auto &child : root.getChildren()) {
+		if(child.getName() == "text")         {setColorFromXml(child, textColor);}
+		else if(child.getName() == "string")  {setColorFromXml(child, stringColor);}
+		else if(child.getName() == "number")  {setColorFromXml(child, numberColor);}
+		else if(child.getName() == "comment") {setColorFromXml(child, commentColor);}
+		else if(child.getName() == "preprocessor") {setColorFromXml(child, preprocessorColor);}
+		else if(child.getName() == "keyword")  {setColorFromXml(child, keywordColor);}
+		else if(child.getName() == "typename") {setColorFromXml(child, typenameColor);}
+		else if(child.getName() == "function") {setColorFromXml(child, functionColor);}
 		else {
-			ofLogWarning("ofxEditorColorScheme") << "ignoring unknown xml tag \"" << xml.getName() << "\"";
+			ofLogWarning("ofxEditorColorScheme") << "ignoring unknown xml tag \"" << child.getName() << "\"";
 		}
-		xml.setToParent();
 	}
-	xml.clear();
 	
 	return true;
 }
@@ -175,10 +170,16 @@ ofColor& ofxEditorColorScheme::getFunctionColor() {
 
 //--------------------------------------------------------------
 void ofxEditorColorScheme::setColorFromXml(ofXml &xml, ofColor &color) {
-	if(xml.exists("gray")) {color.set(xml.getIntValue("gray"));}
-	if(xml.exists("hex")) {color.setHex(ofHexToInt(xml.getValue("hex")));}
-	if(xml.exists("r")) {color.r = xml.getIntValue("r");}
-	if(xml.exists("g")) {color.g = xml.getIntValue("g");}
-	if(xml.exists("b")) {color.b = xml.getIntValue("b");}
-	if(xml.exists("a")) {color.a = xml.getIntValue("a");}
+	auto gray = xml.getChild("gray");
+	auto hex = xml.getChild("hex");
+	auto r = xml.getChild("r");
+	auto g = xml.getChild("g");
+	auto b = xml.getChild("b");
+	auto a = xml.getChild("a");
+	if(gray) {color.set(gray.getIntValue());}
+	if(hex) {color.setHex(ofHexToInt(hex.getValue()));}
+	if(r) {color.r = r.getIntValue();}
+	if(g) {color.g = g.getIntValue();}
+	if(b) {color.b = b.getIntValue();}
+	if(a) {color.a = a.getIntValue();}
 }
