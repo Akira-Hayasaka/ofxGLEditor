@@ -748,7 +748,7 @@ void ofxEditor::keyPressed(int key) {
 			case 'a': case 10: // clear all text
 				if(ofGetKeyPressed(OF_KEY_SHIFT)) {
 					if(s_undo) {
-						updateUndo(DELETE, 0, U"", m_text);
+						updateUndo(ACTION_DELETE, 0, U"", m_text);
 					}
 					clearText();
 				}
@@ -937,7 +937,7 @@ void ofxEditor::keyPressed(int key) {
 					}
 					else if(m_position < m_text.size()) {
 						if(s_undo) {
-							updateUndo(DELETE, m_position, U"", m_text.substr(m_position, 1));
+							updateUndo(ACTION_DELETE, m_position, U"", m_text.substr(m_position, 1));
 						}
 						m_text.erase(m_position, 1);
 					}
@@ -952,7 +952,7 @@ void ofxEditor::keyPressed(int key) {
 					}
 					else if(m_position > 0) {
 						if(s_undo) {
-							updateUndo(BACKSPACE, m_position-1, U"", m_text.substr(m_position-1, 1));
+							updateUndo(ACTION_BACKSPACE, m_position-1, U"", m_text.substr(m_position-1, 1));
 						}
 						m_text.erase(m_position-1, 1);
 						m_position--;
@@ -965,14 +965,14 @@ void ofxEditor::keyPressed(int key) {
 				if(m_settings->getConvertTabs()) {
 					m_text.insert(m_position, u32string(m_settings->getTabWidth(), ' '));
 					if(s_undo) {
-						updateUndo(INSERT, m_position, m_text.substr(m_position, m_settings->getTabWidth()), U"");
+						updateUndo(ACTION_INSERT, m_position, m_text.substr(m_position, m_settings->getTabWidth()), U"");
 					}
 					m_position += m_settings->getTabWidth();
 				}
 				else {
 					m_text.insert(m_position, U"\t");
 					if(s_undo) {
-						updateUndo(INSERT, m_position, m_text.substr(m_position, 1), U"");
+						updateUndo(ACTION_INSERT, m_position, m_text.substr(m_position, 1), U"");
 					}
 					m_position++;
 				}
@@ -1012,7 +1012,7 @@ void ofxEditor::keyPressed(int key) {
 				}
 				
 				if(m_selection != NONE) {
-					eraseSelection(OVERWRITE);
+					eraseSelection(ACTION_OVERWRITE);
 				}
 				
 				// ignore control chars
@@ -1029,7 +1029,7 @@ void ofxEditor::keyPressed(int key) {
 				}
 				m_text.insert(m_position, string_to_wstring(m_UTF8Char));
 				if(s_undo) {
-					updateUndo(INSERT, m_position, m_text.substr(m_position, 1), U"");
+					updateUndo(ACTION_INSERT, m_position, m_text.substr(m_position, 1), U"");
 				}
 				m_UTF8Char = "";
 				m_position++;
@@ -1529,14 +1529,14 @@ void ofxEditor::undo() {
 		UndoAction &a = m_undoActions[m_undoPos];
 		setCurrentPos(a.pos);
 		switch(a.type) {
-			case INSERT:
+			case ACTION_INSERT:
 				deleteText(a.insertText.size());
 				break;
-			case REPLACE: case OVERWRITE:
+			case ACTION_REPLACE: case ACTION_OVERWRITE:
 				deleteText(a.insertText.size());
 				insertText(a.deleteText);
 				break;
-			case DELETE: case BACKSPACE:
+			case ACTION_DELETE: case ACTION_BACKSPACE:
 				insertText(a.deleteText);
 				break;
 		}
@@ -1557,16 +1557,16 @@ void ofxEditor::redo() {
 		UndoAction &a = m_undoActions[m_undoPos];
 		setCurrentPos(a.pos);
 		switch(a.type) {
-			case INSERT:
+			case ACTION_INSERT:
 				insertText(a.insertText);
 				break;
-			case REPLACE: case OVERWRITE:
+			case ACTION_REPLACE: case ACTION_OVERWRITE:
 				deleteText(a.deleteText.size());
 				insertText(a.insertText);
 				break;
-			case DELETE:
+			case ACTION_DELETE:
 				deleteText(a.deleteText.size());
-			case BACKSPACE:
+			case ACTION_BACKSPACE:
 				deleteText(a.deleteText.size(), false);
 				break;
 		}
@@ -1665,25 +1665,25 @@ void ofxEditor::printUndo() {
 		cout << (i == m_undoPos ? "  * " : "    ");
 		UndoAction &a = m_undoActions[i];
 		switch(a.type) {
-			case INSERT:
+			case ACTION_INSERT:
 				cout << "INSERT " << a.pos << " \"" << wstring_to_string(a.insertText) << "\"" << endl;
 				break;
-			case REPLACE:
+			case ACTION_REPLACE:
 				cout << "REPLACE " << a.pos
 				     << " \"" << wstring_to_string(a.insertText) << "\""
 					 << " \"" << wstring_to_string(a.deleteText) << "\""
 					 << endl;
 				break;
-			case OVERWRITE:
+			case ACTION_OVERWRITE:
 				cout << "OVERWRITE " << a.pos
 				     << " \"" << wstring_to_string(a.insertText) << "\""
 					 << " \"" << wstring_to_string(a.deleteText) << "\""
 					 << endl;
 				break;
-			case DELETE:
+			case ACTION_DELETE:
 				cout << "DELETE " << a.pos << " \"" << wstring_to_string(a.deleteText) << "\"" << endl;
 				break;
-			case BACKSPACE:
+			case ACTION_BACKSPACE:
 				cout << "BACKSPACE " << a.pos << " \"" << wstring_to_string(a.deleteText) << "\"" << endl;
 				break;
 		}
@@ -1979,20 +1979,20 @@ void ofxEditor::pasteSelection() {
 		}
 		if(s_undo) {
 			if(m_selection != NONE) {
-				updateUndo(REPLACE, m_highlightStart, string_to_wstring((string)text), m_text.substr(m_highlightStart, m_highlightEnd-m_highlightStart));
+				updateUndo(ACTION_REPLACE, m_highlightStart, string_to_wstring((string)text), m_text.substr(m_highlightStart, m_highlightEnd-m_highlightStart));
 			}
 			else {
-				updateUndo(INSERT, m_position, string_to_wstring((string)text), U"");
+				updateUndo(ACTION_INSERT, m_position, string_to_wstring((string)text), U"");
 			}
 		}
 		insertText((std::string) text);
 	#else
 		if(s_undo) {
 			if(m_selection != NONE) {
-				updateUndo(REPLACE, m_highlightStart, s_copyBuffer, m_text.substr(m_highlightStart, m_highlightEnd-m_highlightStart));
+				updateUndo(ACTION_REPLACE, m_highlightStart, s_copyBuffer, m_text.substr(m_highlightStart, m_highlightEnd-m_highlightStart));
 			}
 			else {
-				updateUndo(INSERT, m_position, s_copyBuffer, L"");
+				updateUndo(ACTION_INSERT, m_position, s_copyBuffer, L"");
 			}
 		}
 		insertText(s_copyBuffer);
@@ -2114,7 +2114,9 @@ void ofxEditor::updateUndo(UndoActionType type, unsigned int pos, const u32strin
 	// add new entry if timeout reached, after a replace, or on new type ...
 	// .., except overwrites append insert text until timeout
 	if((ofGetElapsedTimeMillis() - action->timestamp > UNDO_TIMEOUT) ||
-		((action->type == REPLACE) || ((type != INSERT && action->type != OVERWRITE) && (action->type != type)))) {
+		((action->type == ACTION_REPLACE) ||
+		 ((type != ACTION_INSERT && action->type != ACTION_OVERWRITE) &&
+		 (action->type != type)))) {
 		UndoAction a;
 		a.type = type;
 		a.pos = pos;
@@ -2124,21 +2126,21 @@ void ofxEditor::updateUndo(UndoActionType type, unsigned int pos, const u32strin
 	}
 	
 	switch(type) {
-		case INSERT:
+		case ACTION_INSERT:
 			action->insertText += insertText;
 			break;
-		case REPLACE:
+		case ACTION_REPLACE:
 			action->insertText = insertText;
 			action->deleteText = deleteText;
 			break;
-		case OVERWRITE:
+		case ACTION_OVERWRITE:
 			action->insertText = insertText;
 			action->deleteText = deleteText;
 			break;
-		case DELETE:
+		case ACTION_DELETE:
 			action->deleteText += deleteText;
 			break;
-		case BACKSPACE:
+		case ACTION_BACKSPACE:
 			action->deleteText = deleteText + action->deleteText;
 			break;
 	}

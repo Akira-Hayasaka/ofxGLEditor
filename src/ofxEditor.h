@@ -451,11 +451,11 @@ class ofxEditor {
 	
 		/// undo action types
 		enum UndoActionType {
-			INSERT,       //< text inserted
-			REPLACE,      //< selection replaced via paste action
-			OVERWRITE,    //< selection replaced via key input
-			BACKSPACE,    //< text deleted to the left
-			DELETE        //< text deletetd to the right
+			ACTION_INSERT,    //< text inserted
+			ACTION_REPLACE,   //< selection replaced via paste action
+			ACTION_OVERWRITE, //< selection replaced via key input
+			ACTION_BACKSPACE, //< text deleted to the left
+			ACTION_DELETE     //< text deleted to the right
 		};
 	
 		/// undo action state
@@ -478,7 +478,7 @@ class ofxEditor {
 				}
 			
 				void clear() {
-					type = INSERT;
+					type = ACTION_INSERT;
 					insertText = U"";
 					deleteText = U"";
 					pos = 0;
@@ -552,7 +552,7 @@ class ofxEditor {
 		void pasteSelection();
 	
 		/// erase the current highlight selection, updates undo
-		void eraseSelection(UndoActionType type=DELETE);
+		void eraseSelection(UndoActionType type=ACTION_DELETE);
 	
 		/// update the animation timestamps
 		/// make sure to call this if you implement your own draw() function
