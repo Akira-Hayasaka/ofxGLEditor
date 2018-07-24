@@ -5,6 +5,9 @@
 	* updated for OF 0.10.0
 	* updated to latest fontstash
 
+	* fixed windows compile error due to DELETE enum name
+	  (reported by moebiussurfing)
+
 2015-12-02 Dan Wilcox <danomatika@gmail.com>
 
 	0.3.1
