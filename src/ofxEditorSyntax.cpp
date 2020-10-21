@@ -359,8 +359,7 @@ ofxEditorSyntax::WordType ofxEditorSyntax::getWordType(const std::u32string &wor
 
 //--------------------------------------------------------------
 ofxEditorSyntax::WordType ofxEditorSyntax::getWordType(const std::string &word) {
-    WordType temp = getWordType(string_to_wstring(word));
-    return temp;
+	return getWordType(string_to_wstring(word));
 }
 
 //--------------------------------------------------------------

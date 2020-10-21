@@ -190,7 +190,7 @@ ofxEditor::~ofxEditor() {
 //--------------------------------------------------------------
 bool ofxEditor::loadFont(const std::string &font, int size) {
 
-    bool loaded = false;
+	bool loaded = false;
 	
 	string path = ofToDataPath(font);
 	if(!ofFile::doesFileExist(path)) {
@@ -208,10 +208,10 @@ bool ofxEditor::loadFont(const std::string &font, int size) {
 		s_charHeight = s_font->stringHeight("#ITqg"); // catch tall chars & chars which may hang down
 		s_cursorWidth = MAX(floor(s_charWidth*0.3), 6);
 		s_autoFocusError = MAX(floor(s_charHeight*0.5), 16); // make sure the error space is proportional to the glyph size
-        loaded = true;
+		loaded = true;
 	}
 
-    return loaded;
+	return loaded;
 }
 
 //--------------------------------------------------------------
