@@ -1,3 +1,10 @@
+2020-10-21 Dan Wilcox <danomatika@gmail.com>
+
+    0.3.3
+
+    * fixed missing return values for ofxEditor::loadFont and
+      ofxEditorSyntax::getWordType (Emanuele Mazza)
+
 2018-07-24 Dan Wilcox <danomatika@gmail.com>
 
 	0.3.2
