@@ -24,7 +24,7 @@ Description
 Sample Lua syntax highlighting:  
 ![image](https://github.com/Akira-Hayasaka/ofxGLEditor/raw/master/doc/syntax_highlighting.png)
 
-ofxEditor provides a rewrite of the [Fluxus live coding environment](http://www.pawfal.org/fluxus)'s OpenGL-based text editor for OpenFrameworks including simple syntax highlighting, a file browser, and a Read-Eval-Print Loop console. The ofxGLEditor provides all of the above including 9 editor buffers, so it should be easy to use this as a basis for live coding, scripting, parameter tweaking, etc. Further, ofxEditorSyntax & ofxEditorColorScheme provide simple language specific syntax highlighting.
+ofxEditor provides a rewrite of the [Fluxus live coding environment](http://www.pawfal.org/fluxus)'s OpenGL-based text editor for openFrameworks including simple syntax highlighting, a file browser, and a Read-Eval-Print Loop console. The ofxGLEditor provides all of the above including 9 editor buffers, so it should be easy to use this as a basis for live coding, scripting, parameter tweaking, etc. Further, ofxEditorSyntax & ofxEditorColorScheme provide simple language specific syntax highlighting.
 
 [See a video of the livecodingExample which demonstrates the basic ofxEditor class with syntax highlighting using ofxLua.](https://vimeo.com/116370247)
 
@@ -40,7 +40,7 @@ Read-Eval-Print Loop console:
 Build Requirements
 ------------------
 
-To use ofxGLEditor, first you need to download and install OpenFrameworks. Development is against the latest version of OpenFrameworks on github. Checkout a tag if you need an earlier, stable version.
+To use ofxGLEditor, first you need to download and install openFrameworks. Development is against the latest version of openFrameworks on github. Checkout a tag if you need an earlier, stable version.
 
 [OF github repository](https://github.com/openframeworks/openFrameworks)
 
@@ -65,19 +65,19 @@ See the examples in `editorSyntaxExample`, `glEditorExample`, `glslExample`, `li
 
 ### Examples
 
-Project files for the examples are not included so you will need to generate the project files for your operating system and development environment using the OF ProjectGenerator which is included with the OpenFrameworks distribution.
+Project files for the examples are not included so you will need to generate the project files for your operating system and development environment using the OF ProjectGenerator which is included with the openFrameworks distribution.
 
 To (re)generate project files for an *existing* project:
 
-* click the "Import" button in the ProjectGenerator
-* navigate the to base folder for the project ie. "glEditorExample"
-* click the "Update" button
+* Click the "Import" button in the ProjectGenerator
+* Navigate to the base folder for the example project ie. "glEditorExample"
+* Click the "Update" button
 
 If everything went Ok, you should now be able to open the generated project and build/run the example.
 
 #### glslExample
 
-This is a simple GLSL fragment (pixel) shader editor including GLSL syntax highlighting. The shader is reloaded whenever it is saved or evaluated (MOD key + e).
+This is a simple GLSL fragment (pixel) shaders editor including GLSL syntax highlighting. The shader is reloaded whenever it is saved or evaluated (MOD key + e).
 
 #### liveCodingExample
 
