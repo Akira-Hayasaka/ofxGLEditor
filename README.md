@@ -70,7 +70,7 @@ Project files for the examples are not included so you will need to generate the
 To (re)generate project files for an *existing* project:
 
 * Click the "Import" button in the ProjectGenerator
-* Navigate to the base folder for the example project ie. "glEditorExample"
+* Navigate to the project's parent folder ie. "ofxGLEditor", select the base folder for the example project ie. "glEditorExample", and click the Open button
 * Click the "Update" button
 
 If everything went Ok, you should now be able to open the generated project and build/run the example.
