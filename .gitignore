@@ -35,6 +35,7 @@ editorSyntaxExample/bin/data/test2.txt
 editorSyntaxExample/config.make
 editorSyntaxExample/editorSyntaxExample.xcodeproj
 editorSyntaxExample/openFrameworks-Info.plist
+editorSyntaxExample/of.entitlements
 
 glEditorExample/Makefile
 glEditorExample/Project.xcconfig
@@ -42,6 +43,7 @@ glEditorExample/config.make
 glEditorExample/editorExample.xcodeproj
 glEditorExample/openFrameworks-Info.plist
 glEditorExample/glEditorExample.xcodeproj
+glEditorExample/of.entitlements
 
 glslExample/Makefile
 glslExample/Project.xcconfig
@@ -49,6 +51,7 @@ glslExample/config.make
 glslExample/livecodingExample.xcodeproj
 glslExample/openFrameworks-Info.plist
 glslExample/glslExample.xcodeproj
+glslExample/of.entitlements
 
 livecodingExample/Makefile
 livecodingExample/Project.xcconfig
@@ -56,3 +59,4 @@ livecodingExample/config.make
 livecodingExample/livecodingExample.xcodeproj
 livecodingExample/openFrameworks-Info.plist
 livecodingExample/livecodingExample.xcodeproj
+livecodingExample/of.entitlements
