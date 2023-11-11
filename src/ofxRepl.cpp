@@ -438,14 +438,6 @@ void ofxRepl::Logger::log(ofLogLevel level, const std::string & module, const st
 	}
 }
 
-//--------------------------------------------------------------
-void ofxRepl::Logger::log(ofLogLevel level, const std::string & module, const char* format, va_list args){
-	ofConsoleLoggerChannel::log(level, module, format, args);
-	if(level >= ofGetLogLevel()) {
-		m_parent->print(string_to_wstring(ofVAArgsToString(format, args))+U"\n", true);
-	}
-}
-
 // OTHER UTIL
 
 //--------------------------------------------------------------

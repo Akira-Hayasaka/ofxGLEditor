@@ -135,7 +135,6 @@ class ofxRepl : public ofxEditor {
 		public:
 			ofxRepl *m_parent;
 			void log(ofLogLevel level, const std::string & module, const std::string & message);
-			void log(ofLogLevel level, const std::string & module, const char* format, va_list args);
 		};
 		std::shared_ptr<Logger> m_logger;
 };
