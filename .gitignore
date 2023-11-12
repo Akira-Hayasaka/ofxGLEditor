@@ -12,13 +12,6 @@ build
 # OSX
 *.DS_*
 
-# codeblocks
-*.depend
-*.layout
-example-input/obj
-example-output/obj
-*.cbTemp
-
 # Win
 *.exe
 *.dll

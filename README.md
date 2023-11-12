@@ -3,7 +3,7 @@ ofxGLEditor
 
 ![image](https://github.com/Akira-Hayasaka/ofxGLEditor/raw/master/doc/editor.png)
 
-Copyright © [Dan Wilcox](http://danomatika.com) & [Akira Hayasaka](http://www.ampontang.com) 2011-2018
+Copyright © [Dan Wilcox](http://danomatika.com) & [Akira Hayasaka](http://www.ampontang.com) 2011-2023
 
 GNU Public License v2.
 
@@ -40,23 +40,23 @@ Read-Eval-Print Loop console:
 Build Requirements
 ------------------
 
-To use ofxGLEditor, first you need to download and install openFrameworks. Development is against the latest version of openFrameworks on github. Checkout a tag if you need an earlier, stable version.
+To use ofxGLEditor, first you need to download and install openFrameworks. Development is against the latest version of openFrameworks on Github. Checkout a tag if you need an earlier, stable version.
 
-[OF github repository](https://github.com/openframeworks/openFrameworks)
+[OF Github repository](https://github.com/openframeworks/openFrameworks)
 
 On macOS, you will need to install Xcode.
 
-On Linux, you can use Makefiles and/or Codeblocks project files (without the "\_win" suffix).
+On Linux, you can use Makefiles and/or QT Creator project files.
 
-On Win, you will need either Microsoft Visual Studio C++ or [Codeblocks+MiniGW](http://www.codeblocks.org/downloads/26) and the [Win Codeblocks OF package](http://www.openframeworks.cc/download). Use the Codeblocks projects files with the "\_win" suffix.
+On Win, you will need either Microsoft Visual Studio C++ or [Msys2](https://www.msys2.org/).
 
 Installation
 ------------
 
 Place ofxGLEditor within a folder in the addons folder of the OF dir tree:
-<pre>
+~~~
 openframeworks/addons/ofxGLEditor
-</pre>
+~~~
 
 Usage
 -----
@@ -91,4 +91,4 @@ A growing set of language syntax xml files can be found in the `syntaxes` folder
 
 Both monospaced and variable width fonts are supported. PrintChar21.ttf is included with the example projects. Unicode glyphs are supported if your font has them.
 
-Most *real* text editors load multiple fonts to support different language character sets. ofxGLEditor is *simple*, so it only loads 1 font at a time and you'll need to use an expanded character set font for multiple languages. Another option is to load a specifc font for a specific language or locale in your app. Giant full character set fonts do exist (eg. [Unifont](http://www.unifoundry.com/unifont.html])), but they are generally too large to be useful as they may take a lagre amount of resources. Your mileage may vary.
+Most *real* text editors load multiple fonts to support different language character sets. ofxGLEditor is *simple*, so it only loads 1 font at a time and you'll need to use an expanded character set font for multiple languages. Another option is to load a specific font for a specific language or locale in your app. Giant full character set fonts do exist (eg. [Unifont](http://www.unifoundry.com/unifont.html])), but they are generally too large to be useful as they may take a large amount of resources. Your mileage may vary.

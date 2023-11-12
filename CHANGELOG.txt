@@ -1,3 +1,10 @@
+2023-11-12 Dan Wilcox <danomatika@gmail.com>
+
+		0.3.4
+
+		* updated for OF 0.12.0
+		* updated to latest stb_truetype.h
+
 2020-10-21 Dan Wilcox <danomatika@gmail.com>
 
     0.3.3
