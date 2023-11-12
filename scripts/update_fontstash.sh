@@ -1,13 +1,11 @@
-#! /bin/bash
-
-WD=$(dirname $0)
+#! /bin/sh
 
 SRC=fontstash
 DEST=../libs/fontstash
 
 ###
 
-cd $WD
+cd $(dirname $0)
 
 # get latest source
 git clone https://github.com/memononen/fontstash.git
